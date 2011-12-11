@@ -1,0 +1,5 @@
+-cp ../../
+-cp star_control
+
+-js js/Game.js
+-main StarControl
