@@ -41,6 +41,19 @@ class RendererComponentManager extends ComponentManager
 		renderLayerManager.display();
 	}
 
+	public function getImageFromPath(path:String):ImageSource
+	{
+		// append a uniqueish phrase so that name clashes with renderer identify's are improbable
+		var pathIdentifier:String = "filePath:" + path;
+
+		if (this.cachedBitmaps.exists(pathIdentifier))
+			return this.cachedBitmaps.get(pathIdentifier);
+
+		var imageSource:ImageSource = new ImageSource(path);
+		this.cachedBitmaps.set(pathIdentifier, imageSource);
+		return imageSource;
+	}
+
 	override public function destroy():Void
 	{
 		// destroy my children
