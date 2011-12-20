@@ -4,11 +4,11 @@ import js.Dom;
 
 class CachedBitmaps
 {
-	private var cachedBitmaps:TrieDict<ImageSource>;
+	private var cachedBitmaps:Hash<ImageSource>;
 
 	public function new()
 	{
-		this.cachedBitmaps = new TrieDict();
+		this.cachedBitmaps = new Hash();
 	}
 
 	public function exists(identifier:String):Bool
@@ -39,11 +39,9 @@ class CachedBitmaps
 
 	public function destroy():Void
 	{
-		var images:Array<ImageSource> = cachedBitmaps.getValues();
-		for (image in images)
+		for (image in cachedBitmaps)
 			image.destroy();
 
-		this.cachedBitmaps.destroy();
 		this.cachedBitmaps = null;
 	}
 }

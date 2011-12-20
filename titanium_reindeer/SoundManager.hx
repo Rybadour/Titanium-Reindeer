@@ -52,14 +52,14 @@ class SoundManager
 	private var soundChannels:Array<Dynamic>;
 	private var lastChannelUsed:Int;
 
-	private var cachedSounds:TrieDict<SoundSource>;
+	private var cachedSounds:Hash<SoundSource>;
 
 	public function new()
 	{
 		this.soundChannels = new Array();
 		this.lastChannelUsed = -1;
 
-		this.cachedSounds = new TrieDict();
+		this.cachedSounds = new Hash();
 
 		this.maxSoundChannels = 32;
 		this.globalVolume = 1;
