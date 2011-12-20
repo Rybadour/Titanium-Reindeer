@@ -3215,6 +3215,13 @@ titanium_reindeer.RendererComponentManager.prototype.postUpdate = function(msTim
 	}
 	this.renderLayerManager.display();
 }
+titanium_reindeer.RendererComponentManager.prototype.getImageFromPath = function(path) {
+	var pathIdentifier = "filePath:" + path;
+	if(this.cachedBitmaps.exists(pathIdentifier)) return this.cachedBitmaps.get(pathIdentifier);
+	var imageSource = new titanium_reindeer.ImageSource(path);
+	this.cachedBitmaps.set(pathIdentifier,imageSource);
+	return imageSource;
+}
 titanium_reindeer.RendererComponentManager.prototype.destroy = function() {
 	titanium_reindeer.ComponentManager.prototype.destroy.call(this);
 	this.renderLayerManager.destroy();
@@ -3662,6 +3669,18 @@ Type.enumIndex = function(e) {
 	return e[1];
 }
 Type.prototype.__class__ = Type;
+titanium_reindeer.ColorStop = function(color,offset) {
+	if( color === $_ ) return;
+	this.color = color;
+	this.offset = offset;
+}
+titanium_reindeer.ColorStop.__name__ = ["titanium_reindeer","ColorStop"];
+titanium_reindeer.ColorStop.prototype.color = null;
+titanium_reindeer.ColorStop.prototype.offset = null;
+titanium_reindeer.ColorStop.prototype.identify = function() {
+	return "ColorStop(" + this.color.identify() + "," + this.offset + ");";
+}
+titanium_reindeer.ColorStop.prototype.__class__ = titanium_reindeer.ColorStop;
 titanium_reindeer.LineRenderer = function(endPoint,layer) {
 	if( endPoint === $_ ) return;
 	titanium_reindeer.StrokeFillRenderer.call(this,0,0,layer);
@@ -3726,18 +3745,6 @@ titanium_reindeer.LineRenderer.prototype.render = function() {
 	}
 }
 titanium_reindeer.LineRenderer.prototype.__class__ = titanium_reindeer.LineRenderer;
-titanium_reindeer.ColorStop = function(color,offset) {
-	if( color === $_ ) return;
-	this.color = color;
-	this.offset = offset;
-}
-titanium_reindeer.ColorStop.__name__ = ["titanium_reindeer","ColorStop"];
-titanium_reindeer.ColorStop.prototype.color = null;
-titanium_reindeer.ColorStop.prototype.offset = null;
-titanium_reindeer.ColorStop.prototype.identify = function() {
-	return "ColorStop(" + this.color.identify() + "," + this.offset + ");";
-}
-titanium_reindeer.ColorStop.prototype.__class__ = titanium_reindeer.ColorStop;
 if(typeof js=='undefined') js = {}
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -5454,7 +5461,7 @@ titanium_reindeer.WatchedVector2.prototype.destroy = function() {
 titanium_reindeer.WatchedVector2.prototype.__class__ = titanium_reindeer.WatchedVector2;
 titanium_reindeer.CachedBitmaps = function(p) {
 	if( p === $_ ) return;
-	this.cachedBitmaps = new titanium_reindeer.TrieDict();
+	this.cachedBitmaps = new Hash();
 }
 titanium_reindeer.CachedBitmaps.__name__ = ["titanium_reindeer","CachedBitmaps"];
 titanium_reindeer.CachedBitmaps.prototype.cachedBitmaps = null;
@@ -5475,14 +5482,11 @@ titanium_reindeer.CachedBitmaps.prototype.remove = function(identifier) {
 	return this.cachedBitmaps.remove(identifier);
 }
 titanium_reindeer.CachedBitmaps.prototype.destroy = function() {
-	var images = this.cachedBitmaps.getValues();
-	var _g = 0;
-	while(_g < images.length) {
-		var image = images[_g];
-		++_g;
+	var $it0 = this.cachedBitmaps.iterator();
+	while( $it0.hasNext() ) {
+		var image = $it0.next();
 		image.destroy();
 	}
-	this.cachedBitmaps.destroy();
 	this.cachedBitmaps = null;
 }
 titanium_reindeer.CachedBitmaps.prototype.__class__ = titanium_reindeer.CachedBitmaps;
@@ -5999,7 +6003,7 @@ titanium_reindeer.SoundManager = function(p) {
 	if( p === $_ ) return;
 	this.soundChannels = new Array();
 	this.lastChannelUsed = -1;
-	this.cachedSounds = new titanium_reindeer.TrieDict();
+	this.cachedSounds = new Hash();
 	this.setMaxSoundChannels(32);
 	this.setGlobalVolume(1);
 	this.setIsMuted(false);
@@ -6206,106 +6210,6 @@ titanium_reindeer.MovementComponent.prototype.destroy = function() {
 	this.setVelocity(null);
 }
 titanium_reindeer.MovementComponent.prototype.__class__ = titanium_reindeer.MovementComponent;
-titanium_reindeer.TrieNode = function(p) {
-	if( p === $_ ) return;
-	this.children = new IntHash();
-}
-titanium_reindeer.TrieNode.__name__ = ["titanium_reindeer","TrieNode"];
-titanium_reindeer.TrieNode.prototype.prefix = null;
-titanium_reindeer.TrieNode.prototype.value = null;
-titanium_reindeer.TrieNode.prototype.setValue = function(value) {
-	this.value = value;
-	this.isSet = true;
-	return value;
-}
-titanium_reindeer.TrieNode.prototype.isSet = null;
-titanium_reindeer.TrieNode.prototype.children = null;
-titanium_reindeer.TrieNode.prototype.unSet = function() {
-	this.setValue(null);
-	this.isSet = false;
-}
-titanium_reindeer.TrieNode.prototype.__class__ = titanium_reindeer.TrieNode;
-titanium_reindeer.TrieDict = function(p) {
-	if( p === $_ ) return;
-	this.root = new titanium_reindeer.TrieNode();
-}
-titanium_reindeer.TrieDict.__name__ = ["titanium_reindeer","TrieDict"];
-titanium_reindeer.TrieDict.prototype.root = null;
-titanium_reindeer.TrieDict.prototype.set = function(key,value) {
-	var node = this.root;
-	var _g1 = 0, _g = key.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		if(node.children.get(key.charCodeAt(i)) == null) node.children.set(key.charCodeAt(i),new titanium_reindeer.TrieNode());
-		node = node.children.get(key.charCodeAt(i));
-	}
-	node.setValue(value);
-}
-titanium_reindeer.TrieDict.prototype.exists = function(key) {
-	var node = this.root;
-	var _g1 = 0, _g = key.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		if(node.children.get(key.charCodeAt(i)) == null) return false;
-		node = node.children.get(key.charCodeAt(i));
-	}
-	return node.isSet;
-}
-titanium_reindeer.TrieDict.prototype.get = function(key) {
-	var node = this.root;
-	var _g1 = 0, _g = key.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		if(node.children.get(key.charCodeAt(i)) == null) return null;
-		node = node.children.get(key.charCodeAt(i));
-	}
-	return node.isSet?node.value:null;
-}
-titanium_reindeer.TrieDict.prototype.remove = function(key) {
-	var node = this.root;
-	var _g1 = 0, _g = key.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		if(node.children.get(key.charCodeAt(i)) == null) return false;
-		node = node.children.get(key.charCodeAt(i));
-	}
-	if(node.isSet) {
-		node.unSet();
-		return true;
-	}
-	return false;
-}
-titanium_reindeer.TrieDict.prototype.getValues = function() {
-	var values = this.getValuesRecursive(this.root);
-	if(this.root.value != null) values.push(this.root.value);
-	return values;
-}
-titanium_reindeer.TrieDict.prototype.getValuesRecursive = function(node) {
-	var values = new Array();
-	if(node.children != null) {
-		var $it0 = node.children.iterator();
-		while( $it0.hasNext() ) {
-			var child = $it0.next();
-			if(child.value != null) values.push(child.value);
-			values = values.concat(this.getValuesRecursive(child));
-		}
-	}
-	return values;
-}
-titanium_reindeer.TrieDict.prototype.destroy = function() {
-	this.recursiveNodeDestroy(this.root);
-	this.root = null;
-}
-titanium_reindeer.TrieDict.prototype.recursiveNodeDestroy = function(node) {
-	var $it0 = node.children.keys();
-	while( $it0.hasNext() ) {
-		var childChar = $it0.next();
-		this.recursiveNodeDestroy(node.children.get(childChar));
-		node.children.remove(childChar);
-	}
-	node.children = null;
-}
-titanium_reindeer.TrieDict.prototype.__class__ = titanium_reindeer.TrieDict;
 star_control.UiBar = function(pos) {
 	if( pos === $_ ) return;
 	titanium_reindeer.GameObject.call(this);

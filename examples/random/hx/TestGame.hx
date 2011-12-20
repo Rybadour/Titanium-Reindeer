@@ -12,7 +12,6 @@ import titanium_reindeer.ImageRenderer;
 import titanium_reindeer.ImageSource;
 import titanium_reindeer.Rect;
 import titanium_reindeer.Circle;
-import titanium_reindeer.TrieDict;
 import titanium_reindeer.UnsaturateEffect;
 import titanium_reindeer.PixelatedEffect;
 import titanium_reindeer.TextRenderer;
