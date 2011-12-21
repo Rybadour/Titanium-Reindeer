@@ -37,6 +37,12 @@ titanium_reindeer.ManagedObject.prototype.destroy = function() {
 }
 titanium_reindeer.ManagedObject.prototype.finalDestroy = function() {
 	this.manager = null;
+	var _g1 = 0, _g = this.registeredManagerSetEvents.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		this.registeredManagerSetEvents.splice(0,1);
+	}
+	this.registeredManagerSetEvents = null;
 }
 titanium_reindeer.ManagedObject.prototype.__class__ = titanium_reindeer.ManagedObject;
 titanium_reindeer.GameObject = function(p) {
@@ -345,6 +351,7 @@ titanium_reindeer.MouseRegionManager.prototype.collisionManager = null;
 titanium_reindeer.MouseRegionManager.prototype.layerToPairsMap = null;
 titanium_reindeer.MouseRegionManager.prototype.getHandler = function(component) {
 	if(component == null) return null;
+	if(component.id == null) return null;
 	var handler;
 	var pairs;
 	if(this.layerToPairsMap.exists(component.layerName)) {
@@ -1634,6 +1641,10 @@ titanium_reindeer.Color.getBlackConst = function() {
 titanium_reindeer.Color.Grey = null;
 titanium_reindeer.Color.getGreyConst = function() {
 	return new titanium_reindeer.Color(128,128,128);
+}
+titanium_reindeer.Color.Clear = null;
+titanium_reindeer.Color.getClearConst = function() {
+	return new titanium_reindeer.Color(0,0,0,0);
 }
 titanium_reindeer.Color.prototype.red = null;
 titanium_reindeer.Color.prototype.green = null;
