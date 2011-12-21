@@ -138,6 +138,20 @@ titanium_reindeer.GameObject.prototype.removeComponents = function() {
 		}
 	}
 }
+titanium_reindeer.GameObject.prototype.flushAndDestroyComponents = function() {
+	if(this.components != null) {
+		var $it0 = this.components.iterator();
+		while( $it0.hasNext() ) {
+			var component = $it0.next();
+			component.destroy();
+		}
+		var $it1 = this.components.keys();
+		while( $it1.hasNext() ) {
+			var i = $it1.next();
+			this.components.remove(i);
+		}
+	}
+}
 titanium_reindeer.GameObject.prototype.finalDestroy = function() {
 	titanium_reindeer.ManagedObject.prototype.finalDestroy.call(this);
 	if(this.componentsToRemove != null) {
@@ -2969,6 +2983,9 @@ titanium_reindeer.Geometry.isCircleIntersectingRect = function(c,r) {
 	if(circleDistX <= rWidthHalf || circleDistY <= rHeightHalf) return true;
 	var cornerDistance = (circleDistX - rWidthHalf) * (circleDistX - rWidthHalf) + (circleDistY - rHeightHalf) * (circleDistY - rHeightHalf);
 	return cornerDistance <= c.radius * c.radius;
+}
+titanium_reindeer.Geometry.getMidPoint = function(a,b) {
+	return b.add(a.subtract(b).getExtend(0.5));
 }
 titanium_reindeer.Geometry.isAngleWithin = function(start,target,bounds) {
 	if(bounds >= Math.PI) return true;

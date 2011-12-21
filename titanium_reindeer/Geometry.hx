@@ -38,6 +38,11 @@ class Geometry
 		return cornerDistance <= (c.radius*c.radius);
 	}
 
+	public static function getMidPoint(a:Vector2, b:Vector2):Vector2
+	{
+		return b.add( a.subtract(b).getExtend(0.5) );
+	}
+
 	public static function isAngleWithin(start:Float, target:Float, bounds:Float):Bool
 	{
 		if (bounds >= Math.PI)
