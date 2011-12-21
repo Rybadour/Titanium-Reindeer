@@ -42,6 +42,13 @@ class MouseRegionManager
 		if (component == null)
 			return null;
 
+		// It is impossible to gaurentee that each component will get one and only one unique handler
+		// So we have to turn down the request for a handler until it's initialized
+		if (component.id == null)
+		{
+			return null;
+		}
+
 		var handler:MouseRegionHandler;
 		var pairs:IntHash<ComponentHandlerPair>;
 		if (this.layerToPairsMap.exists(component.layerName))

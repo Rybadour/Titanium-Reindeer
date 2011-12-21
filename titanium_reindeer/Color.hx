@@ -24,6 +24,9 @@ class Color
 	public static var Grey(getGreyConst, never):Color;
 	public static function getGreyConst():Color { return new Color(128, 128, 128); }
 
+	public static var Clear(getClearConst, never):Color;
+	public static function getClearConst():Color { return new Color(0, 0, 0, 0); }
+
 
 	public var red:Int;
 	public var green:Int;

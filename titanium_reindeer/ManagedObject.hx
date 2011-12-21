@@ -60,5 +60,11 @@ class ManagedObject
 	public function finalDestroy():Void
 	{
 		this.manager = null;
+
+		for (i in 0...this.registeredManagerSetEvents.length)
+		{
+			this.registeredManagerSetEvents.splice(0, 1);
+		}
+		this.registeredManagerSetEvents = null;
 	}
 }
