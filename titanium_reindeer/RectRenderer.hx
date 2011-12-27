@@ -1,6 +1,6 @@
 package titanium_reindeer;
 
-class RectangleRenderer extends StrokeFillRenderer
+class RectRenderer extends StrokeFillRenderer
 {
 	public var width(default, setWidth):Float;
 	private function setWidth(value:Float):Float
