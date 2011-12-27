@@ -212,7 +212,7 @@ CirclePlayer = function(game,leftKey,rightKey,upKey,color) {
 	this.radius = 20;
 	this.jumpSpeed = 50;
 	this.color = color;
-	var circ = new titanium_reindeer.RectangleRenderer(this.radius * 2,this.radius * 2,1);
+	var circ = new titanium_reindeer.RectRenderer(this.radius * 2,this.radius * 2,1);
 	circ.setAlpha(0.6);
 	circ.setFill(color);
 	circ.setLineWidth(2);
@@ -1885,7 +1885,7 @@ TestGame = function(p) {
 	this.circle2.friend = this.circle;
 	this.bottomEdge = new titanium_reindeer.GameObject();
 	this.bottomEdge.setPosition(new titanium_reindeer.Vector2(this.width / 2,this.height - this.getGroundHeight() / 2));
-	var rect = new titanium_reindeer.RectangleRenderer(this.width,this.getGroundHeight(),2);
+	var rect = new titanium_reindeer.RectRenderer(this.width,this.getGroundHeight(),2);
 	rect.setFill(new titanium_reindeer.Color(0,100,100));
 	rect.setStrokeColor(titanium_reindeer.Color.getGreyConst());
 	rect.setLineWidth(10);
@@ -2015,7 +2015,7 @@ TestGame.prototype.mouseDown = function(mousePos) {
 	((function($this) {
 		var $r;
 		var $t = $this.bottomEdge.getComponent("mainRect");
-		if(Std["is"]($t,titanium_reindeer.RectangleRenderer)) $t; else throw "Class cast error";
+		if(Std["is"]($t,titanium_reindeer.RectRenderer)) $t; else throw "Class cast error";
 		$r = $t;
 		return $r;
 	}(this))).setFill(new titanium_reindeer.Color(200,100,100));
@@ -2034,7 +2034,7 @@ TestGame.prototype.mouseUp = function(mousePos) {
 	((function($this) {
 		var $r;
 		var $t = $this.bottomEdge.getComponent("mainRect");
-		if(Std["is"]($t,titanium_reindeer.RectangleRenderer)) $t; else throw "Class cast error";
+		if(Std["is"]($t,titanium_reindeer.RectRenderer)) $t; else throw "Class cast error";
 		$r = $t;
 		return $r;
 	}(this))).setFill(new titanium_reindeer.Color(0,100,100));
@@ -2047,7 +2047,7 @@ TestGame.prototype.updateGround = function() {
 	((function($this) {
 		var $r;
 		var $t = $this.bottomEdge.getComponent("mainRect");
-		if(Std["is"]($t,titanium_reindeer.RectangleRenderer)) $t; else throw "Class cast error";
+		if(Std["is"]($t,titanium_reindeer.RectRenderer)) $t; else throw "Class cast error";
 		$r = $t;
 		return $r;
 	}(this))).setHeight(this.getGroundHeight());
@@ -2606,38 +2606,6 @@ titanium_reindeer.Utility.browserHasWebWorkers = function() {
 	return r;
 }
 titanium_reindeer.Utility.prototype.__class__ = titanium_reindeer.Utility;
-titanium_reindeer.RectangleRenderer = function(width,height,layer) {
-	if( width === $_ ) return;
-	titanium_reindeer.StrokeFillRenderer.call(this,width,height,layer);
-	this.setWidth(width);
-	this.setHeight(height);
-}
-titanium_reindeer.RectangleRenderer.__name__ = ["titanium_reindeer","RectangleRenderer"];
-titanium_reindeer.RectangleRenderer.__super__ = titanium_reindeer.StrokeFillRenderer;
-for(var k in titanium_reindeer.StrokeFillRenderer.prototype ) titanium_reindeer.RectangleRenderer.prototype[k] = titanium_reindeer.StrokeFillRenderer.prototype[k];
-titanium_reindeer.RectangleRenderer.prototype.width = null;
-titanium_reindeer.RectangleRenderer.prototype.setWidth = function(value) {
-	this.setInitialWidth(value);
-	this.width = value;
-	return value;
-}
-titanium_reindeer.RectangleRenderer.prototype.height = null;
-titanium_reindeer.RectangleRenderer.prototype.setHeight = function(value) {
-	this.setInitialHeight(value);
-	this.height = value;
-	return value;
-}
-titanium_reindeer.RectangleRenderer.prototype.render = function() {
-	titanium_reindeer.StrokeFillRenderer.prototype.render.call(this);
-	var x = -this.width / 2;
-	var y = -this.height / 2;
-	this.getPen().fillRect(x,y,this.width,this.height);
-	if(this.lineWidth > 0) this.getPen().strokeRect(x + this.lineWidth / 2,y + this.lineWidth / 2,this.width - this.lineWidth,this.height - this.lineWidth);
-}
-titanium_reindeer.RectangleRenderer.prototype.identify = function() {
-	return titanium_reindeer.StrokeFillRenderer.prototype.identify.call(this) + "Rect();";
-}
-titanium_reindeer.RectangleRenderer.prototype.__class__ = titanium_reindeer.RectangleRenderer;
 titanium_reindeer.RenderLayer = function(layerManager,id,targetElement,width,height,clearColor) {
 	if( layerManager === $_ ) return;
 	this.layerManager = layerManager;
@@ -3734,6 +3702,38 @@ Type.enumIndex = function(e) {
 	return e[1];
 }
 Type.prototype.__class__ = Type;
+titanium_reindeer.RectRenderer = function(width,height,layer) {
+	if( width === $_ ) return;
+	titanium_reindeer.StrokeFillRenderer.call(this,width,height,layer);
+	this.setWidth(width);
+	this.setHeight(height);
+}
+titanium_reindeer.RectRenderer.__name__ = ["titanium_reindeer","RectRenderer"];
+titanium_reindeer.RectRenderer.__super__ = titanium_reindeer.StrokeFillRenderer;
+for(var k in titanium_reindeer.StrokeFillRenderer.prototype ) titanium_reindeer.RectRenderer.prototype[k] = titanium_reindeer.StrokeFillRenderer.prototype[k];
+titanium_reindeer.RectRenderer.prototype.width = null;
+titanium_reindeer.RectRenderer.prototype.setWidth = function(value) {
+	this.setInitialWidth(value);
+	this.width = value;
+	return value;
+}
+titanium_reindeer.RectRenderer.prototype.height = null;
+titanium_reindeer.RectRenderer.prototype.setHeight = function(value) {
+	this.setInitialHeight(value);
+	this.height = value;
+	return value;
+}
+titanium_reindeer.RectRenderer.prototype.render = function() {
+	titanium_reindeer.StrokeFillRenderer.prototype.render.call(this);
+	var x = -this.width / 2;
+	var y = -this.height / 2;
+	this.getPen().fillRect(x,y,this.width,this.height);
+	if(this.lineWidth > 0) this.getPen().strokeRect(x + this.lineWidth / 2,y + this.lineWidth / 2,this.width - this.lineWidth,this.height - this.lineWidth);
+}
+titanium_reindeer.RectRenderer.prototype.identify = function() {
+	return titanium_reindeer.StrokeFillRenderer.prototype.identify.call(this) + "Rect();";
+}
+titanium_reindeer.RectRenderer.prototype.__class__ = titanium_reindeer.RectRenderer;
 if(typeof js=='undefined') js = {}
 js.Boot = function() { }
 js.Boot.__name__ = ["js","Boot"];
@@ -5993,14 +5993,6 @@ titanium_reindeer.CollisionLayer.prototype.destroy = function() {
 	this.manager = null;
 }
 titanium_reindeer.CollisionLayer.prototype.__class__ = titanium_reindeer.CollisionLayer;
-titanium_reindeer.CollisionRectangle = function(width,height,layer,group) {
-	if( width === $_ ) return;
-	titanium_reindeer.CollisionComponent.call(this,width,height,layer,group);
-}
-titanium_reindeer.CollisionRectangle.__name__ = ["titanium_reindeer","CollisionRectangle"];
-titanium_reindeer.CollisionRectangle.__super__ = titanium_reindeer.CollisionComponent;
-for(var k in titanium_reindeer.CollisionComponent.prototype ) titanium_reindeer.CollisionRectangle.prototype[k] = titanium_reindeer.CollisionComponent.prototype[k];
-titanium_reindeer.CollisionRectangle.prototype.__class__ = titanium_reindeer.CollisionRectangle;
 titanium_reindeer.SoundManager = function(p) {
 	if( p === $_ ) return;
 	this.soundChannels = new Array();

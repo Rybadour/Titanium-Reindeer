@@ -3,10 +3,9 @@ import titanium_reindeer.Game;
 import titanium_reindeer.GameObject;
 import titanium_reindeer.Color;
 import titanium_reindeer.MovementComponent;
-import titanium_reindeer.RectangleRenderer;
+import titanium_reindeer.RectRenderer;
 import titanium_reindeer.CircleRenderer;
 import titanium_reindeer.Vector2;
-import titanium_reindeer.CollisionRectangle;
 import titanium_reindeer.RendererComponent;
 import titanium_reindeer.InputManager;
 import titanium_reindeer.Shadow;
@@ -40,7 +39,7 @@ class CirclePlayer extends MovableObject
 
 		this.color = color;
 
-		var circ:RectangleRenderer = new RectangleRenderer(this.radius*2, this.radius*2, 1);
+		var circ:RectRenderer = new RectRenderer(this.radius*2, this.radius*2, 1);
 		circ.alpha = 0.6;
 		circ.fillColor = color;
 		circ.lineWidth = 2;

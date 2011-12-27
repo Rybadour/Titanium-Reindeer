@@ -1,6 +1,6 @@
 import titanium_reindeer.Rect;
 import titanium_reindeer.Color;
-import titanium_reindeer.RectangleRenderer;
+import titanium_reindeer.RectRenderer;
 
 class RectIntersection extends RectObj
 {
@@ -24,8 +24,8 @@ class RectIntersection extends RectObj
 			this.position.x = middle.x + middle.width/2;
 			this.position.y = middle.y + middle.height/2;
 
-			cast(this.getComponent("mainRect"), RectangleRenderer).width = middle.width;
-			cast(this.getComponent("mainRect"), RectangleRenderer).height = middle.height;
+			cast(this.getComponent("mainRect"), RectRenderer).width = middle.width;
+			cast(this.getComponent("mainRect"), RectRenderer).height = middle.height;
 		}
 	}
 }

@@ -2466,38 +2466,6 @@ star_control.FighterBullet.__name__ = ["star_control","FighterBullet"];
 star_control.FighterBullet.__super__ = star_control.Projectile;
 for(var k in star_control.Projectile.prototype ) star_control.FighterBullet.prototype[k] = star_control.Projectile.prototype[k];
 star_control.FighterBullet.prototype.__class__ = star_control.FighterBullet;
-titanium_reindeer.RectangleRenderer = function(width,height,layer) {
-	if( width === $_ ) return;
-	titanium_reindeer.StrokeFillRenderer.call(this,width,height,layer);
-	this.setWidth(width);
-	this.setHeight(height);
-}
-titanium_reindeer.RectangleRenderer.__name__ = ["titanium_reindeer","RectangleRenderer"];
-titanium_reindeer.RectangleRenderer.__super__ = titanium_reindeer.StrokeFillRenderer;
-for(var k in titanium_reindeer.StrokeFillRenderer.prototype ) titanium_reindeer.RectangleRenderer.prototype[k] = titanium_reindeer.StrokeFillRenderer.prototype[k];
-titanium_reindeer.RectangleRenderer.prototype.width = null;
-titanium_reindeer.RectangleRenderer.prototype.setWidth = function(value) {
-	this.setInitialWidth(value);
-	this.width = value;
-	return value;
-}
-titanium_reindeer.RectangleRenderer.prototype.height = null;
-titanium_reindeer.RectangleRenderer.prototype.setHeight = function(value) {
-	this.setInitialHeight(value);
-	this.height = value;
-	return value;
-}
-titanium_reindeer.RectangleRenderer.prototype.render = function() {
-	titanium_reindeer.StrokeFillRenderer.prototype.render.call(this);
-	var x = -this.width / 2;
-	var y = -this.height / 2;
-	this.getPen().fillRect(x,y,this.width,this.height);
-	if(this.lineWidth > 0) this.getPen().strokeRect(x + this.lineWidth / 2,y + this.lineWidth / 2,this.width - this.lineWidth,this.height - this.lineWidth);
-}
-titanium_reindeer.RectangleRenderer.prototype.identify = function() {
-	return titanium_reindeer.StrokeFillRenderer.prototype.identify.call(this) + "Rect();";
-}
-titanium_reindeer.RectangleRenderer.prototype.__class__ = titanium_reindeer.RectangleRenderer;
 titanium_reindeer.RenderLayer = function(layerManager,id,targetElement,width,height,clearColor) {
 	if( layerManager === $_ ) return;
 	this.layerManager = layerManager;
@@ -2830,7 +2798,7 @@ titanium_reindeer.Shadow.prototype.__class__ = titanium_reindeer.Shadow;
 star_control.ShipUi = function(p) {
 	if( p === $_ ) return;
 	titanium_reindeer.GameObject.call(this);
-	this.background = new titanium_reindeer.RectangleRenderer(72,86,4);
+	this.background = new titanium_reindeer.RectRenderer(72,86,4);
 	this.background.setFill(titanium_reindeer.Color.getGreyConst());
 	this.background.setStrokeColor(titanium_reindeer.Color.getBlackConst());
 	this.background.setLineWidth(2);
@@ -2855,7 +2823,7 @@ star_control.ShipUi.prototype.initialize = function(maxHealth,maxAmmo) {
 	var _g1 = 0, _g = this.maxHealth;
 	while(_g1 < _g) {
 		var i = _g1++;
-		var healthBar = new titanium_reindeer.RectangleRenderer(12,6,5);
+		var healthBar = new titanium_reindeer.RectRenderer(12,6,5);
 		healthBar.setFill(new titanium_reindeer.Color(34,255,51));
 		healthBar.setStrokeColor(titanium_reindeer.Color.getBlackConst());
 		healthBar.setLineWidth(2);
@@ -2871,7 +2839,7 @@ star_control.ShipUi.prototype.initialize = function(maxHealth,maxAmmo) {
 	var _g1 = 0, _g = this.maxAmmo;
 	while(_g1 < _g) {
 		var i = _g1++;
-		var ammoBar = new titanium_reindeer.RectangleRenderer(12,6,5);
+		var ammoBar = new titanium_reindeer.RectRenderer(12,6,5);
 		ammoBar.setFill(new titanium_reindeer.Color(255,0,17));
 		ammoBar.setStrokeColor(titanium_reindeer.Color.getBlackConst());
 		ammoBar.setLineWidth(2);
@@ -3472,7 +3440,7 @@ titanium_reindeer.ImageSource.prototype.destroy = function() {
 titanium_reindeer.ImageSource.prototype.__class__ = titanium_reindeer.ImageSource;
 star_control.ArtilleryShell = function(owner) {
 	if( owner === $_ ) return;
-	var sprite = new titanium_reindeer.RectangleRenderer(18,10,2);
+	var sprite = new titanium_reindeer.RectRenderer(18,10,2);
 	var colorStops = new Array();
 	colorStops.push(new titanium_reindeer.ColorStop(new titanium_reindeer.Color(255,127,0),0));
 	colorStops.push(new titanium_reindeer.ColorStop(new titanium_reindeer.Color(255,204,153),0.5));
@@ -3709,6 +3677,38 @@ titanium_reindeer.ColorStop.prototype.identify = function() {
 	return "ColorStop(" + this.color.identify() + "," + this.offset + ");";
 }
 titanium_reindeer.ColorStop.prototype.__class__ = titanium_reindeer.ColorStop;
+titanium_reindeer.RectRenderer = function(width,height,layer) {
+	if( width === $_ ) return;
+	titanium_reindeer.StrokeFillRenderer.call(this,width,height,layer);
+	this.setWidth(width);
+	this.setHeight(height);
+}
+titanium_reindeer.RectRenderer.__name__ = ["titanium_reindeer","RectRenderer"];
+titanium_reindeer.RectRenderer.__super__ = titanium_reindeer.StrokeFillRenderer;
+for(var k in titanium_reindeer.StrokeFillRenderer.prototype ) titanium_reindeer.RectRenderer.prototype[k] = titanium_reindeer.StrokeFillRenderer.prototype[k];
+titanium_reindeer.RectRenderer.prototype.width = null;
+titanium_reindeer.RectRenderer.prototype.setWidth = function(value) {
+	this.setInitialWidth(value);
+	this.width = value;
+	return value;
+}
+titanium_reindeer.RectRenderer.prototype.height = null;
+titanium_reindeer.RectRenderer.prototype.setHeight = function(value) {
+	this.setInitialHeight(value);
+	this.height = value;
+	return value;
+}
+titanium_reindeer.RectRenderer.prototype.render = function() {
+	titanium_reindeer.StrokeFillRenderer.prototype.render.call(this);
+	var x = -this.width / 2;
+	var y = -this.height / 2;
+	this.getPen().fillRect(x,y,this.width,this.height);
+	if(this.lineWidth > 0) this.getPen().strokeRect(x + this.lineWidth / 2,y + this.lineWidth / 2,this.width - this.lineWidth,this.height - this.lineWidth);
+}
+titanium_reindeer.RectRenderer.prototype.identify = function() {
+	return titanium_reindeer.StrokeFillRenderer.prototype.identify.call(this) + "Rect();";
+}
+titanium_reindeer.RectRenderer.prototype.__class__ = titanium_reindeer.RectRenderer;
 titanium_reindeer.LineRenderer = function(endPoint,layer) {
 	if( endPoint === $_ ) return;
 	titanium_reindeer.StrokeFillRenderer.call(this,0,0,layer);
@@ -6242,7 +6242,7 @@ star_control.UiBar = function(pos) {
 	if( pos === $_ ) return;
 	titanium_reindeer.GameObject.call(this);
 	this.setPosition(pos.add(new titanium_reindeer.Vector2(100 / 2,600 / 2)));
-	this.background = new titanium_reindeer.RectangleRenderer(100,600,3);
+	this.background = new titanium_reindeer.RectRenderer(100,600,3);
 	this.background.setFill(titanium_reindeer.Color.getGreyConst());
 	this.background.setStrokeColor(titanium_reindeer.Color.getBlackConst());
 	this.background.setLineWidth(2);

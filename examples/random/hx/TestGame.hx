@@ -1,11 +1,10 @@
 import titanium_reindeer.Game;
 import titanium_reindeer.GameObject;
 import titanium_reindeer.MovementComponent;
-import titanium_reindeer.RectangleRenderer;
+import titanium_reindeer.RectRenderer;
 import titanium_reindeer.CircleRenderer;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.Color;
-import titanium_reindeer.CollisionRectangle;
 import titanium_reindeer.RendererComponent;
 import titanium_reindeer.InputManager;
 import titanium_reindeer.ImageRenderer;
@@ -116,7 +115,7 @@ class TestGame extends Game
 
 		bottomEdge = new GameObject();
 		bottomEdge.position = new Vector2(this.width/2, this.height - this.groundHeight/2);
-			var rect:RectangleRenderer = new RectangleRenderer(this.width, this.groundHeight, 2);
+			var rect:RectRenderer = new RectRenderer(this.width, this.groundHeight, 2);
 			rect.fillColor = new Color(0, 100, 100);
 			rect.strokeColor = Color.Grey;
 			rect.lineWidth = 10;
@@ -213,7 +212,7 @@ class TestGame extends Game
 
 	private function mouseDown(mousePos:Vector2):Void
 	{
-		cast(bottomEdge.getComponent("mainRect"), RectangleRenderer).fillColor = new Color(200, 100, 100);
+		cast(bottomEdge.getComponent("mainRect"), RectRenderer).fillColor = new Color(200, 100, 100);
 
 		this.lastDrag = mousePos;
 	}
@@ -234,7 +233,7 @@ class TestGame extends Game
 		groundY += mousePos.y - this.lastDrag.y;
 		this.updateGround();
 
-		cast(bottomEdge.getComponent("mainRect"), RectangleRenderer).fillColor = new Color(0, 100, 100);
+		cast(bottomEdge.getComponent("mainRect"), RectRenderer).fillColor = new Color(0, 100, 100);
 	}
 
 	private function mouseWheel(ticks:Int):Void
@@ -245,7 +244,7 @@ class TestGame extends Game
 
 	private function updateGround():Void
 	{
-		cast(bottomEdge.getComponent("mainRect"), RectangleRenderer).height = this.groundHeight;
+		cast(bottomEdge.getComponent("mainRect"), RectRenderer).height = this.groundHeight;
 		bottomEdge.position.y = this.height - this.groundHeight/2;
 	}
 

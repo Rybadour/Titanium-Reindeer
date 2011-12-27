@@ -1,7 +1,7 @@
 package star_control;
 
 import titanium_reindeer.GameObject;
-import titanium_reindeer.RectangleRenderer;
+import titanium_reindeer.RectRenderer;
 import titanium_reindeer.ImageRenderer;
 import titanium_reindeer.TextRenderer;
 import titanium_reindeer.Vector2;
@@ -15,7 +15,7 @@ class ShipChooseUi extends GameObject
 	public static inline var HEIGHT = 200;
 
 	private var title:TextRenderer;
-	private var background:RectangleRenderer;
+	private var background:RectRenderer;
 	private var shipIcons:Array<ImageRenderer>;
 
 	private var game:StarControlGame;

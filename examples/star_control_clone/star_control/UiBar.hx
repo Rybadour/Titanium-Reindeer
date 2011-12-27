@@ -1,7 +1,7 @@
 package star_control;
 
 import titanium_reindeer.GameObject;
-import titanium_reindeer.RectangleRenderer;
+import titanium_reindeer.RectRenderer;
 import titanium_reindeer.TextRenderer;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.Color;
@@ -13,7 +13,7 @@ class UiBar extends GameObject
 	public static inline var WIDTH = 100;
 	public static inline var HEIGHT = StarControlGame.FIELD_SIZE;
 
-	private var background:RectangleRenderer;
+	private var background:RectRenderer;
 	private var p1Title:TextRenderer;
 	private var p2Title:TextRenderer;
 
@@ -31,7 +31,7 @@ class UiBar extends GameObject
 
 		this.position = pos.add( new Vector2(WIDTH/2, HEIGHT/2) );
 
-		this.background = new RectangleRenderer(WIDTH, HEIGHT, Layers.UI_A);
+		this.background = new RectRenderer(WIDTH, HEIGHT, Layers.UI_A);
 		this.background.fillColor = Color.Grey;
 		this.background.strokeColor = Color.Black;
 		this.background.lineWidth = 2;

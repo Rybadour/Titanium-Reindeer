@@ -1,7 +1,7 @@
 import titanium_reindeer.Rect;
 import titanium_reindeer.GameObject;
 import titanium_reindeer.Color;
-import titanium_reindeer.RectangleRenderer;
+import titanium_reindeer.RectRenderer;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.CollisionRect;
 import titanium_reindeer.CollisionComponent;
@@ -14,12 +14,12 @@ class RectObj extends GameObject
 	public var bounds(getBounds, never):Rect;
 	private function getBounds():Rect
 	{
-		var rect:RectangleRenderer = cast(this.getComponent("mainRect"), RectangleRenderer);
+		var rect:RectRenderer = cast(this.getComponent("mainRect"), RectRenderer);
 		rect.rotation = Math.PI/4;
 		return new Rect(position.x - rect.width/2, position.y - rect.height/2, rect.width, rect.height);
 	}
 
-	private var renderer:RectangleRenderer;
+	private var renderer:RectRenderer;
 	private var collisionRect:CollisionRect;
 
 	private var mouseHandler:MouseRegionHandler;
@@ -30,7 +30,7 @@ class RectObj extends GameObject
 
 		this.position = new Vector2(bounds.x + bounds.width/2, bounds.y + bounds.height/2);
 
-		this.renderer = new RectangleRenderer(bounds.width, bounds.height, 3);
+		this.renderer = new RectRenderer(bounds.width, bounds.height, 3);
 		this.renderer.alpha = 0.3;
 		this.renderer.fillColor = color;
 		this.addComponent("mainRect", renderer);
