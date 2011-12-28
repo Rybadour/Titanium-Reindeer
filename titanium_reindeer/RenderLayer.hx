@@ -46,6 +46,31 @@ class RenderLayer
 		return this.renderComposition;
 	}
 
+	public var visible(default, setVisible):Bool;
+	private function setVisible(value:Bool):Bool
+	{
+		if (value != this.visible)
+		{
+			this.visible = value;
+
+			if (this.visible)
+				this.redrawBackground = true;
+		}
+
+		return this.visible;
+	}
+
+	public var alpha(default, setAlpha):Float;
+	private function setAlpha(value:Float):Float
+	{
+		if (value != this.alpha && value >= 0 && value <= 1)
+		{
+			this.alpha = value;
+		}
+
+		return this.alpha;
+	}
+
 	private var width:Int;
 	private var height:Int;
 
@@ -95,6 +120,8 @@ class RenderLayer
 		this.height = height;
 		this.clearColor = clearColor;
 		this.renderComposition = Composition.SourceOver;
+		this.visible = true;
+		this.alpha = 1;
 		this.watchedOffset = new WatchedVector2(0, 0, offsetChanged);
 
 		this.renderers = new IntHash();
@@ -296,7 +323,15 @@ class RenderLayer
 	// TODO: Consider doing renderOffset magic here
 	public function display(screenPen:Dynamic):Void
 	{
-		screenPen.drawImage(this.canvas, 0, 0);
+		if (this.visible && this.alpha > 0)
+		{
+			screenPen.save();
+
+			screenPen.globalAlpha = this.alpha;
+			screenPen.drawImage(this.canvas, 0, 0);
+
+			screenPen.restore();
+		}
 
 		this.redrawBackground = false;
 	}
