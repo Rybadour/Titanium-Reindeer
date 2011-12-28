@@ -97,7 +97,7 @@ class MouseRegionHandler
 		if (colliding)
 		{
 			// Mouse Up events
-			for (func in this.registeredMouseDownEvents)
+			for (func in this.registeredMouseUpEvents)
 			{
 				func(mousePos, button);
 			}
