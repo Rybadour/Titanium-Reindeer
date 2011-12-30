@@ -26,13 +26,13 @@ class ImageRenderer extends RendererComponent
 
 	public function new(image:ImageSource, layer:Int, sourceRect:Rect = null, width:Float = 0, height:Float = 0)
 	{
-		this.image = image;
-		this.sourceRect = sourceRect;
+		super(0, 0, layer);
 
+		this.sourceRect = sourceRect;
 		this.destWidth = width;
 		this.destHeight = height;
 
-		super(0, 0, layer);
+		this.image = image;
 	}
 
 	override public function render():Void
@@ -40,9 +40,14 @@ class ImageRenderer extends RendererComponent
 		super.render();
 
 		if (this.image.isLoaded)
+		{
+			var x:Int = 2;
 			pen.drawImage(this.image.image, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height, -this.destWidth/2, -this.destHeight/2, this.destWidth, this.destHeight);
+		}
 		else
+		{
 			this.setRedraw(true);
+		}
 	}
 
 	private function imageLoaded(event:Event):Void
