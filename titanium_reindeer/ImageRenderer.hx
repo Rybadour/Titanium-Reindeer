@@ -89,7 +89,6 @@ class ImageRenderer extends RendererComponent
 	{
 		super.destroy();
 
-		image.destroy();
-		image = null;
+		this.image = null;
 	}
 }
