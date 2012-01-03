@@ -51,17 +51,29 @@ class RectButton extends Button
 	private override function enable():Void
 	{
 		super.enable();
+
+		if (this.shownRect != null)
+		{
+			var normalColor:Color = this.shownRect.fillColor;
+			normalColor.red = Math.round(normalColor.red * 2.5);
+			normalColor.green = Math.round(normalColor.green * 2.5);
+			normalColor.blue = Math.round(normalColor.blue * 2.5);
+			this.shownRect.fillColor = normalColor;
+		}
 	}
 
 	private override function disable():Void
 	{
 		super.disable();
 
-		var disableColor:Color = this.shownRect.fillColor;
-		disableColor.red = Math.round(disableColor.red * 0.4);
-		disableColor.green = Math.round(disableColor.green * 0.4);
-		disableColor.blue = Math.round(disableColor.blue * 0.4);
-		this.shownRect.fillColor = disableColor;
+		if (this.shownRect != null)
+		{
+			var disableColor:Color = this.shownRect.fillColor;
+			disableColor.red = Math.round(disableColor.red * 0.4);
+			disableColor.green = Math.round(disableColor.green * 0.4);
+			disableColor.blue = Math.round(disableColor.blue * 0.4);
+			this.shownRect.fillColor = disableColor;
+		}
 	}
 
 	private override function mouseOverStart():Void

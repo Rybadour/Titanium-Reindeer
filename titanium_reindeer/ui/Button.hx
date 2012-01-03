@@ -42,10 +42,10 @@ class Button extends GameObject
 		{
 			this.enabled = value;
 
-			if (!this.enabled)
-			{
+			if (this.enabled)
+				this.enable();
+			else
 				this.disable();
-			}
 		}
 
 		return this.enabled;
