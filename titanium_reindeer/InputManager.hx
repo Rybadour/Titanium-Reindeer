@@ -5,6 +5,9 @@ import titanium_reindeer.Enums;
 
 class InputManager
 {
+	public static inline var DEFAULT_OFFSET_RECALC_DELAY_MS:Int		= 1000;
+
+
 	private var mouseButtonsRegistered:IntHash<IntHash<Array<Vector2 -> Void>>>; // Array<(mousePos) -> Void>
 		private var downMouseButtonsRegistered(getDownMouseButtonsRegistered, null):IntHash<Array<Vector2 -> Void>>;
 		private function getDownMouseButtonsRegistered():IntHash<Array<Vector2 -> Void>>
@@ -40,6 +43,8 @@ class InputManager
 	private var heldKeys:IntHash<Key>;
 
 	private var targetElement:HtmlDom;
+	private var targetDocumentOffset:Vector2;
+	private var timeLeftToRecalculateOffsetMs:Int;
 
 	public function new(targetElement:HtmlDom)
 	{
@@ -61,6 +66,9 @@ class InputManager
 		this.heldKeys = new IntHash();
 
 		this.targetElement = targetElement;
+		this.recalculateCanvasOffset();
+
+		this.timeLeftToRecalculateOffsetMs = InputManager.DEFAULT_OFFSET_RECALC_DELAY_MS;
 
 		untyped
 		{
@@ -88,12 +96,7 @@ class InputManager
 	private function mouseDown(event:Dynamic):Bool
 	{
 		var anyEventCalled:Bool = false;
-		var mousePos:Vector2;
-		if (event.offsetX)
-			mousePos = new Vector2(event.offsetX, event.offsetY);
-		else
-			mousePos = new Vector2(event.layerX, event.layerY);
-
+		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
 		var mouseButton:MouseButton = getMouseButtonFromButton(event.button);
 
 		mouseButtonsHeld.set(Type.enumIndex(mouseButton), mouseButton);
@@ -102,7 +105,7 @@ class InputManager
 		{
 			if (cb != null)
 			{
-				cb(mousePos, mouseButton, MouseButtonState.Down);
+				cb(mousePos.getCopy(), mouseButton, MouseButtonState.Down);
 				anyEventCalled = true;
 			}
 		}
@@ -114,7 +117,7 @@ class InputManager
 			{
 				if (cb != null)
 				{
-					cb(mousePos);
+					cb(mousePos.getCopy());
 					anyEventCalled = true;
 				}
 			}
@@ -126,12 +129,7 @@ class InputManager
 	private function mouseUp(event:Dynamic):Bool
 	{
 		var anyEventCalled:Bool = false;
-		var mousePos:Vector2;
-		if (event.offsetX)
-			mousePos = new Vector2(event.offsetX, event.offsetY);
-		else
-			mousePos = new Vector2(event.layerX, event.layerY);
-
+		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
 		var mouseButton:MouseButton = getMouseButtonFromButton(event.button);
 
 		mouseButtonsHeld.remove(Type.enumIndex(mouseButton));
@@ -140,7 +138,7 @@ class InputManager
 		{
 			if (cb != null)
 			{
-				cb(mousePos, mouseButton, MouseButtonState.Up);
+				cb(mousePos.getCopy(), mouseButton, MouseButtonState.Up);
 				anyEventCalled = true;
 			}
 		}
@@ -152,7 +150,7 @@ class InputManager
 			{
 				if (cb != null)
 				{
-					cb(mousePos);
+					cb(mousePos.getCopy());
 					anyEventCalled = true;
 				}
 			}
@@ -163,19 +161,15 @@ class InputManager
 
 	private function mouseMove(event:Dynamic):Bool
 	{
-		var mousePos:Vector2;
-		if (event.offsetX)
-			mousePos = new Vector2(event.offsetX, event.offsetY);
-		else
-			mousePos = new Vector2(event.layerX, event.layerY);
+		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
 
 		for (cb in this.mousePositionChangesRegistered)
 		{
 			if (cb != null)
-				cb(mousePos);
+				cb(mousePos.getCopy());
 		}
 
-		this.lastMousePos = mousePos.getCopy();
+		this.lastMousePos = mousePos;
 
 		return this.mousePositionChangesRegistered.length == 0; // Return false if the developer is using mouse move at all
 	}
@@ -268,7 +262,7 @@ class InputManager
 		Usual Framework type Functions
 		------------------------------------------------
 	*/
-	public function update():Void
+	public function update(msTimeStep:Int):Void
 	{
 		for (key in heldKeys)
 		{
@@ -293,6 +287,13 @@ class InputManager
 						cb(this.lastMousePos);
 				}
 			}
+		}
+
+		this.timeLeftToRecalculateOffsetMs -= msTimeStep;
+		if (this.timeLeftToRecalculateOffsetMs <= 0)
+		{
+			this.timeLeftToRecalculateOffsetMs = InputManager.DEFAULT_OFFSET_RECALC_DELAY_MS;
+			this.recalculateCanvasOffset();
 		}
 	}
 
@@ -515,10 +516,51 @@ class InputManager
 		return heldKeys.exists(Type.enumIndex(key));
 	}
 
+	public function recalculateCanvasOffset():Void
+	{
+		var offset:Vector2 = new Vector2(0, 0);
+
+		if (this.targetElement != null && this.targetElement.offsetParent != null)
+		{
+			var ele:HtmlDom = this.targetElement;
+			do
+			{
+				offset.x += ele.offsetLeft;
+				offset.y += ele.offsetTop;
+				ele = ele.offsetParent;
+			}
+			while (ele != null);
+		}
+
+		this.targetDocumentOffset = offset;
+	}
+
 	/*
 		Key and Button Mapping functions	
 		------------------------------------------
 	*/
+	private function getMousePositionFromEvent(event:Dynamic):Vector2
+	{
+		if (event == null)
+			return new Vector2(0, 0);
+
+		var mousePos:Vector2;
+		if (event.pageX || event.pageY)
+			 mousePos = new Vector2(event.pageX, event.pageY);
+
+		else if (event.clientX || event.clientY)
+			untyped
+			{
+				mousePos = new Vector2( event.clientX + js.Lib.document.body.scrollLeft + js.Lib.document.documentElement.scrollLeft,
+										event.clientY + js.Lib.document.body.scrollTop + js.Lib.document.documentElement.scrollTop);
+			}
+
+		else
+			return new Vector2(0, 0);
+
+		return mousePos.subtract(this.targetDocumentOffset);
+	}
+
 	private function getMouseButtonFromButton(which:Int):MouseButton
 	{
 		var mouseButton:MouseButton;

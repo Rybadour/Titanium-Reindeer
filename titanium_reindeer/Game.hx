@@ -87,7 +87,7 @@ class Game
 
 			// Game Logic
 			gameObjectManager.update(msTimeStep);
-			inputManager.update();
+			inputManager.update(msTimeStep);
 
 			// Request a game loop tick from the browser
 			requestAnimFrame();
