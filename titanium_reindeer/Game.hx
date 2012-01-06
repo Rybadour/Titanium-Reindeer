@@ -5,6 +5,9 @@ import js.Dom;
 
 class Game
 {
+	public static inline var DEFAULT_UPDATES_TIME_MS:Int 	= Math.round(1000/60); // 60 fps
+
+
 	public var targetElement(default, null):HtmlDom;
 	public var width:Int;
 	public var height:Int;
@@ -13,6 +16,16 @@ class Game
 	public var backgroundColor:Color;
 
 	public var debugMode:Bool;
+	public var maxAllowedUpdateLengthMs(default, setMaxAllowedUpdateLengthMs):Int;
+	private function setMaxAllowedUpdateLengthMs(value:Int):Int
+	{
+		if (value != this.maxAllowedUpdateLengthMs)
+		{
+			this.maxAllowedUpdateLengthMs = Std.int(Math.max(1, Math.min(value, Math.POSITIVE_INFINITY)));
+		}
+
+		return this.maxAllowedUpdateLengthMs;
+	}
 
 	private var exitGame:Bool;
 	private var msLastTimeStep:Int;
@@ -37,6 +50,7 @@ class Game
 		this.backgroundColor = backgroundColor == null ? new Color(255, 255, 255) : backgroundColor;
 
 		this.debugMode = debugMode == null ? false : debugMode;
+		this.maxAllowedUpdateLengthMs = 1000; // 1 fps
 
 		this.exitGame = false;
 
@@ -75,11 +89,11 @@ class Game
 			var msTimeStep:Int;
 			if (now == null)
 			{
-				msTimeStep = Math.round(1000/60);
+				msTimeStep = Game.DEFAULT_UPDATES_TIME_MS;
 			}
 			else
 			{
-				msTimeStep = now - this.msLastTimeStep;
+				msTimeStep = Std.int(Math.min(now - this.msLastTimeStep, this.maxAllowedUpdateLengthMs));
 			}
 			this.msLastTimeStep = now;
 
@@ -117,7 +131,7 @@ class Game
 				js.Lib.window.msRequestAnimationFrame(gameLoop, this.targetElement);
 
 			else
-				js.Lib.window.setTimeout(gameLoop, 1000 / 60);
+				js.Lib.window.setTimeout(gameLoop, Game.DEFAULT_UPDATES_TIME_MS);
 		}
 	}
 
