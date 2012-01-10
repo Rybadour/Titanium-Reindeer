@@ -9,7 +9,7 @@ class CircleRenderer extends StrokeFillRenderer
 		{
 			this.radius = value;
 			this.initialDrawnWidth = value*2;
-			this.initialDrawnWidth = value*2;
+			this.initialDrawnHeight = value*2;
 		}
 
 		return this.radius;
