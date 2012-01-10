@@ -5,17 +5,25 @@ class RectRenderer extends StrokeFillRenderer
 	public var width(default, setWidth):Float;
 	private function setWidth(value:Float):Float
 	{
-		this.initialDrawnWidth = value;
-		this.width = value;
-		return value;
+		if (this.width != value)
+		{
+			this.initialDrawnWidth = value;
+			this.width = value;
+		}
+
+		return this.width;
 	}
 
 	public var height(default, setHeight):Float;
 	private function setHeight(value:Float):Float
 	{
-		this.initialDrawnHeight = value;
-		this.height = value;
-		return value;
+		if (this.height != value)
+		{
+			this.initialDrawnHeight = value;
+			this.height = value;
+		}
+
+		return this.height;
 	}
 
 	public function new(width:Float, height:Float, layer:Int)
