@@ -484,7 +484,7 @@ titanium_reindeer.MouseRegionManager.prototype.getHandler = function(component) 
 titanium_reindeer.MouseRegionManager.prototype.mouseMoveHandle = function(mousePos) {
 	this.handleAction(titanium_reindeer.MouseAction.Move,mousePos,titanium_reindeer.MouseButton.None);
 }
-titanium_reindeer.MouseRegionManager.prototype.mouseButtonHandle = function(mousePos,button,buttonState) {
+titanium_reindeer.MouseRegionManager.prototype.mouseButtonHandle = function(button,buttonState,mousePos) {
 	var action;
 	if(buttonState == titanium_reindeer.MouseButtonState.Down) action = titanium_reindeer.MouseAction.Down; else if(buttonState == titanium_reindeer.MouseButtonState.Up) action = titanium_reindeer.MouseAction.Up; else return;
 	this.handleAction(action,mousePos,button);
@@ -2356,7 +2356,7 @@ titanium_reindeer.CircleRenderer.prototype.setRadius = function(value) {
 	if(this.radius != value) {
 		this.radius = value;
 		this.setInitialWidth(value * 2);
-		this.setInitialWidth(value * 2);
+		this.setInitialHeight(value * 2);
 	}
 	return this.radius;
 }
@@ -2479,6 +2479,8 @@ titanium_reindeer.RenderLayer = function(layerManager,id,targetElement,width,hei
 	this.height = height;
 	this.setClearColor(clearColor);
 	this.setRenderComposition(titanium_reindeer.Composition.SourceOver);
+	this.setVisible(true);
+	this.setAlpha(1);
 	this.watchedOffset = new titanium_reindeer.WatchedVector2(0,0,$closure(this,"offsetChanged"));
 	this.renderers = new IntHash();
 	this.redrawBackground = true;
@@ -2505,6 +2507,19 @@ titanium_reindeer.RenderLayer.prototype.setRenderComposition = function(comp) {
 		this.redrawBackground = true;
 	}
 	return this.renderComposition;
+}
+titanium_reindeer.RenderLayer.prototype.visible = null;
+titanium_reindeer.RenderLayer.prototype.setVisible = function(value) {
+	if(value != this.visible) {
+		this.visible = value;
+		if(this.visible) this.redrawBackground = true;
+	}
+	return this.visible;
+}
+titanium_reindeer.RenderLayer.prototype.alpha = null;
+titanium_reindeer.RenderLayer.prototype.setAlpha = function(value) {
+	if(value != this.alpha && value >= 0 && value <= 1) this.alpha = value;
+	return this.alpha;
 }
 titanium_reindeer.RenderLayer.prototype.width = null;
 titanium_reindeer.RenderLayer.prototype.height = null;
@@ -2657,7 +2672,12 @@ titanium_reindeer.RenderLayer.prototype.finalizeRedrawList = function() {
 	}
 }
 titanium_reindeer.RenderLayer.prototype.display = function(screenPen) {
-	screenPen.drawImage(this.canvas,0,0);
+	if(this.visible && this.alpha > 0) {
+		screenPen.save();
+		screenPen.globalAlpha = this.alpha;
+		screenPen.drawImage(this.canvas,0,0);
+		screenPen.restore();
+	}
 	this.redrawBackground = false;
 }
 titanium_reindeer.RenderLayer.prototype.getVectorToScreen = function(vector) {
@@ -3688,15 +3708,19 @@ titanium_reindeer.RectRenderer.__super__ = titanium_reindeer.StrokeFillRenderer;
 for(var k in titanium_reindeer.StrokeFillRenderer.prototype ) titanium_reindeer.RectRenderer.prototype[k] = titanium_reindeer.StrokeFillRenderer.prototype[k];
 titanium_reindeer.RectRenderer.prototype.width = null;
 titanium_reindeer.RectRenderer.prototype.setWidth = function(value) {
-	this.setInitialWidth(value);
-	this.width = value;
-	return value;
+	if(this.width != value) {
+		this.setInitialWidth(value);
+		this.width = value;
+	}
+	return this.width;
 }
 titanium_reindeer.RectRenderer.prototype.height = null;
 titanium_reindeer.RectRenderer.prototype.setHeight = function(value) {
-	this.setInitialHeight(value);
-	this.height = value;
-	return value;
+	if(this.height != value) {
+		this.setInitialHeight(value);
+		this.height = value;
+	}
+	return this.height;
 }
 titanium_reindeer.RectRenderer.prototype.render = function() {
 	titanium_reindeer.StrokeFillRenderer.prototype.render.call(this);
@@ -4360,6 +4384,96 @@ StringBuf.prototype.toString = function() {
 }
 StringBuf.prototype.b = null;
 StringBuf.prototype.__class__ = StringBuf;
+titanium_reindeer.InputEvent = { __ename__ : ["titanium_reindeer","InputEvent"], __constructs__ : ["MouseDown","MouseUp","MouseMove","MouseWheel","KeyUp","KeyDown","MouseHeldEvent","KeyHeldEvent","MouseAnyEvent","KeyAnyEvent"] }
+titanium_reindeer.InputEvent.MouseDown = ["MouseDown",0];
+titanium_reindeer.InputEvent.MouseDown.toString = $estr;
+titanium_reindeer.InputEvent.MouseDown.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.MouseUp = ["MouseUp",1];
+titanium_reindeer.InputEvent.MouseUp.toString = $estr;
+titanium_reindeer.InputEvent.MouseUp.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.MouseMove = ["MouseMove",2];
+titanium_reindeer.InputEvent.MouseMove.toString = $estr;
+titanium_reindeer.InputEvent.MouseMove.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.MouseWheel = ["MouseWheel",3];
+titanium_reindeer.InputEvent.MouseWheel.toString = $estr;
+titanium_reindeer.InputEvent.MouseWheel.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.KeyUp = ["KeyUp",4];
+titanium_reindeer.InputEvent.KeyUp.toString = $estr;
+titanium_reindeer.InputEvent.KeyUp.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.KeyDown = ["KeyDown",5];
+titanium_reindeer.InputEvent.KeyDown.toString = $estr;
+titanium_reindeer.InputEvent.KeyDown.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.MouseHeldEvent = ["MouseHeldEvent",6];
+titanium_reindeer.InputEvent.MouseHeldEvent.toString = $estr;
+titanium_reindeer.InputEvent.MouseHeldEvent.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.KeyHeldEvent = ["KeyHeldEvent",7];
+titanium_reindeer.InputEvent.KeyHeldEvent.toString = $estr;
+titanium_reindeer.InputEvent.KeyHeldEvent.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.MouseAnyEvent = ["MouseAnyEvent",8];
+titanium_reindeer.InputEvent.MouseAnyEvent.toString = $estr;
+titanium_reindeer.InputEvent.MouseAnyEvent.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.InputEvent.KeyAnyEvent = ["KeyAnyEvent",9];
+titanium_reindeer.InputEvent.KeyAnyEvent.toString = $estr;
+titanium_reindeer.InputEvent.KeyAnyEvent.__enum__ = titanium_reindeer.InputEvent;
+titanium_reindeer.RecordedEvent = function(type,event) {
+	if( type === $_ ) return;
+	this.type = type;
+	this.event = event;
+}
+titanium_reindeer.RecordedEvent.__name__ = ["titanium_reindeer","RecordedEvent"];
+titanium_reindeer.RecordedEvent.prototype.type = null;
+titanium_reindeer.RecordedEvent.prototype.event = null;
+titanium_reindeer.RecordedEvent.prototype.__class__ = titanium_reindeer.RecordedEvent;
+titanium_reindeer.MouseButtonData = function(button,buttonState,cb) {
+	if( button === $_ ) return;
+	this.button = button;
+	this.buttonState = buttonState;
+	this.cb = cb;
+}
+titanium_reindeer.MouseButtonData.__name__ = ["titanium_reindeer","MouseButtonData"];
+titanium_reindeer.MouseButtonData.prototype.button = null;
+titanium_reindeer.MouseButtonData.prototype.buttonState = null;
+titanium_reindeer.MouseButtonData.prototype.cb = null;
+titanium_reindeer.MouseButtonData.prototype.__class__ = titanium_reindeer.MouseButtonData;
+titanium_reindeer.MouseMoveData = function(cb) {
+	if( cb === $_ ) return;
+	this.cb = cb;
+}
+titanium_reindeer.MouseMoveData.__name__ = ["titanium_reindeer","MouseMoveData"];
+titanium_reindeer.MouseMoveData.prototype.cb = null;
+titanium_reindeer.MouseMoveData.prototype.__class__ = titanium_reindeer.MouseMoveData;
+titanium_reindeer.MouseWheelData = function(cb) {
+	if( cb === $_ ) return;
+	this.cb = cb;
+}
+titanium_reindeer.MouseWheelData.__name__ = ["titanium_reindeer","MouseWheelData"];
+titanium_reindeer.MouseWheelData.prototype.cb = null;
+titanium_reindeer.MouseWheelData.prototype.__class__ = titanium_reindeer.MouseWheelData;
+titanium_reindeer.MouseButtonAnyData = function(cb) {
+	if( cb === $_ ) return;
+	this.cb = cb;
+}
+titanium_reindeer.MouseButtonAnyData.__name__ = ["titanium_reindeer","MouseButtonAnyData"];
+titanium_reindeer.MouseButtonAnyData.prototype.cb = null;
+titanium_reindeer.MouseButtonAnyData.prototype.__class__ = titanium_reindeer.MouseButtonAnyData;
+titanium_reindeer.KeyData = function(key,keyState,cb) {
+	if( key === $_ ) return;
+	this.key = key;
+	this.keyState = keyState;
+	this.cb = cb;
+}
+titanium_reindeer.KeyData.__name__ = ["titanium_reindeer","KeyData"];
+titanium_reindeer.KeyData.prototype.key = null;
+titanium_reindeer.KeyData.prototype.keyState = null;
+titanium_reindeer.KeyData.prototype.cb = null;
+titanium_reindeer.KeyData.prototype.__class__ = titanium_reindeer.KeyData;
+titanium_reindeer.KeyAnyData = function(cb) {
+	if( cb === $_ ) return;
+	this.cb = cb;
+}
+titanium_reindeer.KeyAnyData.__name__ = ["titanium_reindeer","KeyAnyData"];
+titanium_reindeer.KeyAnyData.prototype.cb = null;
+titanium_reindeer.KeyAnyData.prototype.__class__ = titanium_reindeer.KeyAnyData;
 titanium_reindeer.InputManager = function(targetElement) {
 	if( targetElement === $_ ) return;
 	this.mouseButtonsRegistered = new IntHash();
@@ -4375,16 +4489,47 @@ titanium_reindeer.InputManager = function(targetElement) {
 	this.keysRegistered.set(titanium_reindeer.KeyState.Down[1],new IntHash());
 	this.keysRegistered.set(titanium_reindeer.KeyState.Held[1],new IntHash());
 	this.keysRegistered.set(titanium_reindeer.KeyState.Up[1],new IntHash());
+	this.keysAnyRegistered = new Array();
 	this.heldKeys = new IntHash();
+	this.recordedEvents = new Array();
+	this.queuedMouseButtonRegisters = new Array();
+	this.queuedMouseMoveRegisters = new Array();
+	this.queuedMouseWheelRegisters = new Array();
+	this.queuedMouseButtonAnyRegisters = new Array();
+	this.queuedKeyRegisters = new Array();
+	this.queuedKeyAnyRegisters = new Array();
+	this.queuedMouseButtonUnregisters = new Array();
+	this.queuedMouseMoveUnregisters = new Array();
+	this.queuedMouseWheelUnregisters = new Array();
+	this.queuedMouseButtonAnyUnregisters = new Array();
+	this.queuedKeyUnregisters = new Array();
+	this.queuedKeyAnyUnregisters = new Array();
+	this.queueRegisters = false;
 	this.targetElement = targetElement;
-	targetElement.onmousedown = $closure(this,"mouseDown");
-	targetElement.onmouseup = $closure(this,"mouseUp");
-	targetElement.onmousemove = $closure(this,"mouseMove");
+	this.recalculateCanvasOffset();
+	this.timeLeftToRecalculateOffsetMs = 1000;
+	var me = this;
+	targetElement.onmousedown = function(event) {
+		me.recordEvent(titanium_reindeer.InputEvent.MouseDown,event);
+	};
+	targetElement.onmouseup = function(event) {
+		me.recordEvent(titanium_reindeer.InputEvent.MouseUp,event);
+	};
+	targetElement.onmousemove = function(event) {
+		me.recordEvent(titanium_reindeer.InputEvent.MouseMove,event);
+	};
 	targetElement.oncontextmenu = $closure(this,"contextMenu");
 	var firefoxReg = new EReg("Firefox","i");
-	if(firefoxReg.match(js.Lib.window.navigator.userAgent)) js.Lib.document.addEventListener("DOMMouseScroll",$closure(this,"mouseWheel"),true); else js.Lib.document.onmousewheel = $closure(this,"mouseWheel");
-	js.Lib.document.onkeydown = $closure(this,"keyDown");
-	js.Lib.document.onkeyup = $closure(this,"keyUp");
+	var wheelFunc = function(event) {
+		me.recordEvent(titanium_reindeer.InputEvent.MouseWheel,event);
+	};
+	if(firefoxReg.match(js.Lib.window.navigator.userAgent)) js.Lib.document.addEventListener("DOMMouseScroll",wheelFunc,true); else js.Lib.document.onmousewheel = wheelFunc;
+	js.Lib.document.onkeydown = function(event) {
+		me.recordEvent(titanium_reindeer.InputEvent.KeyDown,event);
+	};
+	js.Lib.document.onkeyup = function(event) {
+		me.recordEvent(titanium_reindeer.InputEvent.KeyUp,event);
+	};
 }
 titanium_reindeer.InputManager.__name__ = ["titanium_reindeer","InputManager"];
 titanium_reindeer.InputManager.prototype.mouseButtonsRegistered = null;
@@ -4422,22 +4567,42 @@ titanium_reindeer.InputManager.prototype.upKeysRegistered = null;
 titanium_reindeer.InputManager.prototype.getUpKeysRegistered = function() {
 	return this.keysRegistered.get(titanium_reindeer.KeyState.Up[1]);
 }
+titanium_reindeer.InputManager.prototype.keysAnyRegistered = null;
 titanium_reindeer.InputManager.prototype.heldKeys = null;
+titanium_reindeer.InputManager.prototype.recordedEvents = null;
+titanium_reindeer.InputManager.prototype.queuedMouseButtonRegisters = null;
+titanium_reindeer.InputManager.prototype.queuedMouseMoveRegisters = null;
+titanium_reindeer.InputManager.prototype.queuedMouseWheelRegisters = null;
+titanium_reindeer.InputManager.prototype.queuedMouseButtonAnyRegisters = null;
+titanium_reindeer.InputManager.prototype.queuedKeyRegisters = null;
+titanium_reindeer.InputManager.prototype.queuedKeyAnyRegisters = null;
+titanium_reindeer.InputManager.prototype.queuedMouseButtonUnregisters = null;
+titanium_reindeer.InputManager.prototype.queuedMouseMoveUnregisters = null;
+titanium_reindeer.InputManager.prototype.queuedMouseWheelUnregisters = null;
+titanium_reindeer.InputManager.prototype.queuedMouseButtonAnyUnregisters = null;
+titanium_reindeer.InputManager.prototype.queuedKeyUnregisters = null;
+titanium_reindeer.InputManager.prototype.queuedKeyAnyUnregisters = null;
+titanium_reindeer.InputManager.prototype.queueRegisters = null;
 titanium_reindeer.InputManager.prototype.targetElement = null;
+titanium_reindeer.InputManager.prototype.targetDocumentOffset = null;
+titanium_reindeer.InputManager.prototype.timeLeftToRecalculateOffsetMs = null;
+titanium_reindeer.InputManager.prototype.recordEvent = function(type,event) {
+	this.recordedEvents.push(new titanium_reindeer.RecordedEvent(type,event));
+}
+titanium_reindeer.InputManager.prototype.contextMenu = function(event) {
+	var found = false;
+	if(this.getUpMouseButtonsRegistered().exists(titanium_reindeer.MouseButton.Right[1])) found = this.getUpMouseButtonsRegistered().get(titanium_reindeer.MouseButton.Right[1]).length != 0;
+	return !(found || this.mouseButtonsAnyRegistered.length != 0);
+}
 titanium_reindeer.InputManager.prototype.mouseDown = function(event) {
-	var anyEventCalled = false;
-	var mousePos;
-	if(event.offsetX) mousePos = new titanium_reindeer.Vector2(event.offsetX,event.offsetY); else mousePos = new titanium_reindeer.Vector2(event.layerX,event.layerY);
+	var mousePos = this.getMousePositionFromEvent(event);
 	var mouseButton = this.getMouseButtonFromButton(event.button);
 	this.mouseButtonsHeld.set(mouseButton[1],mouseButton);
 	var _g = 0, _g1 = this.mouseButtonsAnyRegistered;
 	while(_g < _g1.length) {
 		var cb = _g1[_g];
 		++_g;
-		if(cb != null) {
-			cb(mousePos,mouseButton,titanium_reindeer.MouseButtonState.Down);
-			anyEventCalled = true;
-		}
+		if(cb != null) cb(mouseButton,titanium_reindeer.MouseButtonState.Down,mousePos.getCopy());
 	}
 	if(this.getDownMouseButtonsRegistered().exists(mouseButton[1])) {
 		var functions = this.getDownMouseButtonsRegistered().get(mouseButton[1]);
@@ -4445,28 +4610,19 @@ titanium_reindeer.InputManager.prototype.mouseDown = function(event) {
 		while(_g < functions.length) {
 			var cb = functions[_g];
 			++_g;
-			if(cb != null) {
-				cb(mousePos);
-				anyEventCalled = true;
-			}
+			if(cb != null) cb(mousePos.getCopy());
 		}
 	}
-	return !anyEventCalled;
 }
 titanium_reindeer.InputManager.prototype.mouseUp = function(event) {
-	var anyEventCalled = false;
-	var mousePos;
-	if(event.offsetX) mousePos = new titanium_reindeer.Vector2(event.offsetX,event.offsetY); else mousePos = new titanium_reindeer.Vector2(event.layerX,event.layerY);
+	var mousePos = this.getMousePositionFromEvent(event);
 	var mouseButton = this.getMouseButtonFromButton(event.button);
 	this.mouseButtonsHeld.remove(mouseButton[1]);
 	var _g = 0, _g1 = this.mouseButtonsAnyRegistered;
 	while(_g < _g1.length) {
 		var cb = _g1[_g];
 		++_g;
-		if(cb != null) {
-			cb(mousePos,mouseButton,titanium_reindeer.MouseButtonState.Up);
-			anyEventCalled = true;
-		}
+		if(cb != null) cb(mouseButton,titanium_reindeer.MouseButtonState.Up,mousePos.getCopy());
 	}
 	if(this.getUpMouseButtonsRegistered().exists(mouseButton[1])) {
 		var functions = this.getUpMouseButtonsRegistered().get(mouseButton[1]);
@@ -4474,25 +4630,19 @@ titanium_reindeer.InputManager.prototype.mouseUp = function(event) {
 		while(_g < functions.length) {
 			var cb = functions[_g];
 			++_g;
-			if(cb != null) {
-				cb(mousePos);
-				anyEventCalled = true;
-			}
+			if(cb != null) cb(mousePos.getCopy());
 		}
 	}
-	return !anyEventCalled;
 }
 titanium_reindeer.InputManager.prototype.mouseMove = function(event) {
-	var mousePos;
-	if(event.offsetX) mousePos = new titanium_reindeer.Vector2(event.offsetX,event.offsetY); else mousePos = new titanium_reindeer.Vector2(event.layerX,event.layerY);
+	var mousePos = this.getMousePositionFromEvent(event);
 	var _g = 0, _g1 = this.mousePositionChangesRegistered;
 	while(_g < _g1.length) {
 		var cb = _g1[_g];
 		++_g;
-		if(cb != null) cb(mousePos);
+		if(cb != null) cb(mousePos.getCopy());
 	}
-	this.lastMousePos = mousePos.getCopy();
-	return this.mousePositionChangesRegistered.length == 0;
+	this.lastMousePos = mousePos;
 }
 titanium_reindeer.InputManager.prototype.mouseWheel = function(event) {
 	var ticks = 0;
@@ -4504,17 +4654,10 @@ titanium_reindeer.InputManager.prototype.mouseWheel = function(event) {
 		++_g;
 		if(cb != null) cb(ticks);
 	}
-	return this.mouseWheelsRegistered.length == 0;
-}
-titanium_reindeer.InputManager.prototype.contextMenu = function(event) {
-	var found = false;
-	if(this.getUpMouseButtonsRegistered().exists(titanium_reindeer.MouseButton.Right[1])) found = this.getUpMouseButtonsRegistered().get(titanium_reindeer.MouseButton.Right[1]).length != 0;
-	return !(found || this.mouseButtonsAnyRegistered.length != 0);
 }
 titanium_reindeer.InputManager.prototype.keyDown = function(event) {
 	var keyCode = event.keyCode;
 	var key = this.getKeyFromCode(keyCode);
-	if(this.heldKeys.exists(key[1])) return true;
 	this.heldKeys.set(key[1],key);
 	if(this.getDownKeysRegistered().exists(key[1])) {
 		var functions = this.getDownKeysRegistered().get(key[1]);
@@ -4524,12 +4667,7 @@ titanium_reindeer.InputManager.prototype.keyDown = function(event) {
 			++_g;
 			if(cb != null) cb();
 		}
-		return functions.length == 0;
 	}
-	if(key == titanium_reindeer.Key.Tab) {
-		if(this.getUpKeysRegistered().exists(key[1]) || this.getHeldKeysRegistered().exists(key[1])) return false;
-	}
-	return true;
 }
 titanium_reindeer.InputManager.prototype.keyUp = function(event) {
 	var keyCode = event.keyCode;
@@ -4543,11 +4681,47 @@ titanium_reindeer.InputManager.prototype.keyUp = function(event) {
 			++_g;
 			if(cb != null) cb();
 		}
-		return functions.length == 0;
 	}
-	return true;
 }
-titanium_reindeer.InputManager.prototype.update = function() {
+titanium_reindeer.InputManager.prototype.update = function(msTimeStep) {
+	var tempEvents = new Array();
+	var _g = 0, _g1 = this.recordedEvents;
+	while(_g < _g1.length) {
+		var recordedEvent = _g1[_g];
+		++_g;
+		tempEvents.push(recordedEvent);
+	}
+	this.recordedEvents = new Array();
+	this.queueRegisters = true;
+	var _g = 0;
+	while(_g < tempEvents.length) {
+		var recordedEvent = tempEvents[_g];
+		++_g;
+		var func;
+		switch( (recordedEvent.type)[1] ) {
+		case 0:
+			func = $closure(this,"mouseDown");
+			break;
+		case 1:
+			func = $closure(this,"mouseUp");
+			break;
+		case 2:
+			func = $closure(this,"mouseMove");
+			break;
+		case 3:
+			func = $closure(this,"mouseWheel");
+			break;
+		case 5:
+			func = $closure(this,"keyDown");
+			break;
+		case 4:
+			func = $closure(this,"keyUp");
+			break;
+		default:
+			func = null;
+		}
+		func(recordedEvent.event);
+	}
 	var $it0 = this.heldKeys.iterator();
 	while( $it0.hasNext() ) {
 		var key = $it0.next();
@@ -4572,6 +4746,13 @@ titanium_reindeer.InputManager.prototype.update = function() {
 				if(cb != null) cb(this.lastMousePos);
 			}
 		}
+	}
+	this.queueRegisters = false;
+	this.flushQueues();
+	this.timeLeftToRecalculateOffsetMs -= msTimeStep;
+	if(this.timeLeftToRecalculateOffsetMs <= 0) {
+		this.timeLeftToRecalculateOffsetMs = 1000;
+		this.recalculateCanvasOffset();
 	}
 }
 titanium_reindeer.InputManager.prototype.destroy = function() {
@@ -4633,30 +4814,62 @@ titanium_reindeer.InputManager.prototype.destroy = function() {
 }
 titanium_reindeer.InputManager.prototype.registerMouseButtonEvent = function(button,buttonState,cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedMouseButtonRegisters.push(new titanium_reindeer.MouseButtonData(button,buttonState,cb));
+		return;
+	}
 	var buttons = this.mouseButtonsRegistered.get(buttonState[1]);
 	if(!buttons.exists(button[1])) buttons.set(button[1],new Array());
 	buttons.get(button[1]).push(cb);
 }
 titanium_reindeer.InputManager.prototype.registerMouseButtonAnyEvent = function(cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedMouseButtonAnyRegisters.push(new titanium_reindeer.MouseButtonAnyData(cb));
+		return;
+	}
 	this.mouseButtonsAnyRegistered.push(cb);
 }
 titanium_reindeer.InputManager.prototype.registerMouseMoveEvent = function(cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedMouseMoveRegisters.push(new titanium_reindeer.MouseMoveData(cb));
+		return;
+	}
 	this.mousePositionChangesRegistered.push(cb);
 }
 titanium_reindeer.InputManager.prototype.registerMouseWheelEvent = function(cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedMouseWheelRegisters.push(new titanium_reindeer.MouseWheelData(cb));
+		return;
+	}
 	this.mouseWheelsRegistered.push(cb);
 }
 titanium_reindeer.InputManager.prototype.registerKeyEvent = function(key,keyState,cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedKeyRegisters.push(new titanium_reindeer.KeyData(key,keyState,cb));
+		return;
+	}
 	var arr = this.keysRegistered.get(keyState[1]);
 	if(!arr.exists(key[1])) arr.set(key[1],new Array());
 	arr.get(key[1]).push(cb);
 }
+titanium_reindeer.InputManager.prototype.registerKeyAnyEvent = function(cb) {
+	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedKeyAnyRegisters.push(new titanium_reindeer.KeyAnyData(cb));
+		return;
+	}
+	this.keysAnyRegistered.push(cb);
+}
 titanium_reindeer.InputManager.prototype.unregisterMouseButtonEvent = function(mouseButton,mouseButtonState,cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedMouseButtonUnregisters.push(new titanium_reindeer.MouseButtonData(mouseButton,mouseButtonState,cb));
+		return;
+	}
 	var mouseButtons = this.mouseButtonsRegistered.get(mouseButtonState[1]);
 	if(mouseButtons.exists(mouseButton[1])) {
 		var functions = mouseButtons.get(mouseButton[1]);
@@ -4672,6 +4885,10 @@ titanium_reindeer.InputManager.prototype.unregisterMouseButtonEvent = function(m
 }
 titanium_reindeer.InputManager.prototype.unregisterMouseButtonAnyEvent = function(cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedMouseButtonAnyUnregisters.push(new titanium_reindeer.MouseButtonAnyData(cb));
+		return;
+	}
 	var _g1 = 0, _g = this.mouseButtonsAnyRegistered.length;
 	while(_g1 < _g) {
 		var i = _g1++;
@@ -4683,6 +4900,10 @@ titanium_reindeer.InputManager.prototype.unregisterMouseButtonAnyEvent = functio
 }
 titanium_reindeer.InputManager.prototype.unregisterMouseMoveEvent = function(cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedMouseMoveUnregisters.push(new titanium_reindeer.MouseMoveData(cb));
+		return;
+	}
 	var _g1 = 0, _g = this.mousePositionChangesRegistered.length;
 	while(_g1 < _g) {
 		var i = _g1++;
@@ -4694,6 +4915,10 @@ titanium_reindeer.InputManager.prototype.unregisterMouseMoveEvent = function(cb)
 }
 titanium_reindeer.InputManager.prototype.unregisterMouseWheelEvent = function(cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedMouseWheelUnregisters.push(new titanium_reindeer.MouseWheelData(cb));
+		return;
+	}
 	var _g1 = 0, _g = this.mouseWheelsRegistered.length;
 	while(_g1 < _g) {
 		var i = _g1++;
@@ -4705,6 +4930,10 @@ titanium_reindeer.InputManager.prototype.unregisterMouseWheelEvent = function(cb
 }
 titanium_reindeer.InputManager.prototype.unregisterKeyEvent = function(key,keyState,cb) {
 	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedKeyUnregisters.push(new titanium_reindeer.KeyData(key,keyState,cb));
+		return;
+	}
 	var keys = this.keysRegistered.get(keyState[1]);
 	if(keys.exists(key[1])) {
 		var functions = keys.get(key[1]);
@@ -4718,11 +4947,132 @@ titanium_reindeer.InputManager.prototype.unregisterKeyEvent = function(key,keySt
 		}
 	}
 }
+titanium_reindeer.InputManager.prototype.unregisterKeyAnyEvent = function(cb) {
+	if(cb == null) return;
+	if(this.queueRegisters) {
+		this.queuedKeyAnyUnregisters.push(new titanium_reindeer.KeyAnyData(cb));
+		return;
+	}
+	var _g1 = 0, _g = this.keysAnyRegistered.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		if(Reflect.compareMethods(this.keysAnyRegistered[i],cb)) {
+			this.keysAnyRegistered.splice(i,1);
+			break;
+		}
+	}
+}
+titanium_reindeer.InputManager.prototype.flushQueues = function() {
+	var _g = 0, _g1 = this.queuedMouseButtonRegisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.registerMouseButtonEvent(data.button,data.buttonState,data.cb);
+	}
+	this.queuedMouseButtonRegisters = new Array();
+	var _g = 0, _g1 = this.queuedMouseMoveRegisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.registerMouseMoveEvent(data.cb);
+	}
+	this.queuedMouseWheelRegisters = new Array();
+	var _g = 0, _g1 = this.queuedMouseWheelRegisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.registerMouseWheelEvent(data.cb);
+	}
+	this.queuedMouseButtonAnyRegisters = new Array();
+	var _g = 0, _g1 = this.queuedMouseButtonAnyRegisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.registerMouseButtonAnyEvent(data.cb);
+	}
+	this.queuedMouseButtonAnyRegisters = new Array();
+	var _g = 0, _g1 = this.queuedKeyRegisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.registerKeyEvent(data.key,data.keyState,data.cb);
+	}
+	this.queuedKeyRegisters = new Array();
+	var _g = 0, _g1 = this.queuedKeyAnyRegisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.registerKeyAnyEvent(data.cb);
+	}
+	this.queuedKeyAnyRegisters = new Array();
+	var _g = 0, _g1 = this.queuedMouseButtonUnregisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.unregisterMouseButtonEvent(data.button,data.buttonState,data.cb);
+	}
+	this.queuedMouseButtonUnregisters = new Array();
+	var _g = 0, _g1 = this.queuedMouseMoveUnregisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.unregisterMouseMoveEvent(data.cb);
+	}
+	this.queuedMouseMoveUnregisters = new Array();
+	var _g = 0, _g1 = this.queuedMouseWheelUnregisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.unregisterMouseWheelEvent(data.cb);
+	}
+	this.queuedMouseWheelUnregisters = new Array();
+	var _g = 0, _g1 = this.queuedMouseButtonAnyUnregisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.unregisterMouseButtonAnyEvent(data.cb);
+	}
+	this.queuedMouseButtonAnyUnregisters = new Array();
+	var _g = 0, _g1 = this.queuedKeyUnregisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.unregisterKeyEvent(data.key,data.keyState,data.cb);
+	}
+	this.queuedKeyUnregisters = new Array();
+	var _g = 0, _g1 = this.queuedKeyAnyUnregisters;
+	while(_g < _g1.length) {
+		var data = _g1[_g];
+		++_g;
+		this.unregisterKeyAnyEvent(data.cb);
+	}
+	this.queuedKeyAnyUnregisters = new Array();
+}
 titanium_reindeer.InputManager.prototype.isMouseButtonDown = function(mouseButton) {
 	return this.mouseButtonsHeld.exists(mouseButton[1]);
 }
 titanium_reindeer.InputManager.prototype.isKeyDown = function(key) {
 	return this.heldKeys.exists(key[1]);
+}
+titanium_reindeer.InputManager.prototype.recalculateCanvasOffset = function() {
+	var offset = new titanium_reindeer.Vector2(0,0);
+	if(this.targetElement != null && this.targetElement.offsetParent != null) {
+		var ele = this.targetElement;
+		do {
+			var _g = offset;
+			_g.setX(_g.getX() + ele.offsetLeft);
+			var _g = offset;
+			_g.setY(_g.getY() + ele.offsetTop);
+			ele = ele.offsetParent;
+		} while(ele != null);
+	}
+	this.targetDocumentOffset = offset;
+}
+titanium_reindeer.InputManager.prototype.getMousePositionFromEvent = function(event) {
+	if(event == null) return new titanium_reindeer.Vector2(0,0);
+	var mousePos;
+	if(event.pageX || event.pageY) mousePos = new titanium_reindeer.Vector2(event.pageX,event.pageY); else if(event.clientX || event.clientY) mousePos = new titanium_reindeer.Vector2(event.clientX + js.Lib.document.body.scrollLeft + js.Lib.document.documentElement.scrollLeft,event.clientY + js.Lib.document.body.scrollTop + js.Lib.document.documentElement.scrollTop); else return new titanium_reindeer.Vector2(0,0);
+	return mousePos.subtract(this.targetDocumentOffset);
 }
 titanium_reindeer.InputManager.prototype.getMouseButtonFromButton = function(which) {
 	var mouseButton;
@@ -5030,11 +5380,11 @@ titanium_reindeer.ImageRenderer = function(image,layer,sourceRect,width,height) 
 	if( image === $_ ) return;
 	if(height == null) height = 0;
 	if(width == null) width = 0;
-	this.setImage(image);
+	titanium_reindeer.RendererComponent.call(this,0,0,layer);
 	this.sourceRect = sourceRect;
 	this.destWidth = width;
 	this.destHeight = height;
-	titanium_reindeer.RendererComponent.call(this,0,0,layer);
+	this.setImage(image);
 }
 titanium_reindeer.ImageRenderer.__name__ = ["titanium_reindeer","ImageRenderer"];
 titanium_reindeer.ImageRenderer.__super__ = titanium_reindeer.RendererComponent;
@@ -5052,7 +5402,10 @@ titanium_reindeer.ImageRenderer.prototype.destWidth = null;
 titanium_reindeer.ImageRenderer.prototype.destHeight = null;
 titanium_reindeer.ImageRenderer.prototype.render = function() {
 	titanium_reindeer.RendererComponent.prototype.render.call(this);
-	if(this.image.isLoaded) this.getPen().drawImage(this.image.image,this.sourceRect.x,this.sourceRect.y,this.sourceRect.width,this.sourceRect.height,-this.destWidth / 2,-this.destHeight / 2,this.destWidth,this.destHeight); else this.setRedraw(true);
+	if(this.image.isLoaded) {
+		var x = 2;
+		this.getPen().drawImage(this.image.image,this.sourceRect.x,this.sourceRect.y,this.sourceRect.width,this.sourceRect.height,-this.destWidth / 2,-this.destHeight / 2,this.destWidth,this.destHeight);
+	} else this.setRedraw(true);
 }
 titanium_reindeer.ImageRenderer.prototype.imageLoaded = function(event) {
 	if(this.destWidth == 0) {
@@ -5071,7 +5424,6 @@ titanium_reindeer.ImageRenderer.prototype.identify = function() {
 }
 titanium_reindeer.ImageRenderer.prototype.destroy = function() {
 	titanium_reindeer.RendererComponent.prototype.destroy.call(this);
-	this.image.destroy();
 	this.setImage(null);
 }
 titanium_reindeer.ImageRenderer.prototype.__class__ = titanium_reindeer.ImageRenderer;
@@ -5353,7 +5705,7 @@ titanium_reindeer.MouseRegionHandler.prototype.mouseDown = function(mousePos,but
 }
 titanium_reindeer.MouseRegionHandler.prototype.mouseUp = function(mousePos,button,colliding) {
 	if(colliding) {
-		var _g = 0, _g1 = this.registeredMouseDownEvents;
+		var _g = 0, _g1 = this.registeredMouseUpEvents;
 		while(_g < _g1.length) {
 			var func = _g1[_g];
 			++_g;
@@ -6107,13 +6459,14 @@ titanium_reindeer.Game = function(targetHtmlId,width,height,layerCount,debugMode
 	this.layerCount = layerCount == null?1:layerCount;
 	this.backgroundColor = backgroundColor == null?new titanium_reindeer.Color(255,255,255):backgroundColor;
 	this.debugMode = debugMode == null?false:debugMode;
+	this.setMaxAllowedUpdateLengthMs(1000);
 	this.exitGame = false;
 	this.gameObjectManager = new titanium_reindeer.GameObjectManager(this);
 	this.inputManager = new titanium_reindeer.InputManager(this.targetElement);
 	this.soundManager = new titanium_reindeer.SoundManager();
 	if(debugMode) js.Lib.setErrorHandler(function(msg,stack) {
 		js.Lib.alert("ERROR[ " + msg + " ]");
-		haxe.Log.trace(stack,{ fileName : "Game.hx", lineNumber : 52, className : "titanium_reindeer.Game", methodName : "new"});
+		haxe.Log.trace(stack,{ fileName : "Game.hx", lineNumber : 66, className : "titanium_reindeer.Game", methodName : "new"});
 		return true;
 	});
 }
@@ -6124,6 +6477,11 @@ titanium_reindeer.Game.prototype.height = null;
 titanium_reindeer.Game.prototype.layerCount = null;
 titanium_reindeer.Game.prototype.backgroundColor = null;
 titanium_reindeer.Game.prototype.debugMode = null;
+titanium_reindeer.Game.prototype.maxAllowedUpdateLengthMs = null;
+titanium_reindeer.Game.prototype.setMaxAllowedUpdateLengthMs = function(value) {
+	if(value != this.maxAllowedUpdateLengthMs) this.maxAllowedUpdateLengthMs = Std["int"](Math.max(1,Math.min(value,Math.POSITIVE_INFINITY)));
+	return this.maxAllowedUpdateLengthMs;
+}
 titanium_reindeer.Game.prototype.exitGame = null;
 titanium_reindeer.Game.prototype.msLastTimeStep = null;
 titanium_reindeer.Game.prototype.gameObjectManager = null;
@@ -6136,16 +6494,16 @@ titanium_reindeer.Game.prototype.gameLoop = function(now) {
 	if(this.exitGame) this.destroy(); else {
 		if(this.msLastTimeStep == null) this.msLastTimeStep = now;
 		var msTimeStep;
-		if(now == null) msTimeStep = Math.round(1000 / 60); else msTimeStep = now - this.msLastTimeStep;
+		if(now == null) msTimeStep = Math.round(1000 / 60); else msTimeStep = Std["int"](Math.min(now - this.msLastTimeStep,this.maxAllowedUpdateLengthMs));
 		this.msLastTimeStep = now;
 		this.update(msTimeStep);
 		this.gameObjectManager.update(msTimeStep);
-		this.inputManager.update();
+		this.inputManager.update(msTimeStep);
 		this.requestAnimFrame();
 	}
 }
 titanium_reindeer.Game.prototype.requestAnimFrame = function() {
-	if(js.Lib.window.requestAnimationFrame) js.Lib.window.requestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else if(js.Lib.window.webkitRequestAnimationFrame) js.Lib.window.webkitRequestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else if(js.Lib.window.mozRequestAnimationFrame) js.Lib.window.mozRequestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else if(js.Lib.window.oRequestAnimationFrame) js.Lib.window.oRequestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else if(js.Lib.window.msRequestAnimationFrame) js.Lib.window.msRequestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else js.Lib.window.setTimeout($closure(this,"gameLoop"),1000 / 60);
+	if(js.Lib.window.requestAnimationFrame) js.Lib.window.requestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else if(js.Lib.window.webkitRequestAnimationFrame) js.Lib.window.webkitRequestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else if(js.Lib.window.mozRequestAnimationFrame) js.Lib.window.mozRequestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else if(js.Lib.window.oRequestAnimationFrame) js.Lib.window.oRequestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else if(js.Lib.window.msRequestAnimationFrame) js.Lib.window.msRequestAnimationFrame($closure(this,"gameLoop"),this.targetElement); else js.Lib.window.setTimeout($closure(this,"gameLoop"),Math.round(1000 / 60));
 }
 titanium_reindeer.Game.prototype.update = function(msTimeStep) {
 }
@@ -6484,6 +6842,7 @@ star_control.ArtilleryShell.DAMAGE = 4;
 star_control.ArtilleryShell.LIFE_TIME = 2000;
 star_control.CollisionGroups.SHIPS = "ships";
 star_control.CollisionGroups.BULLETS = "bullets";
+titanium_reindeer.InputManager.DEFAULT_OFFSET_RECALC_DELAY_MS = 1000;
 star_control.Fighter.MAX_HEALTH = 10;
 star_control.Fighter.MAX_AMMO = 14;
 star_control.Fighter.RECHARGE_RATE = 600;
@@ -6493,6 +6852,7 @@ star_control.Fighter.TURN_RATE = Math.PI;
 star_control.Fighter.THRUST_ACCEL = 400;
 star_control.Fighter.MAX_THRUST = 250;
 star_control.Fighter.FIRE_SOUND = "sound/fighter_fire.mp3";
+titanium_reindeer.Game.DEFAULT_UPDATES_TIME_MS = Math.round(1000 / 60);
 star_control.StarControlGame.IMAGE_BASE = "img/";
 star_control.StarControlGame.FIELD_SIZE = 600;
 star_control.StarControlGame.OFFSCREEN_EDGE = 30;
