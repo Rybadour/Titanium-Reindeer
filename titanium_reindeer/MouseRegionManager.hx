@@ -81,7 +81,7 @@ class MouseRegionManager
 		handleAction(MouseAction.Move, mousePos, MouseButton.None);
 	}
 
-	private function mouseButtonHandle(mousePos:Vector2, button:MouseButton, buttonState:MouseButtonState):Void
+	private function mouseButtonHandle(button:MouseButton, buttonState:MouseButtonState, mousePos:Vector2):Void
 	{
 		var action:MouseAction;
 		if (buttonState == MouseButtonState.Down)

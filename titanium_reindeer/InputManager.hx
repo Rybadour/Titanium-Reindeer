@@ -3,6 +3,102 @@ package titanium_reindeer;
 import js.Dom;
 import titanium_reindeer.Enums;
 
+enum InputEvent
+{
+	MouseDown;
+	MouseUp;
+	MouseMove;
+	MouseWheel;
+	KeyUp;
+	KeyDown;
+
+	MouseHeldEvent;
+	KeyHeldEvent;
+	MouseAnyEvent;
+	KeyAnyEvent;
+}
+
+class RecordedEvent
+{
+	public var type:InputEvent;
+	public var event:Dynamic;
+
+	public function new(type:InputEvent, event:Dynamic)
+	{
+		this.type = type;
+		this.event = event;
+	}
+}
+
+class MouseButtonData
+{
+	public var button:MouseButton;
+	public var buttonState:MouseButtonState;
+	
+	public var cb:Vector2 -> Void;
+
+	public function new(button:MouseButton, buttonState:MouseButtonState, cb:Vector2 -> Void)
+	{
+		this.button = button;
+		this.buttonState = buttonState;
+		this.cb = cb;
+	}
+}
+
+class MouseMoveData
+{
+	public var cb:Vector2 -> Void;
+
+	public function new(cb:Vector2 -> Void)
+	{
+		this.cb = cb;
+	}
+}
+
+class MouseWheelData
+{
+	public var cb:Int -> Void;
+
+	public function new(cb:Int -> Void)
+	{
+		this.cb = cb;
+	}
+}
+
+class MouseButtonAnyData
+{
+	public var cb:MouseButton -> MouseButtonState -> Vector2 -> Void;
+
+	public function new(cb:MouseButton -> MouseButtonState -> Vector2 -> Void)
+	{
+		this.cb = cb;
+	}
+}
+
+class KeyData
+{
+	public var key:Key;
+	public var keyState:KeyState;
+	public var cb:Void -> Void;
+
+	public function new(key:Key, keyState:KeyState, cb:Void -> Void)
+	{
+		this.key = key;
+		this.keyState = keyState;
+		this.cb = cb;
+	}
+}
+
+class KeyAnyData
+{
+	public var cb:Key -> KeyState -> Void;
+	
+	public function new(cb:Key -> KeyState -> Void)
+	{
+		this.cb = cb;
+	}
+}
+
 class InputManager
 {
 	public static inline var DEFAULT_OFFSET_RECALC_DELAY_MS:Int		= 1000;
@@ -18,7 +114,7 @@ class InputManager
 		private var upMouseButtonsRegistered(getUpMouseButtonsRegistered, null):IntHash<Array<Vector2 -> Void>>;
 		private function getUpMouseButtonsRegistered():IntHash<Array<Vector2 -> Void>>
 		{ return mouseButtonsRegistered.get(Type.enumIndex(MouseButtonState.Up)); }
-	private var mouseButtonsAnyRegistered:Array<Vector2 -> MouseButton -> MouseButtonState -> Void>;
+	private var mouseButtonsAnyRegistered:Array<MouseButton -> MouseButtonState -> Vector2 -> Void>;
 	private var mouseWheelsRegistered:Array<Int -> Void>; // Array<(ticks) -> Void>
 	private var mousePositionChangesRegistered:Array<Vector2 -> Void>; // Array<(mousePos) -> Void>
 	private var mouseButtonsHeld:IntHash<MouseButton>;
@@ -40,7 +136,26 @@ class InputManager
 		private var upKeysRegistered(getUpKeysRegistered, null):IntHash<Array<Void -> Void>>;
 		private function getUpKeysRegistered():IntHash<Array<Void -> Void>>
 		{ return keysRegistered.get(Type.enumIndex(KeyState.Up)); }
+	private var keysAnyRegistered:Array<Key -> KeyState -> Void>;
 	private var heldKeys:IntHash<Key>;
+
+	private var recordedEvents:Array<RecordedEvent>;
+
+	private var queuedMouseButtonRegisters:Array<MouseButtonData>;
+	private var queuedMouseMoveRegisters:Array<MouseMoveData>;
+	private var queuedMouseWheelRegisters:Array<MouseWheelData>;
+	private var queuedMouseButtonAnyRegisters:Array<MouseButtonAnyData>;
+	private var queuedKeyRegisters:Array<KeyData>;
+	private var queuedKeyAnyRegisters:Array<KeyAnyData>;
+
+	private var queuedMouseButtonUnregisters:Array<MouseButtonData>;
+	private var queuedMouseMoveUnregisters:Array<MouseMoveData>;
+	private var queuedMouseWheelUnregisters:Array<MouseWheelData>;
+	private var queuedMouseButtonAnyUnregisters:Array<MouseButtonAnyData>;
+	private var queuedKeyUnregisters:Array<KeyData>;
+	private var queuedKeyAnyUnregisters:Array<KeyAnyData>;
+
+	private var queueRegisters:Bool;
 
 	private var targetElement:HtmlDom;
 	private var targetDocumentOffset:Vector2;
@@ -63,7 +178,26 @@ class InputManager
 			this.keysRegistered.set(Type.enumIndex(KeyState.Down), new IntHash());
 			this.keysRegistered.set(Type.enumIndex(KeyState.Held), new IntHash());
 			this.keysRegistered.set(Type.enumIndex(KeyState.Up), new IntHash());
+		this.keysAnyRegistered = new Array();
 		this.heldKeys = new IntHash();
+
+		this.recordedEvents = new Array();
+
+		this.queuedMouseButtonRegisters = new Array();
+		this.queuedMouseMoveRegisters = new Array();
+		this.queuedMouseWheelRegisters = new Array();
+		this.queuedMouseButtonAnyRegisters = new Array();
+		this.queuedKeyRegisters = new Array();
+		this.queuedKeyAnyRegisters = new Array();
+
+		this.queuedMouseButtonUnregisters = new Array();
+		this.queuedMouseMoveUnregisters = new Array();
+		this.queuedMouseWheelUnregisters = new Array();
+		this.queuedMouseButtonAnyUnregisters = new Array();
+		this.queuedKeyUnregisters = new Array();
+		this.queuedKeyAnyUnregisters = new Array();
+
+		this.queueRegisters = false;
 
 		this.targetElement = targetElement;
 		this.recalculateCanvasOffset();
@@ -72,30 +206,48 @@ class InputManager
 
 		untyped
 		{
-			targetElement.onmousedown = this.mouseDown;
-			targetElement.onmouseup = this.mouseUp;
-			targetElement.onmousemove = this.mouseMove;
+			var me = this;
+			targetElement.onmousedown = function(event) { me.recordEvent(InputEvent.MouseDown, event); };
+			targetElement.onmouseup = function(event) { me.recordEvent(InputEvent.MouseUp, event); };
+			targetElement.onmousemove = function(event) { me.recordEvent(InputEvent.MouseMove, event); };
 
 			targetElement.oncontextmenu = this.contextMenu;
 
 			var firefoxReg:EReg = new EReg("Firefox", "i");
+			var wheelFunc = function(event) { me.recordEvent(InputEvent.MouseWheel, event); };
 			if (firefoxReg.match(js.Lib.window.navigator.userAgent))
-				js.Lib.document.addEventListener("DOMMouseScroll", this.mouseWheel, true);
+				js.Lib.document.addEventListener("DOMMouseScroll", wheelFunc, true);
 			else
-				js.Lib.document.onmousewheel = this.mouseWheel;
+				js.Lib.document.onmousewheel = wheelFunc;
 
-			js.Lib.document.onkeydown = this.keyDown;
-			js.Lib.document.onkeyup = this.keyUp;
+			js.Lib.document.onkeydown = function(event) { me.recordEvent(InputEvent.KeyDown, event); };
+			js.Lib.document.onkeyup = function(event) { me.recordEvent(InputEvent.KeyUp, event); };
 		}
 	}
 
+	private function recordEvent(type:InputEvent, event:Dynamic):Void
+	{
+		this.recordedEvents.push(new RecordedEvent(type, event));
+	}
+
+	private function contextMenu(event:Dynamic):Bool
+	{
+		var found:Bool = false;
+		if ( upMouseButtonsRegistered.exists(Type.enumIndex(MouseButton.Right)) )
+		{
+			found = upMouseButtonsRegistered.get(Type.enumIndex(MouseButton.Right)).length != 0;
+		}
+
+		return !(found || this.mouseButtonsAnyRegistered.length != 0);
+	}
+
+
 	/*
-		Dom Event Handler Functions
+		Input Event Handlers
 		------------------------------------------------
 	*/
-	private function mouseDown(event:Dynamic):Bool
+	private function mouseDown(event:Dynamic):Void
 	{
-		var anyEventCalled:Bool = false;
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
 		var mouseButton:MouseButton = getMouseButtonFromButton(event.button);
 
@@ -104,10 +256,7 @@ class InputManager
 		for (cb in this.mouseButtonsAnyRegistered)
 		{
 			if (cb != null)
-			{
-				cb(mousePos.getCopy(), mouseButton, MouseButtonState.Down);
-				anyEventCalled = true;
-			}
+				cb(mouseButton, MouseButtonState.Down, mousePos.getCopy());
 		}
 
 		if ( downMouseButtonsRegistered.exists(Type.enumIndex(mouseButton)) )
@@ -116,19 +265,13 @@ class InputManager
 			for (cb in functions)
 			{
 				if (cb != null)
-				{
 					cb(mousePos.getCopy());
-					anyEventCalled = true;
-				}
 			}
 		}
-
-		return !anyEventCalled;
 	}
 
-	private function mouseUp(event:Dynamic):Bool
+	private function mouseUp(event:Dynamic):Void
 	{
-		var anyEventCalled:Bool = false;
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
 		var mouseButton:MouseButton = getMouseButtonFromButton(event.button);
 
@@ -137,10 +280,7 @@ class InputManager
 		for (cb in this.mouseButtonsAnyRegistered)
 		{
 			if (cb != null)
-			{
-				cb(mousePos.getCopy(), mouseButton, MouseButtonState.Up);
-				anyEventCalled = true;
-			}
+				cb(mouseButton, MouseButtonState.Up, mousePos.getCopy());
 		}
 
 		if ( upMouseButtonsRegistered.exists(Type.enumIndex(mouseButton)) )
@@ -149,17 +289,12 @@ class InputManager
 			for (cb in functions)
 			{
 				if (cb != null)
-				{
 					cb(mousePos.getCopy());
-					anyEventCalled = true;
-				}
 			}
 		}
-
-		return !anyEventCalled;
 	}
 
-	private function mouseMove(event:Dynamic):Bool
+	private function mouseMove(event:Dynamic):Void
 	{
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
 
@@ -170,11 +305,9 @@ class InputManager
 		}
 
 		this.lastMousePos = mousePos;
-
-		return this.mousePositionChangesRegistered.length == 0; // Return false if the developer is using mouse move at all
 	}
 
-	private function mouseWheel(event:Dynamic):Bool
+	private function mouseWheel(event:Dynamic):Void
 	{
 		var ticks:Int = 0;
 
@@ -189,28 +322,12 @@ class InputManager
 			if (cb != null)
 				cb(ticks);
 		}
-
-		return this.mouseWheelsRegistered.length == 0; // Return false if the developer is using mouse move at all
 	}
 
-	private function contextMenu(event:Dynamic):Bool
-	{
-		var found:Bool = false;
-		if ( upMouseButtonsRegistered.exists(Type.enumIndex(MouseButton.Right)) )
-		{
-			found = upMouseButtonsRegistered.get(Type.enumIndex(MouseButton.Right)).length != 0;
-		}
-
-		return !(found || this.mouseButtonsAnyRegistered.length != 0);
-	}
-
-	private function keyDown(event:Event):Bool
+	private function keyDown(event:Event):Void
 	{
 		var keyCode:Int = event.keyCode; 
 		var key:Key = getKeyFromCode(keyCode);
-
-		if (heldKeys.exists(Type.enumIndex(key)))
-			return true;
 
 		heldKeys.set(Type.enumIndex(key), key);
 
@@ -222,21 +339,10 @@ class InputManager
 				if (cb != null)
 					cb();
 			}
-
-			return functions.length == 0; // Return false if the developer is using key down at all
 		}
-
-		// Special Case:
-		if (key == Key.Tab)
-		{
-			if (upKeysRegistered.exists(Type.enumIndex(key)) || heldKeysRegistered.exists(Type.enumIndex(key)))
-				return false;
-		}
-
-		return true;
 	}
 
-	private function keyUp(event:Event):Bool
+	private function keyUp(event:Event):Void
 	{
 		var keyCode:Int = event.keyCode; 
 		var key:Key = getKeyFromCode(keyCode);
@@ -251,11 +357,7 @@ class InputManager
 				if (cb != null)
 					cb();
 			}
-
-			return functions.length == 0; // Return false if the developer is using key up at all
 		}
-
-		return true;
 	}
 
 	/*
@@ -264,6 +366,45 @@ class InputManager
 	*/
 	public function update(msTimeStep:Int):Void
 	{
+		// Get all recorded events into a temporary store so that new events don't affect the loop
+		var tempEvents:Array<RecordedEvent> = new Array();
+		for (recordedEvent in this.recordedEvents)
+		{
+			tempEvents.push(recordedEvent);
+		}
+		this.recordedEvents = new Array();
+
+		// Call recorded events
+		this.queueRegisters = true;
+		for (recordedEvent in tempEvents)
+		{
+			var func:Dynamic -> Void;
+			switch (recordedEvent.type)
+			{
+				case MouseDown:
+					func = this.mouseDown;
+				
+				case MouseUp:
+					func = this.mouseUp;
+				
+				case MouseMove:
+					func = this.mouseMove;
+				
+				case MouseWheel:
+					func = this.mouseWheel;
+				
+				case KeyDown:
+					func = this.keyDown;
+				
+				case KeyUp:
+					func = this.keyUp;
+
+				default:
+					func = null;
+			}
+			func(recordedEvent.event);
+		}
+
 		for (key in heldKeys)
 		{
 			if (heldKeysRegistered.exists(Type.enumIndex(key)))
@@ -288,6 +429,9 @@ class InputManager
 				}
 			}
 		}
+
+		this.queueRegisters = false;
+		this.flushQueues();
 
 		this.timeLeftToRecalculateOffsetMs -= msTimeStep;
 		if (this.timeLeftToRecalculateOffsetMs <= 0)
@@ -370,6 +514,12 @@ class InputManager
 		if (cb == null)
 			return;
 
+		if (this.queueRegisters)
+		{
+			this.queuedMouseButtonRegisters.push(new MouseButtonData(button, buttonState, cb));
+			return;
+		}
+
 		var buttons:IntHash<Array<Vector2 -> Void>> = mouseButtonsRegistered.get(Type.enumIndex(buttonState));
 		if ( !buttons.exists(Type.enumIndex(button)) )
 			buttons.set(Type.enumIndex(button), new Array());
@@ -377,10 +527,16 @@ class InputManager
 		buttons.get(Type.enumIndex(button)).push(cb);
 	}
 
-	public function registerMouseButtonAnyEvent(cb:Vector2 -> MouseButton -> MouseButtonState -> Void):Void
+	public function registerMouseButtonAnyEvent(cb:MouseButton -> MouseButtonState -> Vector2 -> Void):Void
 	{
 		if (cb == null)
 			return;
+
+		if (this.queueRegisters)
+		{
+			this.queuedMouseButtonAnyRegisters.push(new MouseButtonAnyData(cb));
+			return;
+		}
 
 		this.mouseButtonsAnyRegistered.push(cb);
 	}
@@ -390,6 +546,12 @@ class InputManager
 		if (cb == null)
 			return;
 
+		if (this.queueRegisters)
+		{
+			this.queuedMouseMoveRegisters.push(new MouseMoveData(cb));
+			return;
+		}
+
 		this.mousePositionChangesRegistered.push(cb);
 	}
 
@@ -398,6 +560,12 @@ class InputManager
 		if (cb == null)
 			return;
 
+		if (this.queueRegisters)
+		{
+			this.queuedMouseWheelRegisters.push(new MouseWheelData(cb));
+			return;
+		}
+
 		mouseWheelsRegistered.push(cb);
 	}
 
@@ -405,12 +573,32 @@ class InputManager
 	{
 		if (cb == null)
 			return;
+
+		if (this.queueRegisters)
+		{
+			this.queuedKeyRegisters.push(new KeyData(key, keyState, cb));
+			return;
+		}
 		
 		var arr:IntHash<Array<Void -> Void>> = keysRegistered.get(Type.enumIndex(keyState));
 		if ( !arr.exists(Type.enumIndex(key)) )
 			arr.set(Type.enumIndex(key), new Array());
 
 		arr.get(Type.enumIndex(key)).push(cb);
+	}
+
+	public function registerKeyAnyEvent(cb:Key -> KeyState -> Void):Void
+	{
+		if (cb == null)
+			return;
+
+		if (this.queueRegisters)
+		{
+			this.queuedKeyAnyRegisters.push(new KeyAnyData(cb));
+			return;
+		}
+
+		this.keysAnyRegistered.push(cb);
 	}
 
 	/*
@@ -421,6 +609,12 @@ class InputManager
 	{	
 		if (cb == null)
 			return;
+
+		if (this.queueRegisters)
+		{
+			this.queuedMouseButtonUnregisters.push(new MouseButtonData(mouseButton, mouseButtonState, cb));
+			return;
+		}
 
 		var mouseButtons:IntHash<Array<Vector2 -> Void>> = mouseButtonsRegistered.get(Type.enumIndex(mouseButtonState));
 		if ( mouseButtons.exists(Type.enumIndex(mouseButton)) )
@@ -437,10 +631,16 @@ class InputManager
 		}
 	}
 
-	public function unregisterMouseButtonAnyEvent(cb:Vector2 -> MouseButton -> MouseButtonState -> Void):Void
+	public function unregisterMouseButtonAnyEvent(cb:MouseButton -> MouseButtonState -> Vector2 -> Void):Void
 	{	
 		if (cb == null)
 			return;
+
+		if (this.queueRegisters)
+		{
+			this.queuedMouseButtonAnyUnregisters.push(new MouseButtonAnyData(cb));
+			return;
+		}
 
 		for (i in 0...this.mouseButtonsAnyRegistered.length)
 		{
@@ -457,6 +657,12 @@ class InputManager
 		if (cb == null)
 			return;
 
+		if (this.queueRegisters)
+		{
+			this.queuedMouseMoveUnregisters.push(new MouseMoveData(cb));
+			return;
+		}
+
 		for (i in 0...mousePositionChangesRegistered.length)
 		{
 			if (Reflect.compareMethods(mousePositionChangesRegistered[i], cb))
@@ -471,6 +677,12 @@ class InputManager
 	{	
 		if (cb == null)
 			return;
+
+		if (this.queueRegisters)
+		{
+			this.queuedMouseWheelUnregisters.push(new MouseWheelData(cb));
+			return;
+		}
 
 		for (i in 0...mouseWheelsRegistered.length)
 		{
@@ -487,7 +699,14 @@ class InputManager
 		if (cb == null)
 			return;
 
+		if (this.queueRegisters)
+		{
+			this.queuedKeyUnregisters.push(new KeyData(key, keyState, cb));
+			return;
+		}
+
 		var keys:IntHash<Array<Void -> Void>> = keysRegistered.get(Type.enumIndex(keyState));
+		
 		if ( keys.exists(Type.enumIndex(key)) )
 		{
 			var functions:Array<Void -> Void> = keys.get(Type.enumIndex(key));
@@ -501,6 +720,80 @@ class InputManager
 			}
 		}
 	}
+
+	public function unregisterKeyAnyEvent(cb:Key -> KeyState -> Void):Void
+	{	
+		if (cb == null)
+			return;
+
+		if (this.queueRegisters)
+		{
+			this.queuedKeyAnyUnregisters.push(new KeyAnyData(cb));
+			return;
+		}
+
+		for (i in 0...this.keysAnyRegistered.length)
+		{
+			if (Reflect.compareMethods(this.keysAnyRegistered[i], cb))
+			{
+				this.keysAnyRegistered.splice(i, 1);
+				break;
+			}
+		}
+	}
+
+	private function flushQueues():Void
+	{
+		for (data in this.queuedMouseButtonRegisters)
+			this.registerMouseButtonEvent(data.button, data.buttonState, data.cb);
+		this.queuedMouseButtonRegisters = new Array();
+
+		for (data in this.queuedMouseMoveRegisters)
+			this.registerMouseMoveEvent(data.cb);
+		this.queuedMouseWheelRegisters = new Array();
+
+		for (data in this.queuedMouseWheelRegisters)
+			this.registerMouseWheelEvent(data.cb);
+		this.queuedMouseButtonAnyRegisters = new Array();
+
+		for (data in this.queuedMouseButtonAnyRegisters)
+			this.registerMouseButtonAnyEvent(data.cb);
+		this.queuedMouseButtonAnyRegisters = new Array();
+
+		for (data in this.queuedKeyRegisters)
+			this.registerKeyEvent(data.key, data.keyState, data.cb);
+		this.queuedKeyRegisters = new Array();
+
+		for (data in this.queuedKeyAnyRegisters)
+			this.registerKeyAnyEvent(data.cb);
+		this.queuedKeyAnyRegisters = new Array();
+
+
+		for (data in this.queuedMouseButtonUnregisters)
+			this.unregisterMouseButtonEvent(data.button, data.buttonState, data.cb);
+		this.queuedMouseButtonUnregisters = new Array();
+
+		for (data in this.queuedMouseMoveUnregisters)
+			this.unregisterMouseMoveEvent(data.cb);
+		this.queuedMouseMoveUnregisters = new Array();
+
+		for (data in this.queuedMouseWheelUnregisters)
+			this.unregisterMouseWheelEvent(data.cb);
+		this.queuedMouseWheelUnregisters = new Array();
+
+		for (data in this.queuedMouseButtonAnyUnregisters)
+			this.unregisterMouseButtonAnyEvent(data.cb);
+		this.queuedMouseButtonAnyUnregisters = new Array();
+
+		for (data in this.queuedKeyUnregisters)
+			this.unregisterKeyEvent(data.key, data.keyState, data.cb);
+		this.queuedKeyUnregisters = new Array();
+
+		for (data in this.queuedKeyAnyUnregisters)
+			this.unregisterKeyAnyEvent(data.cb);
+		this.queuedKeyAnyUnregisters = new Array();
+	}
+
 
 	/*
 		Current state getter functions
