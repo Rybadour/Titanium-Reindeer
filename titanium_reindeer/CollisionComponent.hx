@@ -117,9 +117,14 @@ class CollisionComponent extends Component
 		}
 	}
 
+	public function getShape():Shape
+	{
+		return this.getMinBoundingRect();
+	}
+
 	public function isPointIntersecting(point:Vector2):Bool
 	{
-		return true;
+		return this.getShape().isPointInside(point);
 	}
 	
 	override public function setOwner(gameObject:GameObject):Void
@@ -158,9 +163,10 @@ class CollisionComponent extends Component
 
 		if (this.owner != null)
 		{
+			var center:Vector2 = this.getCenter();
 			this.minBoundingRect = new Rect(
-				this.owner.position.x + this.offset.x - this.width/2,
-				this.owner.position.y + this.offset.y - this.height/2,
+				center.x - this.width/2,
+				center.y - this.height/2,
 				this.width,
 				this.height
 			);

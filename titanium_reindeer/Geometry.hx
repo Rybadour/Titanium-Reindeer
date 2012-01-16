@@ -3,17 +3,6 @@ package titanium_reindeer;
 // A series of static methods for common geometric calculations
 class Geometry
 {
-	public static function isPointInRect(p:Vector2, r:Rect):Bool
-	{
-		return (p.x >= r.left) && (p.x < r.right) &&
-			   (p.y >= r.top)  && (p.y < r.bottom);
-	}
-
-	public static function isPointInCircle(p:Vector2, c:Circle):Bool
-	{
-		return c.radius >= Vector2.getDistance(p, c.center);
-	}
-
 	public static function isCircleIntersectingRect(c:Circle, r:Rect):Bool
 	{
 		var rWidthHalf:Float = r.width/2;

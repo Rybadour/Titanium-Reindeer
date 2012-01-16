@@ -1,6 +1,6 @@
 package titanium_reindeer;
 
-class Circle
+class Circle extends Shape
 {
 	public static function isIntersecting(a:Circle, b:Circle):Bool
 	{
@@ -23,5 +23,15 @@ class Circle
 		this.radius = radius;
 		this.center = new Vector2(0, 0);
 		this.center = center;
+	}
+
+	public override function getMinBoundingRect():Rect
+	{
+		return new Rect(this.center.x - this.radius, this.center.y - this.radius, this.radius*2, this.radius*2);
+	}
+
+	public override function isPointInside(p:Vector2):Bool
+	{
+		return this.radius >= Vector2.getDistance(p, this.center);
 	}
 }

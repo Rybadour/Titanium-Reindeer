@@ -575,7 +575,7 @@ class RTreeFastInt
 
 				for (child in node.children)
 				{
-					if (Geometry.isPointInRect(point, child.bounds))
+					if (child.bounds.isPointInside(point))
 					{
 						if (Std.is(child, RTreeFastLeaf))
 							results.push(cast(child, RTreeFastLeaf).value);

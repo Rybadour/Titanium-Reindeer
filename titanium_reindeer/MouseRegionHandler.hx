@@ -17,7 +17,8 @@ enum MouseRegionButtonEvent
 
 class MouseRegionHandler
 {
-	private var collisionRegion:CollisionComponent;
+	public var manager(default, null):MouseRegionManager;
+	public var collisionRegion(default, null):CollisionComponent;
 
 	private var registeredMouseMoveEvents:Array<Vector2 -> Void>;
 	private var registeredMouseEnterEvents:Array<Vector2 -> Void>;
@@ -27,14 +28,40 @@ class MouseRegionHandler
 	private var registeredMouseClickEvents:Array<Vector2 -> MouseButton -> Void>;
 
 	public var isMouseInside(default, null):Bool;
+	
 	private var isMouseButtonsDownInside:IntHash<Bool>;
 	public function getIsMouseDownInside(mouseButton:MouseButton):Bool
 	{
 		return isMouseButtonsDownInside.get(Type.enumIndex(mouseButton));
 	}
 
-	public function new(collisionComponent:CollisionComponent)
+	public var depth:Int;
+
+	public var isBlockingBelow(default, setIsBlockingBelow):Bool;
+	private function setIsBlockingBelow(value:Bool):Bool
 	{
+		if (value != this.isBlockingBelow)
+		{
+			this.isBlockingBelow = value;
+			if (value)
+				this.exclusionRegion = this.manager.createExclusionRegion(this.depth, this.collisionRegion.getShape());
+			else
+			{
+				if (this.exclusionRegion != null)
+				{
+					this.exclusionRegion.destroy();
+					this.exclusionRegion = null;
+				}
+			}
+		}
+
+		return this.isBlockingBelow;
+	}
+	public var exclusionRegion(default, null):MouseExclusionRegion;
+
+	public function new(manager:MouseRegionManager, collisionComponent:CollisionComponent)
+	{
+		this.manager = manager;
 		this.collisionRegion = collisionComponent;
 		this.isMouseInside = false;
 		this.isMouseButtonsDownInside = new IntHash();
@@ -45,6 +72,8 @@ class MouseRegionHandler
 		this.registeredMouseDownEvents = new Array();
 		this.registeredMouseUpEvents = new Array();
 		this.registeredMouseClickEvents = new Array();
+
+		this.depth = 0;
 	}
 
 	public function mouseMove(mousePos:Vector2, colliding:Bool):Void
@@ -152,7 +181,7 @@ class MouseRegionHandler
 		}
 	}
 
-	public function unregisterMouseEvent(mouseEvent:MouseRegionMoveEvent, func:Vector2 -> Void):Void
+	public function unregisterMouseMoveEvent(mouseEvent:MouseRegionMoveEvent, func:Vector2 -> Void):Void
 	{
 		if (func == null)
 			return;

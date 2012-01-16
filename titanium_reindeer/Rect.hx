@@ -1,6 +1,6 @@
 package titanium_reindeer;
 
-class Rect
+class Rect extends Shape
 {
 	// Static
 	public static function isIntersecting(a:Rect, b:Rect):Bool
@@ -95,6 +95,17 @@ class Rect
 
 		this.width = width;
 		this.height = height;
+	}
+
+	public override function getMinBoundingRect():Rect
+	{
+		return this.getCopy();
+	}
+
+	public override function isPointInside(p:Vector2):Bool
+	{
+		return (p.x >= this.left) && (p.x < this.right) &&
+			   (p.y >= this.top)  && (p.y < this.bottom);
 	}
 
 	public function getCopy():Rect

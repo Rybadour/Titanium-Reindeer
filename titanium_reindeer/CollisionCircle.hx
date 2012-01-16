@@ -50,8 +50,8 @@ class CollisionCircle extends CollisionComponent
 		}
 	}
 
-	override public function isPointIntersecting(point:Vector2):Bool
+	override public function getShape():Shape
 	{
-		return Geometry.isPointInCircle(point, new Circle(this.radius, this.getCenter()));
+		return new Circle(this.radius, this.getCenter());
 	}
 }

@@ -27,8 +27,8 @@ class Button extends GameObject
 		return this.text;
 	}
 
-	private var collisionShape:CollisionComponent;
-	private var mouseHandler:MouseRegionHandler;
+	public var collisionShape(default, null):CollisionComponent;
+	public var mouseHandler(default, null):MouseRegionHandler;
 
 	private var registeredMouseClickEvents:Array<Vector2 -> Void>;
 
@@ -185,5 +185,19 @@ class Button extends GameObject
 		{
 			func(mousePos);
 		}
+	}
+
+	public override function destroy():Void
+	{
+		super.destroy();
+
+		this.flushAndDestroyComponents();
+
+		this.mouseHandler.unregisterMouseMoveEvent(MouseRegionMoveEvent.Enter, mouseEnter);
+		this.mouseHandler.unregisterMouseMoveEvent(MouseRegionMoveEvent.Exit, mouseExit);
+		this.mouseHandler.unregisterMouseButtonEvent(MouseRegionButtonEvent.Down, mouseDown);
+		this.mouseHandler.unregisterMouseButtonEvent(MouseRegionButtonEvent.Up, mouseUp);
+
+		this.objectManager.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
 	}
 }
