@@ -64,4 +64,16 @@ class Color
 	{
 		return "Color("+red+","+green+","+blue+","+alpha+");";
 	}
+
+	public function getMultiplied(n:Float):Color
+	{
+		return new Color(Std.int(this.red*n), Std.int(this.green*n), Std.int(this.blue*n));
+	}
+
+	public function multiply(n:Float):Void
+	{
+		this.red = Std.int(this.red*n);
+		this.green = Std.int(this.green*n);
+		this.blue = Std.int(this.blue*n);
+	}
 }
