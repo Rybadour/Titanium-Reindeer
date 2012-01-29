@@ -50,6 +50,22 @@ class Button extends GameObject
 
 		return this.enabled;
 	}
+
+	public var visible(default, setVisible):Bool;
+	private function setVisible(value:Bool):Bool
+	{
+		if (value != this.visible)
+		{
+			this.visible = value;
+
+			if (this.visible)
+				this.appear();
+			else
+				this.disappear();
+		}
+
+		return this.visible;
+	}
 	
 
 	public function new(fgLayer:Int, collision:CollisionComponent)
@@ -70,6 +86,7 @@ class Button extends GameObject
 		this.isHeldDown = false;
 
 		this.enabled = true;
+		this.visible = true;
 	}
 
 	// Publicly usable methods
@@ -113,6 +130,16 @@ class Button extends GameObject
 			this.isHeldDown = false;
 			this.heldDownStop();
 		}
+	}
+
+	private function appear():Void
+	{
+		this.shownText.visible = true;
+	}
+
+	private function disappear():Void
+	{
+		this.shownText.visible = false;
 	}
 
 	private function mouseEnter(mousePos:Vector2):Void

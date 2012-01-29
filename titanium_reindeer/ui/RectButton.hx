@@ -39,12 +39,13 @@ class RectButton extends Button
 	{
 		this.collisionRect = new CollisionRect(width, height, Button.UI_COLLISION_LAYER, Button.BUTTON_COLLISION_GROUP);
 
-		super(fgLayer, collisionRect);
-
 		this.shownRect = new RectRenderer(width, height, bgLayer);
 		this.shownRect.fillColor = Color.White;
 		this.shownRect.strokeColor = Color.Black;
 		this.shownRect.lineWidth = 1;
+
+		super(fgLayer, collisionRect);
+
 		this.addComponent("__shown_rect__", shownRect);
 	}
 
@@ -74,6 +75,20 @@ class RectButton extends Button
 			disableColor.blue = Math.round(disableColor.blue * 0.4);
 			this.shownRect.fillColor = disableColor;
 		}
+	}
+
+	private override function appear():Void
+	{
+		super.appear();
+
+		this.shownRect.visible = true;
+	}
+
+	private override function disappear():Void
+	{
+		super.disappear();
+
+		this.shownRect.visible = false;
 	}
 
 	private override function mouseOverStart():Void
