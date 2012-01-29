@@ -34,6 +34,7 @@ class Game
 	public var gameObjectManager(default, null):GameObjectManager;
 	public var inputManager(default, null):InputManager;
 	public var soundManager(default, null):SoundManager;
+	public var cursor(default, null):Cursor;
 	// TODO: Screen manager
 
 	public function new(?targetHtmlId:String, ?width:Int, ?height:Int, ?layerCount:Int, ?debugMode:Bool, ?backgroundColor:Color)
@@ -57,6 +58,7 @@ class Game
 		this.gameObjectManager = new GameObjectManager(this);
 		this.inputManager = new InputManager(this.targetElement);
 		this.soundManager = new SoundManager();
+		this.cursor = new Cursor(this.targetElement);
 
 		if (debugMode)
 		{
