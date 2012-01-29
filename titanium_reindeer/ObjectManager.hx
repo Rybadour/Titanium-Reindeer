@@ -12,6 +12,7 @@ class ObjectManager
 		this.nextId = 0;
 
 		this.objects = new IntHash();
+		this.objectsToRemove = new IntHash();
 	}
 
 	public function getNextId():Int
@@ -41,16 +42,13 @@ class ObjectManager
 
 	private function removeObject(obj:ManagedObject):Void
 	{
-		if (objectsToRemove == null)
-			objectsToRemove = new IntHash();
-
 		if (objects.exists(obj.id) && !objectsToRemove.exists(obj.id))
 			objectsToRemove.set(obj.id, obj.id);
 	}
 
 	public function removeObjects():Void
 	{
-		if (objectsToRemove != null && Lambda.count(objectsToRemove) > 0)
+		if (Lambda.count(objectsToRemove) > 0)
 		{
 			for (objId in objectsToRemove)
 			{
@@ -68,17 +66,17 @@ class ObjectManager
 
 	public function destroy():Void
 	{
-		for (i in objects.keys())
+		for (i in this.objects.keys())
 		{
-			objects.get(i).destroy();
-			objects.remove(i);
+			this.objects.get(i).destroy();
+			this.objects.remove(i);
 		}
-		objects = null;
+		this.objects = null;
 
-		for (i in objectsToRemove.keys())
+		for (i in this.objectsToRemove.keys())
 		{
-			objectsToRemove.remove(i);
+			this.objectsToRemove.remove(i);
 		}
-		objectsToRemove = null;
+		this.objectsToRemove = null;
 	}
 }
