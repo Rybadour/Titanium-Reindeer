@@ -330,6 +330,15 @@ titanium_reindeer.MouseAction.Down.__enum__ = titanium_reindeer.MouseAction;
 titanium_reindeer.MouseAction.Up = ["Up",2];
 titanium_reindeer.MouseAction.Up.toString = $estr;
 titanium_reindeer.MouseAction.Up.__enum__ = titanium_reindeer.MouseAction;
+titanium_reindeer.ExclusionsMaxDepthPair = function(exclusions,maxDepth) {
+	if( exclusions === $_ ) return;
+	this.exclusions = exclusions;
+	this.maxDepth = maxDepth;
+}
+titanium_reindeer.ExclusionsMaxDepthPair.__name__ = ["titanium_reindeer","ExclusionsMaxDepthPair"];
+titanium_reindeer.ExclusionsMaxDepthPair.prototype.exclusions = null;
+titanium_reindeer.ExclusionsMaxDepthPair.prototype.maxDepth = null;
+titanium_reindeer.ExclusionsMaxDepthPair.prototype.__class__ = titanium_reindeer.ExclusionsMaxDepthPair;
 titanium_reindeer.ComponentHandlerPair = function(component,handler) {
 	if( component === $_ ) return;
 	this.component = component;
@@ -345,28 +354,47 @@ titanium_reindeer.MouseRegionManager = function(manager) {
 	this.collisionManager.gameObjectManager.game.inputManager.registerMouseMoveEvent($closure(this,"mouseMoveHandle"));
 	this.collisionManager.gameObjectManager.game.inputManager.registerMouseButtonAnyEvent($closure(this,"mouseButtonHandle"));
 	this.layerToPairsMap = new Hash();
+	this.exclusionRegions = new IntHash();
+	this.exclusionRTree = new titanium_reindeer.RTreeFastInt();
+	this.nextExclusionId = 0;
 }
 titanium_reindeer.MouseRegionManager.__name__ = ["titanium_reindeer","MouseRegionManager"];
 titanium_reindeer.MouseRegionManager.prototype.collisionManager = null;
 titanium_reindeer.MouseRegionManager.prototype.layerToPairsMap = null;
+titanium_reindeer.MouseRegionManager.prototype.exclusionRegions = null;
+titanium_reindeer.MouseRegionManager.prototype.exclusionRTree = null;
+titanium_reindeer.MouseRegionManager.prototype.nextExclusionId = null;
 titanium_reindeer.MouseRegionManager.prototype.getHandler = function(component) {
 	if(component == null) return null;
 	if(component.id == null) return null;
 	var handler;
 	var pairs;
-	if(this.layerToPairsMap.exists(component.layerName)) {
-		pairs = this.layerToPairsMap.get(component.layerName);
-		if(pairs.exists(component.id)) handler = pairs.get(component.id).handler; else {
-			handler = new titanium_reindeer.MouseRegionHandler(component);
-			pairs.set(component.id,new titanium_reindeer.ComponentHandlerPair(component,handler));
-		}
-	} else {
-		handler = new titanium_reindeer.MouseRegionHandler(component);
+	if(this.layerToPairsMap.exists(component.layerName)) pairs = this.layerToPairsMap.get(component.layerName); else {
 		pairs = new IntHash();
-		pairs.set(component.id,new titanium_reindeer.ComponentHandlerPair(component,handler));
 		this.layerToPairsMap.set(component.layerName,pairs);
 	}
+	if(pairs.exists(component.id)) handler = pairs.get(component.id).handler; else {
+		handler = new titanium_reindeer.MouseRegionHandler(this,component);
+		pairs.set(component.id,new titanium_reindeer.ComponentHandlerPair(component,handler));
+	}
 	return handler;
+}
+titanium_reindeer.MouseRegionManager.prototype.createExclusionRegion = function(depth,shape) {
+	if(shape == null) return null;
+	var newExclusionRegion = new titanium_reindeer.MouseExclusionRegion(this,this.nextExclusionId,depth,shape);
+	this.exclusionRegions.set(this.nextExclusionId,newExclusionRegion);
+	this.exclusionRTree.insert(shape.getMinBoundingRect(),this.nextExclusionId);
+	this.nextExclusionId += 1;
+	return newExclusionRegion;
+}
+titanium_reindeer.MouseRegionManager.prototype.updateExclusionRegionShape = function(exclusionRegion) {
+	if(exclusionRegion == null || !this.exclusionRegions.exists(exclusionRegion.id)) return;
+	this.exclusionRTree.update(exclusionRegion.shape.getMinBoundingRect(),exclusionRegion.id);
+}
+titanium_reindeer.MouseRegionManager.prototype.removeExclusionRegion = function(exclusionRegion) {
+	if(exclusionRegion == null || !this.exclusionRegions.exists(exclusionRegion.id)) return;
+	this.exclusionRegions.remove(exclusionRegion.id);
+	this.exclusionRTree.remove(exclusionRegion.id);
 }
 titanium_reindeer.MouseRegionManager.prototype.mouseMoveHandle = function(mousePos) {
 	this.handleAction(titanium_reindeer.MouseAction.Move,mousePos,titanium_reindeer.MouseButton.None);
@@ -377,35 +405,78 @@ titanium_reindeer.MouseRegionManager.prototype.mouseButtonHandle = function(butt
 	this.handleAction(action,mousePos,button);
 }
 titanium_reindeer.MouseRegionManager.prototype.handleAction = function(action,mousePos,button) {
-	var collidingIds;
+	if(Lambda.count(this.layerToPairsMap) <= 0) return;
 	var $it0 = this.layerToPairsMap.keys();
 	while( $it0.hasNext() ) {
 		var layerName = $it0.next();
 		var pairs = this.layerToPairsMap.get(layerName);
 		var foundPairs = new IntHash();
-		collidingIds = this.collisionManager.getLayer(layerName).getIdsIntersectingPoint(mousePos);
+		var collidingIds = this.collisionManager.getLayer(layerName).getIdsIntersectingPoint(mousePos);
 		var _g = 0;
 		while(_g < collidingIds.length) {
 			var id = collidingIds[_g];
 			++_g;
 			if(pairs.exists(id)) foundPairs.set(id,true);
 		}
+		var exclusionResults = null;
 		var $it1 = pairs.keys();
 		while( $it1.hasNext() ) {
 			var id = $it1.next();
+			var colliding = foundPairs.exists(id);
+			var handler = pairs.get(id).handler;
+			if(colliding) {
+				if(exclusionResults == null) exclusionResults = this.organizeIntersectingExclusions(mousePos);
+				var handlersExclusion = -1;
+				if(handler.isBlockingBelow) handlersExclusion = handler.exclusionRegion.id;
+				var _g1 = handler.depth, _g = exclusionResults.maxDepth + 1;
+				while(_g1 < _g) {
+					var d = _g1++;
+					if(exclusionResults.exclusions.exists(d)) {
+						var _g2 = 0, _g3 = exclusionResults.exclusions.get(d);
+						while(_g2 < _g3.length) {
+							var exclusion = _g3[_g2];
+							++_g2;
+							if(exclusion.id != handlersExclusion) {
+								colliding = false;
+								break;
+							}
+						}
+						if(!colliding) break;
+					}
+				}
+			}
 			switch( (action)[1] ) {
 			case 0:
-				pairs.get(id).handler.mouseMove(mousePos,foundPairs.exists(id));
+				handler.mouseMove(mousePos,colliding);
 				break;
 			case 1:
-				pairs.get(id).handler.mouseDown(mousePos,button,foundPairs.exists(id));
+				handler.mouseDown(mousePos,button,colliding);
 				break;
 			case 2:
-				pairs.get(id).handler.mouseUp(mousePos,button,foundPairs.exists(id));
+				handler.mouseUp(mousePos,button,colliding);
 				break;
 			}
 		}
 	}
+}
+titanium_reindeer.MouseRegionManager.prototype.organizeIntersectingExclusions = function(mousePos) {
+	var exclusionIds = this.exclusionRTree.getPointIntersectingValues(mousePos);
+	var exclusionRegions = new IntHash();
+	var regions;
+	var maxDepth = 0;
+	var _g = 0;
+	while(_g < exclusionIds.length) {
+		var id = exclusionIds[_g];
+		++_g;
+		var exclusionRegion = this.exclusionRegions.get(id);
+		if(exclusionRegions.exists(exclusionRegion.depth)) regions = exclusionRegions.get(exclusionRegion.depth); else {
+			regions = new Array();
+			exclusionRegions.set(exclusionRegion.depth,regions);
+		}
+		regions.push(exclusionRegion);
+		if(exclusionRegion.depth > maxDepth) maxDepth = exclusionRegion.depth;
+	}
+	return new titanium_reindeer.ExclusionsMaxDepthPair(exclusionRegions,maxDepth);
 }
 titanium_reindeer.MouseRegionManager.prototype.destroy = function() {
 	this.collisionManager.gameObjectManager.game.inputManager.unregisterMouseMoveEvent($closure(this,"mouseMoveHandle"));
@@ -1177,6 +1248,7 @@ titanium_reindeer.ObjectManager = function(p) {
 	if( p === $_ ) return;
 	this.nextId = 0;
 	this.objects = new IntHash();
+	this.objectsToRemove = new IntHash();
 }
 titanium_reindeer.ObjectManager.__name__ = ["titanium_reindeer","ObjectManager"];
 titanium_reindeer.ObjectManager.prototype.nextId = null;
@@ -1196,11 +1268,10 @@ titanium_reindeer.ObjectManager.prototype.addObject = function(object) {
 	this.objects.set(object.id,object);
 }
 titanium_reindeer.ObjectManager.prototype.removeObject = function(obj) {
-	if(this.objectsToRemove == null) this.objectsToRemove = new IntHash();
 	if(this.objects.exists(obj.id) && !this.objectsToRemove.exists(obj.id)) this.objectsToRemove.set(obj.id,obj.id);
 }
 titanium_reindeer.ObjectManager.prototype.removeObjects = function() {
-	if(this.objectsToRemove != null && Lambda.count(this.objectsToRemove) > 0) {
+	if(Lambda.count(this.objectsToRemove) > 0) {
 		var $it0 = this.objectsToRemove.iterator();
 		while( $it0.hasNext() ) {
 			var objId = $it0.next();
@@ -1663,6 +1734,14 @@ titanium_reindeer.Color.prototype.getCopy = function() {
 titanium_reindeer.Color.prototype.identify = function() {
 	return "Color(" + this.red + "," + this.green + "," + this.blue + "," + this.alpha + ");";
 }
+titanium_reindeer.Color.prototype.getMultiplied = function(n) {
+	return new titanium_reindeer.Color(Std["int"](this.red * n),Std["int"](this.green * n),Std["int"](this.blue * n));
+}
+titanium_reindeer.Color.prototype.multiply = function(n) {
+	this.red = Std["int"](this.red * n);
+	this.green = Std["int"](this.green * n);
+	this.blue = Std["int"](this.blue * n);
+}
 titanium_reindeer.Color.prototype.__class__ = titanium_reindeer.Color;
 List = function(p) {
 	if( p === $_ ) return;
@@ -1789,9 +1868,10 @@ titanium_reindeer.Game = function(targetHtmlId,width,height,layerCount,debugMode
 	this.gameObjectManager = new titanium_reindeer.GameObjectManager(this);
 	this.inputManager = new titanium_reindeer.InputManager(this.targetElement);
 	this.soundManager = new titanium_reindeer.SoundManager();
+	this.cursor = new titanium_reindeer.Cursor(this.targetElement);
 	if(debugMode) js.Lib.setErrorHandler(function(msg,stack) {
 		js.Lib.alert("ERROR[ " + msg + " ]");
-		haxe.Log.trace(stack,{ fileName : "Game.hx", lineNumber : 66, className : "titanium_reindeer.Game", methodName : "new"});
+		haxe.Log.trace(stack,{ fileName : "Game.hx", lineNumber : 68, className : "titanium_reindeer.Game", methodName : "new"});
 		return true;
 	});
 }
@@ -1812,6 +1892,7 @@ titanium_reindeer.Game.prototype.msLastTimeStep = null;
 titanium_reindeer.Game.prototype.gameObjectManager = null;
 titanium_reindeer.Game.prototype.inputManager = null;
 titanium_reindeer.Game.prototype.soundManager = null;
+titanium_reindeer.Game.prototype.cursor = null;
 titanium_reindeer.Game.prototype.play = function() {
 	this.requestAnimFrame();
 }
@@ -2503,7 +2584,7 @@ titanium_reindeer.RTreeFastInt.prototype.getPointIntersectingValues = function(p
 			while(_g1 < _g2.length) {
 				var child = _g2[_g1];
 				++_g1;
-				if(titanium_reindeer.Geometry.isPointInRect(point,child.bounds)) {
+				if(child.bounds.isPointInside(point)) {
 					if(Std["is"](child,titanium_reindeer.RTreeFastLeaf)) results.push(((function($this) {
 						var $r;
 						var $t = child;
@@ -3012,12 +3093,6 @@ titanium_reindeer.LinearGradient.prototype.destroy = function() {
 titanium_reindeer.LinearGradient.prototype.__class__ = titanium_reindeer.LinearGradient;
 titanium_reindeer.Geometry = function() { }
 titanium_reindeer.Geometry.__name__ = ["titanium_reindeer","Geometry"];
-titanium_reindeer.Geometry.isPointInRect = function(p,r) {
-	return p.getX() >= r.getLeft() && p.getX() < r.getRight() && p.getY() >= r.getTop() && p.getY() < r.getBottom();
-}
-titanium_reindeer.Geometry.isPointInCircle = function(p,c) {
-	return c.radius >= titanium_reindeer.Vector2.getDistance(p,c.center);
-}
 titanium_reindeer.Geometry.isCircleIntersectingRect = function(c,r) {
 	var rWidthHalf = r.width / 2;
 	var rHeightHalf = r.height / 2;
@@ -3059,6 +3134,16 @@ titanium_reindeer.Geometry.closestAngle = function(rad,comparisons) {
 	return closestComparison;
 }
 titanium_reindeer.Geometry.prototype.__class__ = titanium_reindeer.Geometry;
+titanium_reindeer.Shape = function() { }
+titanium_reindeer.Shape.__name__ = ["titanium_reindeer","Shape"];
+titanium_reindeer.Shape.prototype.getMinBoundingRect = function() {
+	throw "Error: This function should not be called, inheriting classes should override and not call!";
+	return null;
+}
+titanium_reindeer.Shape.prototype.isPointInside = function(p) {
+	return false;
+}
+titanium_reindeer.Shape.prototype.__class__ = titanium_reindeer.Shape;
 titanium_reindeer.SoundSource = function(filePath) {
 	if( filePath === $_ ) return;
 	this.isLoaded = false;
@@ -3373,8 +3458,11 @@ titanium_reindeer.CollisionComponent.prototype.unregisterCallback = function(fun
 		while(i < this.registeredCallbacks.length) if(Reflect.compareMethods(this.registeredCallbacks[i],func)) this.registeredCallbacks.splice(i,1); else break;
 	}
 }
+titanium_reindeer.CollisionComponent.prototype.getShape = function() {
+	return this.getMinBoundingRect();
+}
 titanium_reindeer.CollisionComponent.prototype.isPointIntersecting = function(point) {
-	return true;
+	return this.getShape().isPointInside(point);
 }
 titanium_reindeer.CollisionComponent.prototype.setOwner = function(gameObject) {
 	titanium_reindeer.Component.prototype.setOwner.call(this,gameObject);
@@ -3395,7 +3483,10 @@ titanium_reindeer.CollisionComponent.prototype.offsetChanged = function() {
 }
 titanium_reindeer.CollisionComponent.prototype.updateBounds = function() {
 	if(!this.allowUpdateBounds) return;
-	if(this.owner != null) this.minBoundingRect = new titanium_reindeer.Rect(this.owner.getPosition().getX() + this.getOffset().getX() - this.width / 2,this.owner.getPosition().getY() + this.getOffset().getY() - this.height / 2,this.width,this.height);
+	if(this.owner != null) {
+		var center = this.getCenter();
+		this.minBoundingRect = new titanium_reindeer.Rect(center.getX() - this.width / 2,center.getY() - this.height / 2,this.width,this.height);
+	}
 	if(this.getCollisionManager() != null) {
 		var layer = this.getCollisionManager().getLayer(this.layerName);
 		layer.updateComponent(this);
@@ -3412,6 +3503,8 @@ titanium_reindeer.Circle = function(radius,center) {
 	this.setCenter(center);
 }
 titanium_reindeer.Circle.__name__ = ["titanium_reindeer","Circle"];
+titanium_reindeer.Circle.__super__ = titanium_reindeer.Shape;
+for(var k in titanium_reindeer.Shape.prototype ) titanium_reindeer.Circle.prototype[k] = titanium_reindeer.Shape.prototype[k];
 titanium_reindeer.Circle.isIntersecting = function(a,b) {
 	return a.radius + b.radius > titanium_reindeer.Vector2.getDistance(a.center,b.center);
 }
@@ -3420,6 +3513,12 @@ titanium_reindeer.Circle.prototype.center = null;
 titanium_reindeer.Circle.prototype.setCenter = function(value) {
 	if(value != null) this.center = value;
 	return this.center;
+}
+titanium_reindeer.Circle.prototype.getMinBoundingRect = function() {
+	return new titanium_reindeer.Rect(this.center.getX() - this.radius,this.center.getY() - this.radius,this.radius * 2,this.radius * 2);
+}
+titanium_reindeer.Circle.prototype.isPointInside = function(p) {
+	return this.radius >= titanium_reindeer.Vector2.getDistance(p,this.center);
 }
 titanium_reindeer.Circle.prototype.__class__ = titanium_reindeer.Circle;
 titanium_reindeer.CollisionRect = function(width,height,layer,group) {
@@ -3503,6 +3602,184 @@ titanium_reindeer.ImageSource.prototype.destroy = function() {
 	}
 }
 titanium_reindeer.ImageSource.prototype.__class__ = titanium_reindeer.ImageSource;
+titanium_reindeer.CursorType = { __ename__ : ["titanium_reindeer","CursorType"], __constructs__ : ["AllScroll","ColResize","CrossHair","Custom","Default","EResize","Help","Move","NEResize","NoDrop","None","NotAllowed","NResize","NWResize","Pointer","Progress","RowResize","SEResize","SResize","SWResize","Text","VerticalText","Wait","WResize"] }
+titanium_reindeer.CursorType.AllScroll = ["AllScroll",0];
+titanium_reindeer.CursorType.AllScroll.toString = $estr;
+titanium_reindeer.CursorType.AllScroll.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.ColResize = ["ColResize",1];
+titanium_reindeer.CursorType.ColResize.toString = $estr;
+titanium_reindeer.CursorType.ColResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.CrossHair = ["CrossHair",2];
+titanium_reindeer.CursorType.CrossHair.toString = $estr;
+titanium_reindeer.CursorType.CrossHair.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.Custom = ["Custom",3];
+titanium_reindeer.CursorType.Custom.toString = $estr;
+titanium_reindeer.CursorType.Custom.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.Default = ["Default",4];
+titanium_reindeer.CursorType.Default.toString = $estr;
+titanium_reindeer.CursorType.Default.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.EResize = ["EResize",5];
+titanium_reindeer.CursorType.EResize.toString = $estr;
+titanium_reindeer.CursorType.EResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.Help = ["Help",6];
+titanium_reindeer.CursorType.Help.toString = $estr;
+titanium_reindeer.CursorType.Help.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.Move = ["Move",7];
+titanium_reindeer.CursorType.Move.toString = $estr;
+titanium_reindeer.CursorType.Move.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.NEResize = ["NEResize",8];
+titanium_reindeer.CursorType.NEResize.toString = $estr;
+titanium_reindeer.CursorType.NEResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.NoDrop = ["NoDrop",9];
+titanium_reindeer.CursorType.NoDrop.toString = $estr;
+titanium_reindeer.CursorType.NoDrop.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.None = ["None",10];
+titanium_reindeer.CursorType.None.toString = $estr;
+titanium_reindeer.CursorType.None.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.NotAllowed = ["NotAllowed",11];
+titanium_reindeer.CursorType.NotAllowed.toString = $estr;
+titanium_reindeer.CursorType.NotAllowed.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.NResize = ["NResize",12];
+titanium_reindeer.CursorType.NResize.toString = $estr;
+titanium_reindeer.CursorType.NResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.NWResize = ["NWResize",13];
+titanium_reindeer.CursorType.NWResize.toString = $estr;
+titanium_reindeer.CursorType.NWResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.Pointer = ["Pointer",14];
+titanium_reindeer.CursorType.Pointer.toString = $estr;
+titanium_reindeer.CursorType.Pointer.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.Progress = ["Progress",15];
+titanium_reindeer.CursorType.Progress.toString = $estr;
+titanium_reindeer.CursorType.Progress.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.RowResize = ["RowResize",16];
+titanium_reindeer.CursorType.RowResize.toString = $estr;
+titanium_reindeer.CursorType.RowResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.SEResize = ["SEResize",17];
+titanium_reindeer.CursorType.SEResize.toString = $estr;
+titanium_reindeer.CursorType.SEResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.SResize = ["SResize",18];
+titanium_reindeer.CursorType.SResize.toString = $estr;
+titanium_reindeer.CursorType.SResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.SWResize = ["SWResize",19];
+titanium_reindeer.CursorType.SWResize.toString = $estr;
+titanium_reindeer.CursorType.SWResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.Text = ["Text",20];
+titanium_reindeer.CursorType.Text.toString = $estr;
+titanium_reindeer.CursorType.Text.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.VerticalText = ["VerticalText",21];
+titanium_reindeer.CursorType.VerticalText.toString = $estr;
+titanium_reindeer.CursorType.VerticalText.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.Wait = ["Wait",22];
+titanium_reindeer.CursorType.Wait.toString = $estr;
+titanium_reindeer.CursorType.Wait.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.CursorType.WResize = ["WResize",23];
+titanium_reindeer.CursorType.WResize.toString = $estr;
+titanium_reindeer.CursorType.WResize.__enum__ = titanium_reindeer.CursorType;
+titanium_reindeer.Cursor = function(targetElement) {
+	if( targetElement === $_ ) return;
+	this.targetElement = targetElement;
+	this.setCursorType(titanium_reindeer.CursorType.Default);
+}
+titanium_reindeer.Cursor.__name__ = ["titanium_reindeer","Cursor"];
+titanium_reindeer.Cursor.prototype.cursorType = null;
+titanium_reindeer.Cursor.prototype.setCursorType = function(value) {
+	if(value != this.cursorType) {
+		this.cursorType = value;
+		if(this.cursorType != titanium_reindeer.CursorType.Custom) this.setCustomUrl("");
+		this.targetElement.style.cursor = this.getCursorTypeValue(this.cursorType);
+	}
+	return this.cursorType;
+}
+titanium_reindeer.Cursor.prototype.customUrl = null;
+titanium_reindeer.Cursor.prototype.setCustomUrl = function(value) {
+	if(value != this.customUrl) {
+		this.customUrl = value;
+		if(this.customUrl != "") this.setCursorType(titanium_reindeer.CursorType.Custom);
+	}
+	return this.customUrl;
+}
+titanium_reindeer.Cursor.prototype.targetElement = null;
+titanium_reindeer.Cursor.prototype.getCursorTypeValue = function(cursorType) {
+	var value = "";
+	switch( (cursorType)[1] ) {
+	case 0:
+		value = "all-scroll";
+		break;
+	case 1:
+		value = "col-resize";
+		break;
+	case 2:
+		value = "crosshair";
+		break;
+	case 4:
+		value = "default";
+		break;
+	case 5:
+		value = "E-resize";
+		break;
+	case 6:
+		value = "help";
+		break;
+	case 7:
+		value = "move";
+		break;
+	case 8:
+		value = "NE-resize";
+		break;
+	case 9:
+		value = "no-drop";
+		break;
+	case 10:
+		value = "none";
+		break;
+	case 11:
+		value = "not-allowed";
+		break;
+	case 12:
+		value = "N-resize";
+		break;
+	case 13:
+		value = "NW-resize";
+		break;
+	case 14:
+		value = "pointer";
+		break;
+	case 15:
+		value = "progress";
+		break;
+	case 16:
+		value = "row-resize";
+		break;
+	case 17:
+		value = "SE-resize";
+		break;
+	case 18:
+		value = "S-resize";
+		break;
+	case 19:
+		value = "sw-resize";
+		break;
+	case 20:
+		value = "text";
+		break;
+	case 21:
+		value = "vertical-text";
+		break;
+	case 22:
+		value = "wait";
+		break;
+	case 23:
+		value = "W-resize";
+		break;
+	case 3:
+		var curReplaceReg = new EReg("\\..*$","");
+		var customCur = curReplaceReg.replace(this.customUrl,".cur");
+		value = "url(" + this.customUrl + "), url(" + customCur + "), auto";
+		break;
+	}
+	return value;
+}
+titanium_reindeer.Cursor.prototype.__class__ = titanium_reindeer.Cursor;
 titanium_reindeer.Rect = function(x,y,width,height) {
 	if( x === $_ ) return;
 	this.x = x;
@@ -3511,6 +3788,8 @@ titanium_reindeer.Rect = function(x,y,width,height) {
 	this.height = height;
 }
 titanium_reindeer.Rect.__name__ = ["titanium_reindeer","Rect"];
+titanium_reindeer.Rect.__super__ = titanium_reindeer.Shape;
+for(var k in titanium_reindeer.Shape.prototype ) titanium_reindeer.Rect.prototype[k] = titanium_reindeer.Shape.prototype[k];
 titanium_reindeer.Rect.isIntersecting = function(a,b) {
 	return a.x + a.width >= b.x && a.x <= b.x + b.width && a.y + a.height >= b.y && a.y <= b.y + b.height;
 }
@@ -3552,6 +3831,12 @@ titanium_reindeer.Rect.prototype.right = null;
 titanium_reindeer.Rect.prototype.getRight = function() {
 	return this.x + this.width;
 }
+titanium_reindeer.Rect.prototype.getMinBoundingRect = function() {
+	return this.getCopy();
+}
+titanium_reindeer.Rect.prototype.isPointInside = function(p) {
+	return p.getX() >= this.getLeft() && p.getX() < this.getRight() && p.getY() >= this.getTop() && p.getY() < this.getBottom();
+}
 titanium_reindeer.Rect.prototype.getCopy = function() {
 	return new titanium_reindeer.Rect(this.x,this.y,this.width,this.height);
 }
@@ -3559,18 +3844,6 @@ titanium_reindeer.Rect.prototype.getArea = function() {
 	return this.width * this.height;
 }
 titanium_reindeer.Rect.prototype.__class__ = titanium_reindeer.Rect;
-titanium_reindeer.ColorStop = function(color,offset) {
-	if( color === $_ ) return;
-	this.color = color;
-	this.offset = offset;
-}
-titanium_reindeer.ColorStop.__name__ = ["titanium_reindeer","ColorStop"];
-titanium_reindeer.ColorStop.prototype.color = null;
-titanium_reindeer.ColorStop.prototype.offset = null;
-titanium_reindeer.ColorStop.prototype.identify = function() {
-	return "ColorStop(" + this.color.identify() + "," + this.offset + ");";
-}
-titanium_reindeer.ColorStop.prototype.__class__ = titanium_reindeer.ColorStop;
 ValueType = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] }
 ValueType.TNull = ["TNull",0];
 ValueType.TNull.toString = $estr;
@@ -3728,6 +4001,18 @@ Type.enumIndex = function(e) {
 	return e[1];
 }
 Type.prototype.__class__ = Type;
+titanium_reindeer.ColorStop = function(color,offset) {
+	if( color === $_ ) return;
+	this.color = color;
+	this.offset = offset;
+}
+titanium_reindeer.ColorStop.__name__ = ["titanium_reindeer","ColorStop"];
+titanium_reindeer.ColorStop.prototype.color = null;
+titanium_reindeer.ColorStop.prototype.offset = null;
+titanium_reindeer.ColorStop.prototype.identify = function() {
+	return "ColorStop(" + this.color.identify() + "," + this.offset + ");";
+}
+titanium_reindeer.ColorStop.prototype.__class__ = titanium_reindeer.ColorStop;
 titanium_reindeer.RectRenderer = function(width,height,layer) {
 	if( width === $_ ) return;
 	titanium_reindeer.StrokeFillRenderer.call(this,width,height,layer);
@@ -5594,8 +5879,9 @@ titanium_reindeer.MouseRegionButtonEvent.Up.__enum__ = titanium_reindeer.MouseRe
 titanium_reindeer.MouseRegionButtonEvent.Click = ["Click",2];
 titanium_reindeer.MouseRegionButtonEvent.Click.toString = $estr;
 titanium_reindeer.MouseRegionButtonEvent.Click.__enum__ = titanium_reindeer.MouseRegionButtonEvent;
-titanium_reindeer.MouseRegionHandler = function(collisionComponent) {
-	if( collisionComponent === $_ ) return;
+titanium_reindeer.MouseRegionHandler = function(manager,collisionComponent) {
+	if( manager === $_ ) return;
+	this.manager = manager;
 	this.collisionRegion = collisionComponent;
 	this.isMouseInside = false;
 	this.isMouseButtonsDownInside = new IntHash();
@@ -5605,8 +5891,10 @@ titanium_reindeer.MouseRegionHandler = function(collisionComponent) {
 	this.registeredMouseDownEvents = new Array();
 	this.registeredMouseUpEvents = new Array();
 	this.registeredMouseClickEvents = new Array();
+	this.depth = 0;
 }
 titanium_reindeer.MouseRegionHandler.__name__ = ["titanium_reindeer","MouseRegionHandler"];
+titanium_reindeer.MouseRegionHandler.prototype.manager = null;
 titanium_reindeer.MouseRegionHandler.prototype.collisionRegion = null;
 titanium_reindeer.MouseRegionHandler.prototype.registeredMouseMoveEvents = null;
 titanium_reindeer.MouseRegionHandler.prototype.registeredMouseEnterEvents = null;
@@ -5619,6 +5907,19 @@ titanium_reindeer.MouseRegionHandler.prototype.isMouseButtonsDownInside = null;
 titanium_reindeer.MouseRegionHandler.prototype.getIsMouseDownInside = function(mouseButton) {
 	return this.isMouseButtonsDownInside.get(mouseButton[1]);
 }
+titanium_reindeer.MouseRegionHandler.prototype.depth = null;
+titanium_reindeer.MouseRegionHandler.prototype.isBlockingBelow = null;
+titanium_reindeer.MouseRegionHandler.prototype.setIsBlockingBelow = function(value) {
+	if(value != this.isBlockingBelow) {
+		this.isBlockingBelow = value;
+		if(value) this.exclusionRegion = this.manager.createExclusionRegion(this.depth,this.collisionRegion.getShape()); else if(this.exclusionRegion != null) {
+			this.exclusionRegion.destroy();
+			this.exclusionRegion = null;
+		}
+	}
+	return this.isBlockingBelow;
+}
+titanium_reindeer.MouseRegionHandler.prototype.exclusionRegion = null;
 titanium_reindeer.MouseRegionHandler.prototype.mouseMove = function(mousePos,colliding) {
 	if(colliding) {
 		var _g = 0, _g1 = this.registeredMouseMoveEvents;
@@ -5703,7 +6004,7 @@ titanium_reindeer.MouseRegionHandler.prototype.registerMouseButtonEvent = functi
 		break;
 	}
 }
-titanium_reindeer.MouseRegionHandler.prototype.unregisterMouseEvent = function(mouseEvent,func) {
+titanium_reindeer.MouseRegionHandler.prototype.unregisterMouseMoveEvent = function(mouseEvent,func) {
 	if(func == null) return;
 	var events;
 	switch( (mouseEvent)[1] ) {
@@ -5835,8 +6136,8 @@ titanium_reindeer.CollisionCircle.prototype.collide = function(otherCompId) {
 		if(titanium_reindeer.Geometry.isCircleIntersectingRect(new titanium_reindeer.Circle(this.radius,this.getCenter()),rectComp.getMinBoundingRect())) titanium_reindeer.CollisionComponent.prototype.collide.call(this,otherCompId);
 	}
 }
-titanium_reindeer.CollisionCircle.prototype.isPointIntersecting = function(point) {
-	return titanium_reindeer.Geometry.isPointInCircle(point,new titanium_reindeer.Circle(this.radius,this.getCenter()));
+titanium_reindeer.CollisionCircle.prototype.getShape = function() {
+	return new titanium_reindeer.Circle(this.radius,this.getCenter());
 }
 titanium_reindeer.CollisionCircle.prototype.__class__ = titanium_reindeer.CollisionCircle;
 titanium_reindeer.CachedBitmaps = function(p) {
@@ -6423,6 +6724,36 @@ titanium_reindeer.SoundManager.prototype.playRandomSound = function(possibleSoun
 	}
 }
 titanium_reindeer.SoundManager.prototype.__class__ = titanium_reindeer.SoundManager;
+titanium_reindeer.MouseExclusionRegion = function(manager,id,depth,shape) {
+	if( manager === $_ ) return;
+	this.manager = manager;
+	this.id = id;
+	this.depth = depth;
+	if(shape == null) throw "Error: MouseExclusionRegion must take a non-null shape!";
+	this.dontUpdateManager = true;
+	this.setShape(shape);
+	this.dontUpdateManager = false;
+}
+titanium_reindeer.MouseExclusionRegion.__name__ = ["titanium_reindeer","MouseExclusionRegion"];
+titanium_reindeer.MouseExclusionRegion.prototype.manager = null;
+titanium_reindeer.MouseExclusionRegion.prototype.id = null;
+titanium_reindeer.MouseExclusionRegion.prototype.dontUpdateManager = null;
+titanium_reindeer.MouseExclusionRegion.prototype.depth = null;
+titanium_reindeer.MouseExclusionRegion.prototype.shape = null;
+titanium_reindeer.MouseExclusionRegion.prototype.setShape = function(value) {
+	if(value != this.shape && value != null) {
+		this.shape = value;
+		if(!this.dontUpdateManager) this.manager.updateExclusionRegionShape(this);
+	}
+	return this.shape;
+}
+titanium_reindeer.MouseExclusionRegion.prototype.destroy = function() {
+	if(this.manager != null) {
+		this.manager.removeExclusionRegion(this);
+		this.manager = null;
+	}
+}
+titanium_reindeer.MouseExclusionRegion.prototype.__class__ = titanium_reindeer.MouseExclusionRegion;
 titanium_reindeer.MovementComponent = function(velocity) {
 	if( velocity === $_ ) return;
 	titanium_reindeer.Component.call(this);
