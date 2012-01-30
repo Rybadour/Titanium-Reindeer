@@ -34,6 +34,7 @@ class CompositionRenderer extends RendererComponent
 
 	override public function initialize():Void
 	{
+		super.initialize();
 	}
 
 	override public function preRender():Void
