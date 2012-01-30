@@ -4,6 +4,8 @@ import titanium_reindeer.CompositionRenderer;
 import titanium_reindeer.CompositionLayer;
 import titanium_reindeer.RectRenderer;
 import titanium_reindeer.CircleRenderer;
+import titanium_reindeer.Enums;
+import titanium_reindeer.Vector2;
 
 class Thing extends GameObject
 {
@@ -16,7 +18,7 @@ class Thing extends GameObject
 
         this.body = new CompositionRenderer([
             new CompositionLayer(new RectRenderer(40, 40, Layers.ALPHA)),
-            new CompositionLayer(new CircleRenderer(20, 20, Layers.ALPHA), Composition.DestinationOut)
+            new CompositionLayer(new CircleRenderer(20, Layers.ALPHA), Composition.DestinationOut)
         ],
         Layers.BETA);
         this.addComponent("body", this.body);

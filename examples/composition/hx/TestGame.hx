@@ -35,9 +35,10 @@ class TestGame extends Game
 
 	public function new()
 	{
-		super("TestGame", 800, 500, 4, true, new Color(255, 255, 100));
+		super("TestGame", 800, 500, Layers.NUM_LAYERS, true, new Color(255, 255, 100));
 
         this.thing = new Thing();
+		this.thing.position = new Vector2(200, 200);
         this.gameObjectManager.addGameObject(this.thing);
 
 		var collisionManager:CollisionComponentManager = cast(gameObjectManager.getManager(CollisionComponentManager), CollisionComponentManager);
