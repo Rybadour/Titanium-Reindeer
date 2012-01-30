@@ -421,24 +421,6 @@ class RenderLayer
 		}
 	}
 
-	public function compositionToString(comp:Composition):String
-	{
-		return switch (comp)
-		{
-			case SourceAtop: 		"source-atop";
-			case SourceIn: 			"source-in";
-			case SourceOut: 		"source-out";
-			case SourceOver:		"source-over";
-			case DestinationAtop: 	"destination-atop";
-			case DestinationIn:     "destination-in";
-			case DestinationOut:  	"destination-out";
-			case DestinationOver: 	"destination-over";
-			case Lighter: 			"lighter";
-			case Copy: 				"copy";
-			case Xor:				"xor";
-		}
-	}
-	
 	public function destroy():Void
 	{
 		this.layerManager = null;

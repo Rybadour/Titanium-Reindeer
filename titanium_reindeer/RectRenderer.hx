@@ -34,7 +34,7 @@ class RectRenderer extends StrokeFillRenderer
 		this.height = height;
 	}
 
-	override public function render()
+	override public function render():Void
 	{
 		super.render();
 
