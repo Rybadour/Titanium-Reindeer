@@ -1,6 +1,7 @@
 package titanium_reindeer;
 
 import js.Dom;
+import titanium_reindeer.Enums;
 
 class RendererComponent extends Component
 {
@@ -176,6 +177,15 @@ class RendererComponent extends Component
 		return alpha;
 	}
 
+	public var renderComposition(getRenderComposition, null):Composition;
+	private function getRenderComposition():Composition
+	{
+		if (this.layer == null)
+			return Composition.SourceOver;
+		else
+			return this.layer.renderComposition;
+	}
+
 	public var screenPos(getScreenPos, null):Vector2;
 	public function getScreenPos():Vector2
 	{
@@ -271,6 +281,8 @@ class RendererComponent extends Component
 
 		this.lastIdentifier = "";
 		this.lastRenderedPosition = new Vector2(0, 0);
+
+		this.useFakes = false;
 	}
 
 	override public function getManagerType():Class<ComponentManager>
@@ -308,7 +320,7 @@ class RendererComponent extends Component
 	public function preRender():Void
 	{
 		pen.save();
-		pen.globalCompositeOperation = this.layer.compositionToString(this.layer.renderComposition);
+		pen.globalCompositeOperation = RendererComponent.CompositionToString(this.renderComposition);
 		pen.translate(this.screenPos.x, this.screenPos.y);
 
 		if (this.rotation != 0)
@@ -336,17 +348,21 @@ class RendererComponent extends Component
 
 	public function renderSharedBitmap():Void
 	{
-		if (sharedBitmap != null)
+		if (this.sharedBitmap != null)
 		{
-			this.pen.drawImage(sharedBitmap.image, screenPos.x - (drawnWidth/2 + 1), screenPos.y - (drawnHeight/2 + 1));
+			this.pen.drawImage(
+				this.sharedBitmap.image,
+				this.screenPos.x - (this.drawnWidth/2 + 1),
+				this.screenPos.y - (this.drawnHeight/2 + 1)
+			);
 		}
 	}
 
 	public function setLastRendered():Void
 	{
-		this.lastRenderedPosition = screenPos.getCopy();
-		this.lastRenderedWidth = drawnWidth;
-		this.lastRenderedHeight = drawnHeight;
+		this.lastRenderedPosition = this.screenPos.getCopy();
+		this.lastRenderedWidth = this.drawnWidth;
+		this.lastRenderedHeight = this.drawnHeight;
 	}
 
 	public function identify():String
@@ -358,27 +374,44 @@ class RendererComponent extends Component
 				identifier += ",";
 			identifier += effect.identify();
 		}
-		return "Renderer("+Math.round(drawnWidth)+","+Math.round(drawnHeight)+","+alpha+","+shadow.identify()+","+rotation+",Effects("+ identifier +"));";
+		return "Renderer("+Math.round(this.drawnWidth)+","+Math.round(this.drawnHeight)+","+this.alpha+","+this.shadow.identify()+","+this.rotation+",Effects("+ identifier +"));";
 	}
 
 	public function addEffect(name:String, effect:BitmapEffect):Void
 	{
-		effects.set(name, effect);
+		this.effects.set(name, effect);
 
 		this.timeForRedraw = true;
 	}
 
 	public function removeEffect(name:String):Void
 	{
-		effects.remove(name);
+		this.effects.remove(name);
 
 		this.timeForRedraw = true;
+	}
+
+	public function useAlternateCanvas(pen:Dynamic, ?newPosition:Vector2):Void
+	{
+		this.fakePen = pen;
+		if (newPosition == null)
+			this.fakePosition = new Vector2(this.drawnWidth/2 + 1, this.drawnHeight/2 + 1);
+		else
+			this.fakePosition = newPosition;
+		this.useFakes = true;
+	}
+
+	public function disableAlternateCanvas():Void
+	{
+		this.fakePen = null;
+		this.fakePosition = null;
+		this.useFakes = false;
 	}
 
 	private function recreateBitmapData():Void
 	{
 		// If there is some manager to handle our activities, and some effects (making this caching necessary)
-		if (rendererManager != null && Lambda.count(this.effects) != 0)
+		if (this.rendererManager != null && Lambda.count(this.effects) != 0)
 		{
 			var identifier:String = this.identify();
 			if (this.lastIdentifier == identifier)
@@ -386,20 +419,18 @@ class RendererComponent extends Component
 
 			this.lastIdentifier = identifier;
 
-			usingSharedBitmap = true;
+			this.usingSharedBitmap = true;
 
 			// Use whats already there
-			if ( rendererManager.cachedBitmaps.exists(identifier) )
-				sharedBitmap = rendererManager.cachedBitmaps.get(identifier);
+			if ( this.rendererManager.cachedBitmaps.exists(identifier) )
+				this.sharedBitmap = this.rendererManager.cachedBitmaps.get(identifier);
 			else
 			{
 				// Time to setup some cached bitmap data to share
 				var canvas:Dynamic = js.Lib.document.createElement("canvas");
 				canvas.setAttribute("width", (this.drawnWidth+2)+"px");
 				canvas.setAttribute("height", (this.drawnHeight+2)+"px");
-				this.fakePen = canvas.getContext("2d");
-				this.fakePosition = new Vector2(this.drawnWidth/2 + 1, this.drawnHeight/2 + 1);
-				this.useFakes = true;
+				this.useAlternateCanvas(canvas.getContext("2d"), new Vector2(this.drawnWidth/2 + 1, this.drawnHeight/2 + 1));
 
 				// Since we set the object to render to a fake canvas this will fill our temp canvas with bitmap data
 				this.preRender();
@@ -420,29 +451,27 @@ class RendererComponent extends Component
 				else
 				/* */
 				{
-					for (effect in effects)
+					for (effect in this.effects)
 						effect.apply(bitmapData);
 					this.fakePen.clearRect(0, 0, this.drawnWidth+2, this.drawnHeight+2);
 					this.fakePen.putImageData(bitmapData.rawData, 0, 0);
 
 					var bitmap:ImageSource = new ImageSource(canvas.toDataURL("image/png"));
 					if (bitmap.isLoaded)
-						cachedBitmapLoaded(null);
+						this.cachedBitmapLoaded(null);
 					else
-						bitmap.registerLoadEvent(cachedBitmapLoaded);
+						bitmap.registerLoadEvent(this.cachedBitmapLoaded);
 					sharedBitmap = bitmap;
-					rendererManager.cachedBitmaps.set(identifier, bitmap);
+					this.rendererManager.cachedBitmaps.set(identifier, bitmap);
 				}
 				
-				this.fakePen = null;
-				this.fakePosition = null;
-				this.useFakes = false;
+				this.disableAlternateCanvas();
 			}
 		}
 		else
 		{
-			usingSharedBitmap = false;
-			lastIdentifier = "";
+			this.usingSharedBitmap = false;
+			this.lastIdentifier = "";
 		}
 	}
 
@@ -478,8 +507,8 @@ class RendererComponent extends Component
 		var height:Float = this.drawnHeight + extraEdgeSize;
 
 		return new Rect(
-			screenPos.x - width/2,
-			screenPos.y - height/2,
+			this.screenPos.x - width/2,
+			this.screenPos.y - height/2,
 			width,
 			height
 		);
@@ -526,5 +555,24 @@ class RendererComponent extends Component
 		this.effects = null;
 
 		this.sharedBitmap = null;
+	}
+
+
+	public static function CompositionToString(comp:Composition):String
+	{
+		return switch (comp)
+		{
+			case SourceAtop: 		"source-atop";
+			case SourceIn: 			"source-in";
+			case SourceOut: 		"source-out";
+			case SourceOver:		"source-over";
+			case DestinationAtop: 	"destination-atop";
+			case DestinationIn:     "destination-in";
+			case DestinationOut:  	"destination-out";
+			case DestinationOver: 	"destination-over";
+			case Lighter: 			"lighter";
+			case Copy: 				"copy";
+			case Xor:				"xor";
+		}
 	}
 }
