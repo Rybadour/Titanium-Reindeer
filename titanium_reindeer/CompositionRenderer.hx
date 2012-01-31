@@ -53,16 +53,16 @@ class CompositionRenderer extends RendererComponent
 
 		for (layer in this.layers)
 		{
-			// set the composition based on the layer
+			// set the composition based on the layer but after the preRender
+			layer.renderer.preRender();
 			this.compositionPen.globalCompositeOperation = RendererComponent.CompositionToString(layer.renderComposition);
 
-			layer.renderer.preRender();
 			layer.renderer.render();
 			layer.renderer.postRender();
 		}
 
 		// Finally take out composition of renderers and blend it to the canvas
-		this.pen.drawImage(this.compositionCanvas, 0, 0);
+		this.pen.drawImage(this.compositionCanvas, -this.maxWidth/2 - 1, -this.maxHeight/2 - 1);
 	}
 
 	override public function postRender():Void

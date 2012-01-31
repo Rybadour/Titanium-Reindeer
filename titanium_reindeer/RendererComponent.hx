@@ -177,6 +177,15 @@ class RendererComponent extends Component
 		return alpha;
 	}
 
+	public var renderComposition(getRenderComposition, null):Composition;
+	private function getRenderComposition():Composition
+	{
+		if (this.layer == null)
+			return Composition.SourceOver;
+		else
+			return this.layer.renderComposition;
+	}
+
 	public var screenPos(getScreenPos, null):Vector2;
 	public function getScreenPos():Vector2
 	{
@@ -311,7 +320,7 @@ class RendererComponent extends Component
 	public function preRender():Void
 	{
 		pen.save();
-		pen.globalCompositeOperation = RendererComponent.CompositionToString(this.layer.renderComposition);
+		pen.globalCompositeOperation = RendererComponent.CompositionToString(this.renderComposition);
 		pen.translate(this.screenPos.x, this.screenPos.y);
 
 		if (this.rotation != 0)
