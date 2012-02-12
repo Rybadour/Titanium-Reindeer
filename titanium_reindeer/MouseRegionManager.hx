@@ -47,8 +47,8 @@ class MouseRegionManager
 	public function new(manager:CollisionComponentManager)
 	{
 		this.collisionManager = manager;
-		this.collisionManager.gameObjectManager.game.inputManager.registerMouseMoveEvent(mouseMoveHandle);
-		this.collisionManager.gameObjectManager.game.inputManager.registerMouseButtonAnyEvent(mouseButtonHandle);
+		this.collisionManager.scene.game.inputManager.registerMouseMoveEvent(mouseMoveHandle);
+		this.collisionManager.scene.game.inputManager.registerMouseButtonAnyEvent(mouseButtonHandle);
 
 		this.layerToPairsMap = new Hash();
 
@@ -241,8 +241,8 @@ class MouseRegionManager
 
 	public function destroy():Void
 	{
-		this.collisionManager.gameObjectManager.game.inputManager.unregisterMouseMoveEvent(mouseMoveHandle);
-		this.collisionManager.gameObjectManager.game.inputManager.unregisterMouseButtonAnyEvent(mouseButtonHandle);
+		this.collisionManager.scene.game.inputManager.unregisterMouseMoveEvent(mouseMoveHandle);
+		this.collisionManager.scene.game.inputManager.unregisterMouseButtonAnyEvent(mouseButtonHandle);
 
 		this.collisionManager = null;
 			

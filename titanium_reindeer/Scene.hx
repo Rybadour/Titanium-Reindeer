@@ -1,25 +1,35 @@
 package titanium_reindeer;
 
-class GameObjectManager extends ObjectManager
+class Scene extends ObjectManager
 {
-	public var game(default, null):Game;
+	public var sceneManager(default, null):SceneManager;
+	public var game(getGame, null):Game;
+	private function getGame():Game
+	{
+		return this.sceneManager.game;
+	}
+
+	public var name(default, null):String;
+	public var input(default, null):SceneInputBridge;
 
 	private var componentManagers:Hash<ComponentManager>;
 
-	// Constructor
-	public function new(game:Game)
+	public function new(game:Game, name:String)
 	{
 		super();
 
-		this.game = game;
+		this.name = name;
+		this.input = new SceneInputBridge();
+
+		this.sceneManager = game.sceneManager;
+		this.sceneManager.addScene(this);
 
 		this.componentManagers = new Hash();
 	}
 
-	// External functions
-	public function addGameObject(obj:GameObject):Void
+	public function addGameObject(gameObject:GameObject):Void
 	{
-		super.addObject(obj);
+		this.addObject(gameObject);
 	}
 
 	public function addGameObjects(objs:Array<GameObject>):Void
@@ -123,6 +133,6 @@ class GameObjectManager extends ObjectManager
 		}
 		this.componentManagers = null;
 
-		game = null;
+		this.sceneManager = null;
 	}
 }

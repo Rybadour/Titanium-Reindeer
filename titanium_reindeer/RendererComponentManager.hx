@@ -5,11 +5,11 @@ class RendererComponentManager extends ComponentManager
 	public var renderLayerManager(default, null):RenderLayerManager;
 	public var cachedBitmaps(default, null):CachedBitmaps; 
 
-	public function new(gameObjectManager:GameObjectManager)
+	public function new(scene:Scene)
 	{
-		super(gameObjectManager);
+		super(scene);
 
-		var game:Game = this.gameObjectManager.game;
+		var game:Game = this.scene.game;
 
 		this.renderLayerManager = new RenderLayerManager(game.layerCount, game.targetElement, game.backgroundColor, game.width, game.height);
 

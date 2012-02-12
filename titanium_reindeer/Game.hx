@@ -31,11 +31,12 @@ class Game
 	private var msLastTimeStep:Int;
 
 	// Managers
-	public var gameObjectManager(default, null):GameObjectManager;
+	public var sceneManager(default, null):SceneManager;
 	public var inputManager(default, null):InputManager;
 	public var soundManager(default, null):SoundManager;
 	public var cursor(default, null):Cursor;
-	// TODO: Screen manager
+
+	public var globalScene(default, null):Scene;
 
 	public function new(?targetHtmlId:String, ?width:Int, ?height:Int, ?layerCount:Int, ?debugMode:Bool, ?backgroundColor:Color)
 	{
@@ -55,10 +56,12 @@ class Game
 
 		this.exitGame = false;
 
-		this.gameObjectManager = new GameObjectManager(this);
+		this.sceneManager = new SceneManager(this);
 		this.inputManager = new InputManager(this.targetElement);
 		this.soundManager = new SoundManager();
 		this.cursor = new Cursor(this.targetElement);
+
+		this.globalScene = new Scene(this, "__global_scene__");
 
 		if (debugMode)
 		{
@@ -102,7 +105,7 @@ class Game
 			this.update(msTimeStep);
 
 			// Game Logic
-			gameObjectManager.update(msTimeStep);
+			sceneManager.update(msTimeStep);
 			inputManager.update(msTimeStep);
 
 			// Request a game loop tick from the browser
@@ -141,15 +144,15 @@ class Game
 
 	public function destroy():Void
 	{
-		targetElement = null;
-		backgroundColor = null;
+		this.targetElement = null;
+		this.backgroundColor = null;
 
-		gameObjectManager.destroy();
-		inputManager.destroy();
+		this.globalScene.destroy();
+		this.inputManager.destroy();
 	}
 
 	public function stopGame():Void
 	{
-		exitGame = true;
+		this.exitGame = true;
 	}
 }

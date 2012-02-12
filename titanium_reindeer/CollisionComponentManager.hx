@@ -6,9 +6,9 @@ class CollisionComponentManager extends ComponentManager
 
 	public var mouseRegionManager(default, null):MouseRegionManager;
 
-	public function new(gameObjectManager:GameObjectManager)
+	public function new(scene:Scene)
 	{
-		super(gameObjectManager);
+		super(scene);
 
 		this.collisionLayers = new Hash();
 
