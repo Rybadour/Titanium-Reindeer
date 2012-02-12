@@ -22,6 +22,8 @@ class ShipChooseUi extends GameObject
 
 	public function new(game:StarControlGame)
 	{
+		super(game.globalScene);
+
 		this.game = game;
 	}
 }

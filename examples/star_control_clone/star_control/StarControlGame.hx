@@ -40,30 +40,23 @@ class StarControlGame extends Game
 		this.player1Score = 0;
 		this.player2Score = 0;
 
-		this.ui = new UiBar(new Vector2(FIELD_SIZE, 0));
-		this.gameObjectManager.addGameObject(this.ui);
-
+		this.ui = new UiBar(this.globalScene, new Vector2(FIELD_SIZE, 0));
 
 		// Player 1
-		var ship1:Ship = new Fighter(true, this.ui.ship1Ui);
+		var ship1:Ship = new Fighter(this.globalScene, true, this.ui.ship1Ui);
 		ship1.position = new Vector2(50, 50);
-		this.gameObjectManager.addGameObject(ship1);
 
 		this.player1 = new Player(this, ship1, Key.W, Key.D, Key.A, Key.Q);
-		this.gameObjectManager.addGameObject(this.player1);
-		
 
 		// Player 2
-		var ship2:Ship = new Artillery(false, this.ui.ship2Ui);
+		var ship2:Ship = new Artillery(this.globalScene, false, this.ui.ship2Ui);
 		ship2.position = new Vector2(550, 550);
-		this.gameObjectManager.addGameObject(ship2);
 
 		this.player2 = new Player(this, ship2, Key.UpArrow, Key.RightArrow, Key.LeftArrow, Key.Period);
-		this.gameObjectManager.addGameObject(this.player2);
 
 
 		// Setup collision groups
-		var collisionManager:CollisionComponentManager = cast(this.gameObjectManager.getManager(CollisionComponentManager), CollisionComponentManager);
+		var collisionManager:CollisionComponentManager = cast(this.globalScene.getManager(CollisionComponentManager), CollisionComponentManager);
 		collisionManager.getLayer("main").getGroup(CollisionGroups.SHIPS).addCollidingGroup(CollisionGroups.SHIPS);
 		collisionManager.getLayer("main").getGroup(CollisionGroups.SHIPS).addCollidingGroup(CollisionGroups.BULLETS);
 		collisionManager.getLayer("main").getGroup(CollisionGroups.BULLETS).addCollidingGroup(CollisionGroups.SHIPS);
@@ -87,7 +80,7 @@ class StarControlGame extends Game
 
 		this.ui.updateScore(this.player1Score, this.player2Score);
 
-		var rendererManager:RendererComponentManager = cast(this.gameObjectManager.getManager(RendererComponentManager), RendererComponentManager);
+		var rendererManager:RendererComponentManager = cast(this.globalScene.getManager(RendererComponentManager), RendererComponentManager);
 		rendererManager.renderLayerManager.getLayer(Layers.SHIPS).redrawBackground = true;
 	}
 }

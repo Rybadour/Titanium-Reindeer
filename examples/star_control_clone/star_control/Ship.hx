@@ -1,6 +1,7 @@
 package star_control;
 
 import titanium_reindeer.GameObject;
+import titanium_reindeer.Scene;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.ImageRenderer;
 import titanium_reindeer.CircleRenderer;
@@ -51,9 +52,9 @@ class Ship extends GameObject
 	public var facing(default, null):Float;
 	private var projectiles:IntHash<Projectile>;
 
-	public function new(isPlayer1:Bool, imagePath:String, shipUi:ShipUi, maxHealth:Int, maxAmmo:Int, rechargeRate:Int, fireRate:Int, primaryAmmoCost:Int, turnRate:Float, thrustAccel:Int, maxThrust:Int)
+	public function new(scene:Scene, isPlayer1:Bool, imagePath:String, shipUi:ShipUi, maxHealth:Int, maxAmmo:Int, rechargeRate:Int, fireRate:Int, primaryAmmoCost:Int, turnRate:Float, thrustAccel:Int, maxThrust:Int)
 	{
-		super();
+		super(scene);
 
 		this.isPlayer1 = isPlayer1;
 		var highlight:Color = this.isPlayer1 ? StarControlGame.PLAYER1_COLOR : StarControlGame.PLAYER2_COLOR;
@@ -73,6 +74,9 @@ class Ship extends GameObject
 
 		this.velocity = new MovementComponent();
 		this.addComponent("velocity", this.velocity);
+
+		this.hitSound = this.scene.game.soundManager.getSound(Ship.HIT_SOUND);
+		this.hitSound2 = this.scene.game.soundManager.getSound(Ship.HIT_SOUND2);
 
 		this.shipUi = shipUi;
 
@@ -99,15 +103,6 @@ class Ship extends GameObject
 		this.projectiles = new IntHash();
 	}
 
-	override private function hasInitialized():Void
-	{
-		if (this.hitSound == null)
-			this.hitSound = this.objectManager.game.soundManager.getSound(Ship.HIT_SOUND);
-
-		if (this.hitSound2 == null)
-			this.hitSound2 = this.objectManager.game.soundManager.getSound(Ship.HIT_SOUND2);
-	}
-
 	public function reset(startPos:Vector2):Void
 	{
 		this.position = startPos;
@@ -123,7 +118,7 @@ class Ship extends GameObject
 		for (projectile in tempProjectiles)
 		{
 			projectile.destroy();
-			this.objectManager.removeGameObject(projectile);
+			this.scene.removeGameObject(projectile);
 			this.projectiles.remove(projectile.id);
 		}
 	}
@@ -230,7 +225,7 @@ class Ship extends GameObject
 			var projectile:Projectile = cast(other.owner, Projectile);
 			this.setHealth(this.health - projectile.damage);
 
-			this.objectManager.game.soundManager.playRandomSound([this.hitSound, this.hitSound2]);
+			this.scene.game.soundManager.playRandomSound([this.hitSound, this.hitSound2]);
 		}
 	}
 
@@ -252,7 +247,7 @@ class Ship extends GameObject
 
 	private function addProjectile(projectile:Projectile):Void
 	{
-		this.objectManager.addGameObject(projectile);
+		this.scene.addGameObject(projectile);
 		this.projectiles.set(projectile.id, projectile);
 	}
 
@@ -260,7 +255,7 @@ class Ship extends GameObject
 	{
 		if (projectiles.exists(projectile.id))
 		{
-			this.objectManager.removeGameObject(projectile);
+			this.scene.removeGameObject(projectile);
 			this.projectiles.remove(projectile.id);
 		}
 	}

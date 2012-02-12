@@ -30,7 +30,7 @@ class CirclePlayer extends MovableObject
 
 	public function new(game:TestGame, leftKey:Key, rightKey:Key, upKey:Key, color:Color)
 	{		
-		super(new Vector2(0, 0));
+		super(game.globalScene, new Vector2(0, 0));
 
 		this.game = game;
 

@@ -26,7 +26,7 @@ class BladeTailSegment extends GameObject
 
 	public function new(head:BladeTail, segmentNumber:Int, nextSegment:BladeTailSegment)
 	{
-		super();
+		super(this.head.game.globalScene);
 
 		this.head = head;
 		this.segmentNumber = segmentNumber;

@@ -68,7 +68,7 @@ class TestGame extends Game
 		this.inputManager.registerKeyEvent(Key.Esc, KeyState.Up, stopGame);
 
 		// Image man
-		imageMan = new GameObject();
+		imageMan = new GameObject(this.globalScene);
 		imageMan.position = new Vector2(-100, 200);
 			var img:ImageRenderer = new ImageRenderer(new ImageSource("img/man.png"), 2);
 			img.shadow = new Shadow(new Color(0, 0, 0, 0.5), new Vector2(15, 15), 4);
@@ -80,7 +80,7 @@ class TestGame extends Game
 		//gameObjectManager.addGameObject(imageMan);
 
 		// Image box
-		imageBox = new GameObject();
+		imageBox = new GameObject(this.globalScene);
 		imageBox.position = new Vector2(-50, 200);
 			var img:ImageRenderer = new ImageRenderer(new ImageSource("img/jupiter.png"), 1, new Rect(0, 0, 200, 400), 1000, 1000);
 			img.visible = false;
@@ -113,7 +113,7 @@ class TestGame extends Game
 		circle.friend = circle2;
 		circle2.friend = circle;
 
-		bottomEdge = new GameObject();
+		bottomEdge = new GameObject(this.globalScene);
 		bottomEdge.position = new Vector2(this.width/2, this.height - this.groundHeight/2);
 			var rect:RectRenderer = new RectRenderer(this.width, this.groundHeight, 2);
 			rect.fillColor = new Color(0, 100, 100);
@@ -121,17 +121,15 @@ class TestGame extends Game
 			rect.lineWidth = 10;
 		bottomEdge.addComponent("mainRect", rect);
 
-		gameObjectManager.addGameObjects([imageMan, imageBox, circle, circle2, bottomEdge]);
-
 		for (i in 0...10)
 		{
 			for (j in 0...10)
 			{
-				gameObjectManager.addGameObject(new CircleObj(new Circle(20, new Vector2(40 + (100 *i), 40 + (100*j))), Color.Black));
+				new CircleObj(this.globalScene, new Circle(20, new Vector2(40 + (100 *i), 40 + (100*j))), Color.Black);
 			}
 		}
 
-		var collisionManager:CollisionComponentManager = cast(gameObjectManager.getManager(CollisionComponentManager), CollisionComponentManager);
+		var collisionManager:CollisionComponentManager = cast(this.globalScene.getManager(CollisionComponentManager), CollisionComponentManager);
 		collisionManager.getLayer("main").getGroup("onlyGroup").addCollidingGroup("onlyGroup");
 	}
 

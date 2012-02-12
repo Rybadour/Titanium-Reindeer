@@ -1,6 +1,7 @@
 package star_control;
 
 import titanium_reindeer.GameObject;
+import titanium_reindeer.Scene;
 import titanium_reindeer.RectRenderer;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.Color;
@@ -31,9 +32,9 @@ class ShipUi extends GameObject
 	private var lastHealth:Int;
 	private var lastAmmo:Int;
 
-	public function new()
+	public function new(scene:Scene)
 	{
-		super();
+		super(scene);
 
 		this.background = new RectRenderer(WIDTH, HEIGHT, Layers.UI_B);
 		this.background.fillColor = Color.Grey;

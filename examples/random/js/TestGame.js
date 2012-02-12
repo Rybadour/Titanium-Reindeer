@@ -45,21 +45,25 @@ titanium_reindeer.ManagedObject.prototype.finalDestroy = function() {
 	this.registeredManagerSetEvents = null;
 }
 titanium_reindeer.ManagedObject.prototype.__class__ = titanium_reindeer.ManagedObject;
-titanium_reindeer.GameObject = function(p) {
-	if( p === $_ ) return;
+titanium_reindeer.GameObject = function(scene) {
+	if( scene === $_ ) return;
 	titanium_reindeer.ManagedObject.call(this);
 	this.watchedPosition = new titanium_reindeer.WatchedVector2(0,0,$closure(this,"positionChanged"));
 	this.components = new Hash();
+	if(scene != null) {
+		scene.addGameObject(this);
+		this.setManager(scene);
+	}
 }
 titanium_reindeer.GameObject.__name__ = ["titanium_reindeer","GameObject"];
 titanium_reindeer.GameObject.__super__ = titanium_reindeer.ManagedObject;
 for(var k in titanium_reindeer.ManagedObject.prototype ) titanium_reindeer.GameObject.prototype[k] = titanium_reindeer.ManagedObject.prototype[k];
-titanium_reindeer.GameObject.prototype.objectManager = null;
+titanium_reindeer.GameObject.prototype.scene = null;
 titanium_reindeer.GameObject.prototype.getManager = function() {
 	if(this.manager == null) return null; else return (function($this) {
 		var $r;
 		var $t = $this.manager;
-		if(Std["is"]($t,titanium_reindeer.GameObjectManager)) $t; else throw "Class cast error";
+		if(Std["is"]($t,titanium_reindeer.Scene)) $t; else throw "Class cast error";
 		$r = $t;
 		return $r;
 	}(this));
@@ -114,16 +118,14 @@ titanium_reindeer.GameObject.prototype.notifyPositionChanged = function() {
 		}
 	}
 }
-titanium_reindeer.GameObject.prototype.hasInitialized = function() {
-}
 titanium_reindeer.GameObject.prototype.setManager = function(manager) {
+	if(this.manager == manager) return;
 	titanium_reindeer.ManagedObject.prototype.setManager.call(this,manager);
 	var $it0 = this.components.iterator();
 	while( $it0.hasNext() ) {
 		var component = $it0.next();
 		this.getManager().delegateComponent(component);
 	}
-	this.hasInitialized();
 }
 titanium_reindeer.GameObject.prototype.remove = function() {
 	if(this.componentsToRemove == null) this.componentsToRemove = new Array();
@@ -176,9 +178,9 @@ titanium_reindeer.GameObject.prototype.finalDestroy = function() {
 	this.watchedPosition = null;
 }
 titanium_reindeer.GameObject.prototype.__class__ = titanium_reindeer.GameObject;
-MovableObject = function(velocity) {
-	if( velocity === $_ ) return;
-	titanium_reindeer.GameObject.call(this);
+MovableObject = function(scene,velocity) {
+	if( scene === $_ ) return;
+	titanium_reindeer.GameObject.call(this,scene);
 	titanium_reindeer.GameObject.prototype.addComponent.call(this,"velocity",new titanium_reindeer.MovementComponent(velocity));
 }
 MovableObject.__name__ = ["MovableObject"];
@@ -207,7 +209,7 @@ MovableObject.prototype.setVelocity = function(velocity) {
 MovableObject.prototype.__class__ = MovableObject;
 CirclePlayer = function(game,leftKey,rightKey,upKey,color) {
 	if( game === $_ ) return;
-	MovableObject.call(this,new titanium_reindeer.Vector2(0,0));
+	MovableObject.call(this,game.globalScene,new titanium_reindeer.Vector2(0,0));
 	this.game = game;
 	this.radius = 20;
 	this.jumpSpeed = 50;
@@ -351,8 +353,8 @@ titanium_reindeer.ComponentHandlerPair.prototype.__class__ = titanium_reindeer.C
 titanium_reindeer.MouseRegionManager = function(manager) {
 	if( manager === $_ ) return;
 	this.collisionManager = manager;
-	this.collisionManager.gameObjectManager.game.inputManager.registerMouseMoveEvent($closure(this,"mouseMoveHandle"));
-	this.collisionManager.gameObjectManager.game.inputManager.registerMouseButtonAnyEvent($closure(this,"mouseButtonHandle"));
+	this.collisionManager.scene.getGame().inputManager.registerMouseMoveEvent($closure(this,"mouseMoveHandle"));
+	this.collisionManager.scene.getGame().inputManager.registerMouseButtonAnyEvent($closure(this,"mouseButtonHandle"));
 	this.layerToPairsMap = new Hash();
 	this.exclusionRegions = new IntHash();
 	this.exclusionRTree = new titanium_reindeer.RTreeFastInt();
@@ -479,8 +481,8 @@ titanium_reindeer.MouseRegionManager.prototype.organizeIntersectingExclusions = 
 	return new titanium_reindeer.ExclusionsMaxDepthPair(exclusionRegions,maxDepth);
 }
 titanium_reindeer.MouseRegionManager.prototype.destroy = function() {
-	this.collisionManager.gameObjectManager.game.inputManager.unregisterMouseMoveEvent($closure(this,"mouseMoveHandle"));
-	this.collisionManager.gameObjectManager.game.inputManager.unregisterMouseButtonAnyEvent($closure(this,"mouseButtonHandle"));
+	this.collisionManager.scene.getGame().inputManager.unregisterMouseMoveEvent($closure(this,"mouseMoveHandle"));
+	this.collisionManager.scene.getGame().inputManager.unregisterMouseButtonAnyEvent($closure(this,"mouseButtonHandle"));
 	this.collisionManager = null;
 	var $it0 = this.layerToPairsMap.keys();
 	while( $it0.hasNext() ) {
@@ -587,10 +589,52 @@ titanium_reindeer.RendererComponent = function(width,height,layer) {
 	this.effects = new Hash();
 	this.lastIdentifier = "";
 	this.lastRenderedPosition = new titanium_reindeer.Vector2(0,0);
+	this.useFakes = false;
 }
 titanium_reindeer.RendererComponent.__name__ = ["titanium_reindeer","RendererComponent"];
 titanium_reindeer.RendererComponent.__super__ = titanium_reindeer.Component;
 for(var k in titanium_reindeer.Component.prototype ) titanium_reindeer.RendererComponent.prototype[k] = titanium_reindeer.Component.prototype[k];
+titanium_reindeer.RendererComponent.CompositionToString = function(comp) {
+	return (function($this) {
+		var $r;
+		switch( (comp)[1] ) {
+		case 0:
+			$r = "source-atop";
+			break;
+		case 1:
+			$r = "source-in";
+			break;
+		case 2:
+			$r = "source-out";
+			break;
+		case 3:
+			$r = "source-over";
+			break;
+		case 4:
+			$r = "destination-atop";
+			break;
+		case 5:
+			$r = "destination-in";
+			break;
+		case 6:
+			$r = "destination-out";
+			break;
+		case 7:
+			$r = "destination-over";
+			break;
+		case 8:
+			$r = "lighter";
+			break;
+		case 9:
+			$r = "copy";
+			break;
+		case 10:
+			$r = "xor";
+			break;
+		}
+		return $r;
+	}(this));
+}
 titanium_reindeer.RendererComponent.prototype.rendererManager = null;
 titanium_reindeer.RendererComponent.prototype.getRendererManager = function() {
 	if(this.manager == null) return null; else return (function($this) {
@@ -699,6 +743,10 @@ titanium_reindeer.RendererComponent.prototype.setAlpha = function(value) {
 	}
 	return this.alpha;
 }
+titanium_reindeer.RendererComponent.prototype.renderComposition = null;
+titanium_reindeer.RendererComponent.prototype.getRenderComposition = function() {
+	if(this.layer == null) return titanium_reindeer.Composition.SourceOver; else return this.layer.renderComposition;
+}
 titanium_reindeer.RendererComponent.prototype.screenPos = null;
 titanium_reindeer.RendererComponent.prototype.getScreenPos = function() {
 	if(this.useFakes) return this.fakePosition;
@@ -761,7 +809,7 @@ titanium_reindeer.RendererComponent.prototype.fixRotationOnPoint = function(p) {
 }
 titanium_reindeer.RendererComponent.prototype.preRender = function() {
 	this.getPen().save();
-	this.getPen().globalCompositeOperation = this.layer.compositionToString(this.layer.renderComposition);
+	this.getPen().globalCompositeOperation = titanium_reindeer.RendererComponent.CompositionToString(this.getRenderComposition());
 	this.getPen().translate(this.getScreenPos().getX(),this.getScreenPos().getY());
 	if(this.rotation != 0) this.getPen().rotate(this.rotation);
 	this.getPen().globalAlpha = this.alpha;
@@ -802,6 +850,16 @@ titanium_reindeer.RendererComponent.prototype.removeEffect = function(name) {
 	this.effects.remove(name);
 	this.setRedraw(true);
 }
+titanium_reindeer.RendererComponent.prototype.useAlternateCanvas = function(pen,newPosition) {
+	this.fakePen = pen;
+	if(newPosition == null) this.fakePosition = new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1); else this.fakePosition = newPosition;
+	this.useFakes = true;
+}
+titanium_reindeer.RendererComponent.prototype.disableAlternateCanvas = function() {
+	this.fakePen = null;
+	this.fakePosition = null;
+	this.useFakes = false;
+}
 titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 	if(this.getRendererManager() != null && Lambda.count(this.effects) != 0) {
 		var identifier = this.identify();
@@ -812,9 +870,7 @@ titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 			var canvas = js.Lib.document.createElement("canvas");
 			canvas.setAttribute("width",this.drawnWidth + 2 + "px");
 			canvas.setAttribute("height",this.drawnHeight + 2 + "px");
-			this.fakePen = canvas.getContext("2d");
-			this.fakePosition = new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1);
-			this.useFakes = true;
+			this.useAlternateCanvas(canvas.getContext("2d"),new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1));
 			this.preRender();
 			this.render();
 			this.postRender();
@@ -830,9 +886,7 @@ titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 			if(bitmap.isLoaded) this.cachedBitmapLoaded(null); else bitmap.registerLoadEvent($closure(this,"cachedBitmapLoaded"));
 			this.sharedBitmap = bitmap;
 			this.getRendererManager().cachedBitmaps.set(identifier,bitmap);
-			this.fakePen = null;
-			this.fakePosition = null;
-			this.useFakes = false;
+			this.disableAlternateCanvas();
 		}
 	} else {
 		this.usingSharedBitmap = false;
@@ -1300,6 +1354,10 @@ titanium_reindeer.ObjectManager.prototype.destroy = function() {
 	this.objectsToRemove = null;
 }
 titanium_reindeer.ObjectManager.prototype.__class__ = titanium_reindeer.ObjectManager;
+titanium_reindeer.SceneInputBridge = function(p) {
+}
+titanium_reindeer.SceneInputBridge.__name__ = ["titanium_reindeer","SceneInputBridge"];
+titanium_reindeer.SceneInputBridge.prototype.__class__ = titanium_reindeer.SceneInputBridge;
 titanium_reindeer.MouseButton = { __ename__ : ["titanium_reindeer","MouseButton"], __constructs__ : ["Left","Right","Middle","None"] }
 titanium_reindeer.MouseButton.Left = ["Left",0];
 titanium_reindeer.MouseButton.Left.toString = $estr;
@@ -1865,13 +1923,14 @@ titanium_reindeer.Game = function(targetHtmlId,width,height,layerCount,debugMode
 	this.debugMode = debugMode == null?false:debugMode;
 	this.setMaxAllowedUpdateLengthMs(1000);
 	this.exitGame = false;
-	this.gameObjectManager = new titanium_reindeer.GameObjectManager(this);
+	this.sceneManager = new titanium_reindeer.SceneManager(this);
 	this.inputManager = new titanium_reindeer.InputManager(this.targetElement);
 	this.soundManager = new titanium_reindeer.SoundManager();
 	this.cursor = new titanium_reindeer.Cursor(this.targetElement);
+	this.globalScene = new titanium_reindeer.Scene(this,"__global_scene__");
 	if(debugMode) js.Lib.setErrorHandler(function(msg,stack) {
 		js.Lib.alert("ERROR[ " + msg + " ]");
-		haxe.Log.trace(stack,{ fileName : "Game.hx", lineNumber : 68, className : "titanium_reindeer.Game", methodName : "new"});
+		haxe.Log.trace(stack,{ fileName : "Game.hx", lineNumber : 71, className : "titanium_reindeer.Game", methodName : "new"});
 		return true;
 	});
 }
@@ -1889,10 +1948,11 @@ titanium_reindeer.Game.prototype.setMaxAllowedUpdateLengthMs = function(value) {
 }
 titanium_reindeer.Game.prototype.exitGame = null;
 titanium_reindeer.Game.prototype.msLastTimeStep = null;
-titanium_reindeer.Game.prototype.gameObjectManager = null;
+titanium_reindeer.Game.prototype.sceneManager = null;
 titanium_reindeer.Game.prototype.inputManager = null;
 titanium_reindeer.Game.prototype.soundManager = null;
 titanium_reindeer.Game.prototype.cursor = null;
+titanium_reindeer.Game.prototype.globalScene = null;
 titanium_reindeer.Game.prototype.play = function() {
 	this.requestAnimFrame();
 }
@@ -1903,7 +1963,7 @@ titanium_reindeer.Game.prototype.gameLoop = function(now) {
 		if(now == null) msTimeStep = Math.round(1000 / 60); else msTimeStep = Std["int"](Math.min(now - this.msLastTimeStep,this.maxAllowedUpdateLengthMs));
 		this.msLastTimeStep = now;
 		this.update(msTimeStep);
-		this.gameObjectManager.update(msTimeStep);
+		this.sceneManager.update(msTimeStep);
 		this.inputManager.update(msTimeStep);
 		this.requestAnimFrame();
 	}
@@ -1916,7 +1976,7 @@ titanium_reindeer.Game.prototype.update = function(msTimeStep) {
 titanium_reindeer.Game.prototype.destroy = function() {
 	this.targetElement = null;
 	this.backgroundColor = null;
-	this.gameObjectManager.destroy();
+	this.globalScene.destroy();
 	this.inputManager.destroy();
 }
 titanium_reindeer.Game.prototype.stopGame = function() {
@@ -1935,7 +1995,7 @@ TestGame = function(p) {
 	this.inputManager.registerKeyEvent(titanium_reindeer.Key.Two,titanium_reindeer.KeyState.Up,$closure(this,"unsaturatedEffects"));
 	this.inputManager.registerKeyEvent(titanium_reindeer.Key.Three,titanium_reindeer.KeyState.Up,$closure(this,"pixelatedEffects"));
 	this.inputManager.registerKeyEvent(titanium_reindeer.Key.Esc,titanium_reindeer.KeyState.Up,$closure(this,"stopGame"));
-	this.imageMan = new titanium_reindeer.GameObject();
+	this.imageMan = new titanium_reindeer.GameObject(this.globalScene);
 	this.imageMan.setPosition(new titanium_reindeer.Vector2(-100,200));
 	var img = new titanium_reindeer.ImageRenderer(new titanium_reindeer.ImageSource("img/man.png"),2);
 	img.setShadow(new titanium_reindeer.Shadow(new titanium_reindeer.Color(0,0,0,0.5),new titanium_reindeer.Vector2(15,15),4));
@@ -1944,7 +2004,7 @@ TestGame = function(p) {
 	var velo = new titanium_reindeer.MovementComponent();
 	velo.setVelocity(new titanium_reindeer.Vector2(1,0));
 	this.imageMan.addComponent("velo",velo);
-	this.imageBox = new titanium_reindeer.GameObject();
+	this.imageBox = new titanium_reindeer.GameObject(this.globalScene);
 	this.imageBox.setPosition(new titanium_reindeer.Vector2(-50,200));
 	var img1 = new titanium_reindeer.ImageRenderer(new titanium_reindeer.ImageSource("img/jupiter.png"),1,new titanium_reindeer.Rect(0,0,200,400),1000,1000);
 	img1.setVisible(false);
@@ -1970,26 +2030,25 @@ TestGame = function(p) {
 	this.circle2.setPosition(new titanium_reindeer.Vector2(80,100));
 	this.circle.friend = this.circle2;
 	this.circle2.friend = this.circle;
-	this.bottomEdge = new titanium_reindeer.GameObject();
+	this.bottomEdge = new titanium_reindeer.GameObject(this.globalScene);
 	this.bottomEdge.setPosition(new titanium_reindeer.Vector2(this.width / 2,this.height - this.getGroundHeight() / 2));
 	var rect = new titanium_reindeer.RectRenderer(this.width,this.getGroundHeight(),2);
 	rect.setFill(new titanium_reindeer.Color(0,100,100));
 	rect.setStrokeColor(titanium_reindeer.Color.getGreyConst());
 	rect.setLineWidth(10);
 	this.bottomEdge.addComponent("mainRect",rect);
-	this.gameObjectManager.addGameObjects([this.imageMan,this.imageBox,this.circle,this.circle2,this.bottomEdge]);
 	var _g = 0;
 	while(_g < 10) {
 		var i = _g++;
 		var _g1 = 0;
 		while(_g1 < 10) {
 			var j = _g1++;
-			this.gameObjectManager.addGameObject(new CircleObj(new titanium_reindeer.Circle(20,new titanium_reindeer.Vector2(40 + 100 * i,40 + 100 * j)),titanium_reindeer.Color.getBlackConst()));
+			new CircleObj(this.globalScene,new titanium_reindeer.Circle(20,new titanium_reindeer.Vector2(40 + 100 * i,40 + 100 * j)),titanium_reindeer.Color.getBlackConst());
 		}
 	}
 	var collisionManager = (function($this) {
 		var $r;
-		var $t = $this.gameObjectManager.getManager(titanium_reindeer.CollisionComponentManager);
+		var $t = $this.globalScene.getManager(titanium_reindeer.CollisionComponentManager);
 		if(Std["is"]($t,titanium_reindeer.CollisionComponentManager)) $t; else throw "Class cast error";
 		$r = $t;
 		return $r;
@@ -2954,47 +3013,6 @@ titanium_reindeer.RenderLayer.prototype.ensureYetToRedrawIsReady = function() {
 		}
 	}
 }
-titanium_reindeer.RenderLayer.prototype.compositionToString = function(comp) {
-	return (function($this) {
-		var $r;
-		switch( (comp)[1] ) {
-		case 0:
-			$r = "source-atop";
-			break;
-		case 1:
-			$r = "source-in";
-			break;
-		case 2:
-			$r = "source-out";
-			break;
-		case 3:
-			$r = "source-over";
-			break;
-		case 4:
-			$r = "destination-atop";
-			break;
-		case 5:
-			$r = "destination-in";
-			break;
-		case 6:
-			$r = "destination-out";
-			break;
-		case 7:
-			$r = "destination-over";
-			break;
-		case 8:
-			$r = "lighter";
-			break;
-		case 9:
-			$r = "copy";
-			break;
-		case 10:
-			$r = "xor";
-			break;
-		}
-		return $r;
-	}(this));
-}
 titanium_reindeer.RenderLayer.prototype.destroy = function() {
 	this.layerManager = null;
 	this.canvas = null;
@@ -3273,16 +3291,16 @@ Reflect.makeVarArgs = function(f) {
 	};
 }
 Reflect.prototype.__class__ = Reflect;
-titanium_reindeer.ComponentManager = function(gameObjectManager) {
-	if( gameObjectManager === $_ ) return;
+titanium_reindeer.ComponentManager = function(scene) {
+	if( scene === $_ ) return;
 	titanium_reindeer.ObjectManager.call(this);
-	this.gameObjectManager = gameObjectManager;
+	this.scene = scene;
 	this.componentsChanged = true;
 }
 titanium_reindeer.ComponentManager.__name__ = ["titanium_reindeer","ComponentManager"];
 titanium_reindeer.ComponentManager.__super__ = titanium_reindeer.ObjectManager;
 for(var k in titanium_reindeer.ObjectManager.prototype ) titanium_reindeer.ComponentManager.prototype[k] = titanium_reindeer.ObjectManager.prototype[k];
-titanium_reindeer.ComponentManager.prototype.gameObjectManager = null;
+titanium_reindeer.ComponentManager.prototype.scene = null;
 titanium_reindeer.ComponentManager.prototype.components = null;
 titanium_reindeer.ComponentManager.prototype.getComponents = function() {
 	if(this.componentsChanged) {
@@ -3324,13 +3342,13 @@ titanium_reindeer.ComponentManager.prototype.removeComponents = function() {
 titanium_reindeer.ComponentManager.prototype.destroy = function() {
 	titanium_reindeer.ObjectManager.prototype.destroy.call(this);
 	this.components = null;
-	this.gameObjectManager = null;
+	this.scene = null;
 }
 titanium_reindeer.ComponentManager.prototype.__class__ = titanium_reindeer.ComponentManager;
-titanium_reindeer.RendererComponentManager = function(gameObjectManager) {
-	if( gameObjectManager === $_ ) return;
-	titanium_reindeer.ComponentManager.call(this,gameObjectManager);
-	var game = this.gameObjectManager.game;
+titanium_reindeer.RendererComponentManager = function(scene) {
+	if( scene === $_ ) return;
+	titanium_reindeer.ComponentManager.call(this,scene);
+	var game = this.scene.getGame();
 	this.renderLayerManager = new titanium_reindeer.RenderLayerManager(game.layerCount,game.targetElement,game.backgroundColor,game.width,game.height);
 	this.cachedBitmaps = new titanium_reindeer.CachedBitmaps();
 }
@@ -4497,112 +4515,6 @@ titanium_reindeer.Vector2.prototype.identify = function() {
 	return "Vector2(" + this.getX() + "," + this.getY() + ")";
 }
 titanium_reindeer.Vector2.prototype.__class__ = titanium_reindeer.Vector2;
-titanium_reindeer.GameObjectManager = function(game) {
-	if( game === $_ ) return;
-	titanium_reindeer.ObjectManager.call(this);
-	this.game = game;
-	this.componentManagers = new Hash();
-}
-titanium_reindeer.GameObjectManager.__name__ = ["titanium_reindeer","GameObjectManager"];
-titanium_reindeer.GameObjectManager.__super__ = titanium_reindeer.ObjectManager;
-for(var k in titanium_reindeer.ObjectManager.prototype ) titanium_reindeer.GameObjectManager.prototype[k] = titanium_reindeer.ObjectManager.prototype[k];
-titanium_reindeer.GameObjectManager.prototype.game = null;
-titanium_reindeer.GameObjectManager.prototype.componentManagers = null;
-titanium_reindeer.GameObjectManager.prototype.addGameObject = function(obj) {
-	titanium_reindeer.ObjectManager.prototype.addObject.call(this,obj);
-}
-titanium_reindeer.GameObjectManager.prototype.addGameObjects = function(objs) {
-	var _g = 0;
-	while(_g < objs.length) {
-		var obj = objs[_g];
-		++_g;
-		titanium_reindeer.ObjectManager.prototype.addObject.call(this,obj);
-	}
-}
-titanium_reindeer.GameObjectManager.prototype.removeGameObject = function(obj) {
-	if(titanium_reindeer.ObjectManager.prototype.objectIdExists.call(this,obj.id)) obj.remove();
-	titanium_reindeer.ObjectManager.prototype.removeObject.call(this,obj);
-}
-titanium_reindeer.GameObjectManager.prototype.getGameObject = function(id) {
-	return (function($this) {
-		var $r;
-		var $t = titanium_reindeer.ObjectManager.prototype.getObject.call($this,id);
-		if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";
-		$r = $t;
-		return $r;
-	}(this));
-}
-titanium_reindeer.GameObjectManager.prototype.getManager = function(managerType) {
-	var className = Type.getClassName(managerType);
-	var manager;
-	if(this.componentManagers.exists(className)) manager = this.componentManagers.get(className); else {
-		manager = Type.createInstance(managerType,[this]);
-		this.componentManagers.set(className,manager);
-	}
-	return manager;
-}
-titanium_reindeer.GameObjectManager.prototype.delegateComponent = function(component) {
-	var manager = this.getManager(component.getManagerType());
-	manager.addComponent(component);
-	component.initialize();
-}
-titanium_reindeer.GameObjectManager.prototype.update = function(msTimeStep) {
-	var $it0 = this.componentManagers.iterator();
-	while( $it0.hasNext() ) {
-		var manager = $it0.next();
-		manager.preUpdate(msTimeStep);
-	}
-	var $it1 = this.objects.iterator();
-	while( $it1.hasNext() ) {
-		var obj = $it1.next();
-		((function($this) {
-			var $r;
-			var $t = obj;
-			if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";
-			$r = $t;
-			return $r;
-		}(this))).update(msTimeStep);
-	}
-	var $it2 = this.componentManagers.iterator();
-	while( $it2.hasNext() ) {
-		var manager = $it2.next();
-		manager.update(msTimeStep);
-	}
-	var $it3 = this.componentManagers.iterator();
-	while( $it3.hasNext() ) {
-		var manager = $it3.next();
-		manager.postUpdate(msTimeStep);
-	}
-	titanium_reindeer.ObjectManager.prototype.removeObjects.call(this);
-	var $it4 = this.objects.iterator();
-	while( $it4.hasNext() ) {
-		var obj = $it4.next();
-		((function($this) {
-			var $r;
-			var $t = obj;
-			if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";
-			$r = $t;
-			return $r;
-		}(this))).removeComponents();
-	}
-	var $it5 = this.componentManagers.iterator();
-	while( $it5.hasNext() ) {
-		var manager = $it5.next();
-		manager.removeComponents();
-	}
-}
-titanium_reindeer.GameObjectManager.prototype.destroy = function() {
-	titanium_reindeer.ObjectManager.prototype.destroy.call(this);
-	var $it0 = this.componentManagers.keys();
-	while( $it0.hasNext() ) {
-		var managerName = $it0.next();
-		this.componentManagers.get(managerName).destroy();
-		this.componentManagers.remove(managerName);
-	}
-	this.componentManagers = null;
-	this.game = null;
-}
-titanium_reindeer.GameObjectManager.prototype.__class__ = titanium_reindeer.GameObjectManager;
 StringBuf = function(p) {
 	if( p === $_ ) return;
 	this.b = new Array();
@@ -5665,9 +5577,28 @@ titanium_reindeer.ImageRenderer.prototype.destroy = function() {
 	this.setImage(null);
 }
 titanium_reindeer.ImageRenderer.prototype.__class__ = titanium_reindeer.ImageRenderer;
-titanium_reindeer.CollisionComponentManager = function(gameObjectManager) {
-	if( gameObjectManager === $_ ) return;
-	titanium_reindeer.ComponentManager.call(this,gameObjectManager);
+titanium_reindeer.SceneManager = function(game) {
+	if( game === $_ ) return;
+	this.game = game;
+	this.scenes = new Hash();
+}
+titanium_reindeer.SceneManager.__name__ = ["titanium_reindeer","SceneManager"];
+titanium_reindeer.SceneManager.prototype.game = null;
+titanium_reindeer.SceneManager.prototype.scenes = null;
+titanium_reindeer.SceneManager.prototype.addScene = function(scene) {
+	if(!this.scenes.exists(scene.name)) this.scenes.set(scene.name,scene);
+}
+titanium_reindeer.SceneManager.prototype.update = function(msTimeStep) {
+	var $it0 = this.scenes.iterator();
+	while( $it0.hasNext() ) {
+		var scene = $it0.next();
+		scene.update(msTimeStep);
+	}
+}
+titanium_reindeer.SceneManager.prototype.__class__ = titanium_reindeer.SceneManager;
+titanium_reindeer.CollisionComponentManager = function(scene) {
+	if( scene === $_ ) return;
+	titanium_reindeer.ComponentManager.call(this,scene);
 	this.collisionLayers = new Hash();
 	this.mouseRegionManager = new titanium_reindeer.MouseRegionManager(this);
 }
@@ -5859,6 +5790,121 @@ Lambda.concat = function(a,b) {
 	return l;
 }
 Lambda.prototype.__class__ = Lambda;
+titanium_reindeer.Scene = function(game,name) {
+	if( game === $_ ) return;
+	titanium_reindeer.ObjectManager.call(this);
+	this.name = name;
+	this.input = new titanium_reindeer.SceneInputBridge();
+	this.sceneManager = game.sceneManager;
+	this.sceneManager.addScene(this);
+	this.componentManagers = new Hash();
+}
+titanium_reindeer.Scene.__name__ = ["titanium_reindeer","Scene"];
+titanium_reindeer.Scene.__super__ = titanium_reindeer.ObjectManager;
+for(var k in titanium_reindeer.ObjectManager.prototype ) titanium_reindeer.Scene.prototype[k] = titanium_reindeer.ObjectManager.prototype[k];
+titanium_reindeer.Scene.prototype.sceneManager = null;
+titanium_reindeer.Scene.prototype.game = null;
+titanium_reindeer.Scene.prototype.getGame = function() {
+	return this.sceneManager.game;
+}
+titanium_reindeer.Scene.prototype.name = null;
+titanium_reindeer.Scene.prototype.input = null;
+titanium_reindeer.Scene.prototype.componentManagers = null;
+titanium_reindeer.Scene.prototype.addGameObject = function(gameObject) {
+	this.addObject(gameObject);
+}
+titanium_reindeer.Scene.prototype.addGameObjects = function(objs) {
+	var _g = 0;
+	while(_g < objs.length) {
+		var obj = objs[_g];
+		++_g;
+		titanium_reindeer.ObjectManager.prototype.addObject.call(this,obj);
+	}
+}
+titanium_reindeer.Scene.prototype.removeGameObject = function(obj) {
+	if(titanium_reindeer.ObjectManager.prototype.objectIdExists.call(this,obj.id)) obj.remove();
+	titanium_reindeer.ObjectManager.prototype.removeObject.call(this,obj);
+}
+titanium_reindeer.Scene.prototype.getGameObject = function(id) {
+	return (function($this) {
+		var $r;
+		var $t = titanium_reindeer.ObjectManager.prototype.getObject.call($this,id);
+		if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";
+		$r = $t;
+		return $r;
+	}(this));
+}
+titanium_reindeer.Scene.prototype.getManager = function(managerType) {
+	var className = Type.getClassName(managerType);
+	var manager;
+	if(this.componentManagers.exists(className)) manager = this.componentManagers.get(className); else {
+		manager = Type.createInstance(managerType,[this]);
+		this.componentManagers.set(className,manager);
+	}
+	return manager;
+}
+titanium_reindeer.Scene.prototype.delegateComponent = function(component) {
+	var manager = this.getManager(component.getManagerType());
+	manager.addComponent(component);
+	component.initialize();
+}
+titanium_reindeer.Scene.prototype.update = function(msTimeStep) {
+	var $it0 = this.componentManagers.iterator();
+	while( $it0.hasNext() ) {
+		var manager = $it0.next();
+		manager.preUpdate(msTimeStep);
+	}
+	var $it1 = this.objects.iterator();
+	while( $it1.hasNext() ) {
+		var obj = $it1.next();
+		((function($this) {
+			var $r;
+			var $t = obj;
+			if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";
+			$r = $t;
+			return $r;
+		}(this))).update(msTimeStep);
+	}
+	var $it2 = this.componentManagers.iterator();
+	while( $it2.hasNext() ) {
+		var manager = $it2.next();
+		manager.update(msTimeStep);
+	}
+	var $it3 = this.componentManagers.iterator();
+	while( $it3.hasNext() ) {
+		var manager = $it3.next();
+		manager.postUpdate(msTimeStep);
+	}
+	titanium_reindeer.ObjectManager.prototype.removeObjects.call(this);
+	var $it4 = this.objects.iterator();
+	while( $it4.hasNext() ) {
+		var obj = $it4.next();
+		((function($this) {
+			var $r;
+			var $t = obj;
+			if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";
+			$r = $t;
+			return $r;
+		}(this))).removeComponents();
+	}
+	var $it5 = this.componentManagers.iterator();
+	while( $it5.hasNext() ) {
+		var manager = $it5.next();
+		manager.removeComponents();
+	}
+}
+titanium_reindeer.Scene.prototype.destroy = function() {
+	titanium_reindeer.ObjectManager.prototype.destroy.call(this);
+	var $it0 = this.componentManagers.keys();
+	while( $it0.hasNext() ) {
+		var managerName = $it0.next();
+		this.componentManagers.get(managerName).destroy();
+		this.componentManagers.remove(managerName);
+	}
+	this.componentManagers = null;
+	this.sceneManager = null;
+}
+titanium_reindeer.Scene.prototype.__class__ = titanium_reindeer.Scene;
 titanium_reindeer.MouseRegionMoveEvent = { __ename__ : ["titanium_reindeer","MouseRegionMoveEvent"], __constructs__ : ["Move","Enter","Exit"] }
 titanium_reindeer.MouseRegionMoveEvent.Move = ["Move",0];
 titanium_reindeer.MouseRegionMoveEvent.Move.toString = $estr;
@@ -6198,9 +6244,9 @@ titanium_reindeer.BitmapData.prototype.destroy = function() {
 	this.rawData = null;
 }
 titanium_reindeer.BitmapData.prototype.__class__ = titanium_reindeer.BitmapData;
-CircleObj = function(bounds,color) {
-	if( bounds === $_ ) return;
-	titanium_reindeer.GameObject.call(this);
+CircleObj = function(scene,bounds,color) {
+	if( scene === $_ ) return;
+	titanium_reindeer.GameObject.call(this,scene);
 	this.setPosition(new titanium_reindeer.Vector2(bounds.center.getX() + bounds.radius,bounds.center.getY() + bounds.radius));
 	this.renderer = new titanium_reindeer.CircleRenderer(bounds.radius,3);
 	this.renderer.setAlpha(0.3);
@@ -6210,16 +6256,6 @@ CircleObj = function(bounds,color) {
 	this.collisionCircle.registerCallback($closure(this,"collide"));
 	this.addComponent("collision",this.collisionCircle);
 	this.isLocked = false;
-}
-CircleObj.__name__ = ["CircleObj"];
-CircleObj.__super__ = titanium_reindeer.GameObject;
-for(var k in titanium_reindeer.GameObject.prototype ) CircleObj.prototype[k] = titanium_reindeer.GameObject.prototype[k];
-CircleObj.prototype.renderer = null;
-CircleObj.prototype.collisionCircle = null;
-CircleObj.prototype.mouseHandler = null;
-CircleObj.prototype.isLocked = null;
-CircleObj.prototype.setManager = function(manager) {
-	titanium_reindeer.GameObject.prototype.setManager.call(this,manager);
 	this.mouseHandler = ((function($this) {
 		var $r;
 		var $t = $this.getManager().getManager(titanium_reindeer.CollisionComponentManager);
@@ -6231,6 +6267,13 @@ CircleObj.prototype.setManager = function(manager) {
 	this.mouseHandler.registerMouseMoveEvent(titanium_reindeer.MouseRegionMoveEvent.Exit,$closure(this,"mouseExit"));
 	this.mouseHandler.registerMouseButtonEvent(titanium_reindeer.MouseRegionButtonEvent.Click,$closure(this,"mouseClick"));
 }
+CircleObj.__name__ = ["CircleObj"];
+CircleObj.__super__ = titanium_reindeer.GameObject;
+for(var k in titanium_reindeer.GameObject.prototype ) CircleObj.prototype[k] = titanium_reindeer.GameObject.prototype[k];
+CircleObj.prototype.renderer = null;
+CircleObj.prototype.collisionCircle = null;
+CircleObj.prototype.mouseHandler = null;
+CircleObj.prototype.isLocked = null;
 CircleObj.prototype.collide = function(other) {
 	this.renderer.setAlpha(1);
 }
@@ -6339,9 +6382,9 @@ Std.random = function(x) {
 	return Math.floor(Math.random() * x);
 }
 Std.prototype.__class__ = Std;
-titanium_reindeer.MovementComponentManager = function(gameObjectManager) {
-	if( gameObjectManager === $_ ) return;
-	titanium_reindeer.ComponentManager.call(this,gameObjectManager);
+titanium_reindeer.MovementComponentManager = function(scene) {
+	if( scene === $_ ) return;
+	titanium_reindeer.ComponentManager.call(this,scene);
 }
 titanium_reindeer.MovementComponentManager.__name__ = ["titanium_reindeer","MovementComponentManager"];
 titanium_reindeer.MovementComponentManager.__super__ = titanium_reindeer.ComponentManager;

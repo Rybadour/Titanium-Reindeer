@@ -1,3 +1,4 @@
+import titanium_reindeer.Scene;
 import titanium_reindeer.Circle;
 import titanium_reindeer.GameObject;
 import titanium_reindeer.Color;
@@ -19,9 +20,9 @@ class CircleObj extends GameObject
 
 	private var isLocked:Bool;
 
-	public function new(bounds:Circle, color:Color)
+	public function new(scene:Scene, bounds:Circle, color:Color)
 	{
-		super();
+		super(scene);
 
 		this.position = new Vector2(bounds.center.x + bounds.radius, bounds.center.y + bounds.radius);
 
@@ -35,13 +36,8 @@ class CircleObj extends GameObject
 		this.addComponent("collision", this.collisionCircle);
 
 		this.isLocked = false;
-	}
 
-	override public function setManager(manager:ObjectManager):Void
-	{
-		super.setManager(manager);
-
-		this.mouseHandler = cast(this.objectManager.getManager(CollisionComponentManager), CollisionComponentManager).mouseRegionManager.getHandler(this.collisionCircle);
+		this.mouseHandler = cast(this.scene.getManager(CollisionComponentManager), CollisionComponentManager).mouseRegionManager.getHandler(this.collisionCircle);
 		this.mouseHandler.registerMouseMoveEvent(MouseRegionMoveEvent.Enter, mouseEnter);
 		this.mouseHandler.registerMouseMoveEvent(MouseRegionMoveEvent.Exit, mouseExit);
 		this.mouseHandler.registerMouseButtonEvent(MouseRegionButtonEvent.Click, mouseClick);

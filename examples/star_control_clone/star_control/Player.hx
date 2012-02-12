@@ -20,7 +20,7 @@ class Player extends GameObject
 
 	public function new(game:StarControlGame, ship:Ship, thrustKey:Key, turnRightKey:Key, turnLeftKey:Key, shootKey:Key)
 	{
-		super();
+		super(game.globalScene);
 
 		this.game = game;
 		this.ship = ship;

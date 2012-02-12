@@ -1,6 +1,7 @@
 package star_control;
 
 import titanium_reindeer.GameObject;
+import titanium_reindeer.Scene;
 import titanium_reindeer.RectRenderer;
 import titanium_reindeer.TextRenderer;
 import titanium_reindeer.Vector2;
@@ -25,9 +26,9 @@ class UiBar extends GameObject
 	public var ship1Ui(default, null):ShipUi;
 	public var ship2Ui(default, null):ShipUi;
 
-	public function new(pos:Vector2)
+	public function new(scene:Scene, pos:Vector2)
 	{
-		super();
+		super(scene);
 
 		this.position = pos.add( new Vector2(WIDTH/2, HEIGHT/2) );
 
@@ -81,10 +82,10 @@ class UiBar extends GameObject
 
 		var shipUiMargin:Float = (WIDTH - ShipUi.WIDTH)/2;
 
-		this.ship1Ui = new ShipUi();
+		this.ship1Ui = new ShipUi(this.scene);
 		this.ship1Ui.position = pos.add(new Vector2(ShipUi.WIDTH/2 + shipUiMargin, ShipUi.HEIGHT/2 + 100));
 
-		this.ship2Ui = new ShipUi();
+		this.ship2Ui = new ShipUi(this.scene);
 		this.ship2Ui.position = pos.add(new Vector2(ShipUi.WIDTH/2 + shipUiMargin, HEIGHT - 100 - ShipUi.HEIGHT/2));
 	}
 
@@ -92,14 +93,5 @@ class UiBar extends GameObject
 	{
 		this.p1Score.text = p1Score+"";
 		this.p2Score.text = p2Score+"";
-	}
-
-	public override function setManager(manager:ObjectManager):Void
-	{
-		super.setManager(manager);
-
-		this.objectManager.addGameObject(ship1Ui);
-
-		this.objectManager.addGameObject(ship2Ui);
 	}
 }

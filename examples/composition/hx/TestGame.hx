@@ -37,11 +37,10 @@ class TestGame extends Game
 	{
 		super("TestGame", 800, 500, Layers.NUM_LAYERS, true, Color.Black);
 
-        this.thing = new Thing();
+        this.thing = new Thing(this.globalScene);
 		this.thing.position = new Vector2(200, 200);
-        this.gameObjectManager.addGameObject(this.thing);
 
-		var collisionManager:CollisionComponentManager = cast(gameObjectManager.getManager(CollisionComponentManager), CollisionComponentManager);
+		var collisionManager:CollisionComponentManager = cast(this.globalScene.getManager(CollisionComponentManager), CollisionComponentManager);
 		collisionManager.getLayer("main").getGroup("onlyGroup").addCollidingGroup("onlyGroup");
 	}
 }

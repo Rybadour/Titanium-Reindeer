@@ -1,4 +1,5 @@
 import titanium_reindeer.GameObject;
+import titanium_reindeer.Scene;
 import titanium_reindeer.MovementComponent;
 import titanium_reindeer.CompositionRenderer;
 import titanium_reindeer.CompositionLayer;
@@ -13,9 +14,9 @@ class Thing extends GameObject
     public var body:CompositionRenderer;
     public var velo:MovementComponent;
 
-    public function new()
+    public function new(scene:Scene)
     {
-        super();
+        super(scene);
 
 		var a:CircleRenderer = new CircleRenderer(40, Layers.ALPHA);
 		a.fillColor = Color.White;

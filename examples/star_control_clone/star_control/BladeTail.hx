@@ -1,5 +1,6 @@
 package star_control;
 
+import titanium_reindeer.Scene;
 import titanium_reindeer.ImageSource;
 import titanium_reindeer.CollisionCircle;
 import titanium_reindeer.CollisionComponent;
@@ -28,9 +29,9 @@ class BladeTail extends Ship
 	public var bladeTailSegmentSource(default, null):ImageSource;
 	public var bladeTailSegmentOnSource(default, null):ImageSource;
 
-	public function new(isPlayer1:Bool, shipUi:ShipUi)
+	public function new(scene:Scene, isPlayer1:Bool, shipUi:ShipUi)
 	{
-		super(isPlayer1, "bladeTailHead.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
+		super(scene, isPlayer1, "bladeTailHead.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
 
 		this.activeWeapon = false;
 		this.lastHit = 0;
@@ -47,7 +48,7 @@ class BladeTail extends Ship
 		{
 			segments.push( new BladeTailSegment(this, i, lastSegment) );
 			lastSegment = segments[i];
-			this.objectManager.addGameObject(lastSegment);
+			this.scene.addGameObject(lastSegment);
 		}
 	}
 
