@@ -35,7 +35,7 @@ class RectButton extends Button
 		return this.height;
 	}
 
-	public function new(width:Float, height:Float, bgLayer:Int, fgLayer:Int)
+	public function new(scene:Scene, width:Float, height:Float, bgLayer:Int, fgLayer:Int)
 	{
 		this.collisionRect = new CollisionRect(width, height, Button.UI_COLLISION_LAYER, Button.BUTTON_COLLISION_GROUP);
 
@@ -44,7 +44,7 @@ class RectButton extends Button
 		this.shownRect.strokeColor = Color.Black;
 		this.shownRect.lineWidth = 1;
 
-		super(fgLayer, collisionRect);
+		super(scene, fgLayer, collisionRect);
 
 		this.addComponent("__shown_rect__", shownRect);
 	}

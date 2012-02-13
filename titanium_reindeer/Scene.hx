@@ -11,15 +11,21 @@ class Scene extends ObjectManager
 
 	public var name(default, null):String;
 	public var input(default, null):SceneInputBridge;
+	public var renderDepth(default, null):Int;
+	public var layerCount(default, null):Int;
+	public var backgroundColor(default, null):Color;
 
 	private var componentManagers:Hash<ComponentManager>;
 
-	public function new(game:Game, name:String)
+	public function new(game:Game, name:String, renderDepth:Int, layerCount:Int, ?backgroundColor:Color)
 	{
 		super();
 
 		this.name = name;
 		this.input = new SceneInputBridge();
+		this.renderDepth = renderDepth;
+		this.layerCount = layerCount;
+		this.backgroundColor = backgroundColor == null ? new Color(255, 255, 255) : backgroundColor;
 
 		this.sceneManager = game.sceneManager;
 		this.sceneManager.addScene(this);

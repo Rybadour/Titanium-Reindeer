@@ -28,4 +28,15 @@ class SceneManager
 			scene.update(msTimeStep);
 		}
 	}
+
+	public function destroy():Void
+	{
+		this.game = null;
+		for (sceneName in this.scenes.keys())
+		{
+			this.scenes.get(sceneName).destroy();
+			this.scenes.remove(sceneName);
+		}
+		this.scenes = null;
+	}
 }

@@ -68,9 +68,9 @@ class Button extends GameObject
 	}
 	
 
-	public function new(fgLayer:Int, collision:CollisionComponent)
+	public function new(scene:Scene, fgLayer:Int, collision:CollisionComponent)
 	{
-		super();
+		super(scene);
 
 		this.text = "";
 		this.shownText = new TextRenderer(this.text, fgLayer);
@@ -87,6 +87,15 @@ class Button extends GameObject
 
 		this.enabled = true;
 		this.visible = true;
+
+		var collisionManager:CollisionComponentManager = cast(this.scene.getManager(CollisionComponentManager), CollisionComponentManager);
+		this.mouseHandler = collisionManager.mouseRegionManager.getHandler(this.collisionShape);
+		this.mouseHandler.registerMouseMoveEvent(MouseRegionMoveEvent.Enter, mouseEnter);
+		this.mouseHandler.registerMouseMoveEvent(MouseRegionMoveEvent.Exit, mouseExit);
+		this.mouseHandler.registerMouseButtonEvent(MouseRegionButtonEvent.Down, mouseDown);
+		this.mouseHandler.registerMouseButtonEvent(MouseRegionButtonEvent.Up, mouseUp);
+
+		this.scene.game.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
 	}
 
 	// Publicly usable methods
@@ -96,21 +105,6 @@ class Button extends GameObject
 			return;
 			
 		this.registeredMouseClickEvents.push(func);	
-	}
-
-	// Internal methods
-	private override function hasInitialized():Void
-	{
-		super.hasInitialized();
-
-		var collisionManager:CollisionComponentManager = cast(this.objectManager.getManager(CollisionComponentManager), CollisionComponentManager);
-		this.mouseHandler = collisionManager.mouseRegionManager.getHandler(this.collisionShape);
-		this.mouseHandler.registerMouseMoveEvent(MouseRegionMoveEvent.Enter, mouseEnter);
-		this.mouseHandler.registerMouseMoveEvent(MouseRegionMoveEvent.Exit, mouseExit);
-		this.mouseHandler.registerMouseButtonEvent(MouseRegionButtonEvent.Down, mouseDown);
-		this.mouseHandler.registerMouseButtonEvent(MouseRegionButtonEvent.Up, mouseUp);
-
-		this.objectManager.game.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
 	}
 
 	private function enable():Void
@@ -225,6 +219,6 @@ class Button extends GameObject
 		this.mouseHandler.unregisterMouseButtonEvent(MouseRegionButtonEvent.Down, mouseDown);
 		this.mouseHandler.unregisterMouseButtonEvent(MouseRegionButtonEvent.Up, mouseUp);
 
-		this.objectManager.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
+		this.scene.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
 	}
 }

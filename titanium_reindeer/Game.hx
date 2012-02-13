@@ -12,7 +12,6 @@ class Game
 	public var width:Int;
 	public var height:Int;
 
-	public var layerCount:Int;
 	public var backgroundColor:Color;
 
 	public var debugMode:Bool;
@@ -36,20 +35,13 @@ class Game
 	public var soundManager(default, null):SoundManager;
 	public var cursor(default, null):Cursor;
 
-	public var globalScene(default, null):Scene;
-
-	public function new(?targetHtmlId:String, ?width:Int, ?height:Int, ?layerCount:Int, ?debugMode:Bool, ?backgroundColor:Color)
+	public function new(targetHtmlId:String, ?width:Int, ?height:Int, ?debugMode:Bool)
 	{
-		if (targetHtmlId == null || targetHtmlId == "")
-			this.targetElement = js.Lib.document.createElement("div");
-		else
-			this.targetElement = js.Lib.document.getElementById(targetHtmlId);
+		this.targetElement = js.Lib.document.getElementById(targetHtmlId);
+		this.targetElement.style.position = "relative";
 
 		this.width = width == null ? 400 : width;
 		this.height = height == null ? 300 : height;
-
-		this.layerCount = layerCount == null ? 1 : layerCount;
-		this.backgroundColor = backgroundColor == null ? new Color(255, 255, 255) : backgroundColor;
 
 		this.debugMode = debugMode == null ? false : debugMode;
 		this.maxAllowedUpdateLengthMs = 1000; // 1 fps
@@ -60,8 +52,6 @@ class Game
 		this.inputManager = new InputManager(this.targetElement);
 		this.soundManager = new SoundManager();
 		this.cursor = new Cursor(this.targetElement);
-
-		this.globalScene = new Scene(this, "__global_scene__");
 
 		if (debugMode)
 		{
@@ -147,7 +137,7 @@ class Game
 		this.targetElement = null;
 		this.backgroundColor = null;
 
-		this.globalScene.destroy();
+		this.sceneManager.destroy();
 		this.inputManager.destroy();
 	}
 

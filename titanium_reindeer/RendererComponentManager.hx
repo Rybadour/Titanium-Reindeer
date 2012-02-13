@@ -11,7 +11,7 @@ class RendererComponentManager extends ComponentManager
 
 		var game:Game = this.scene.game;
 
-		this.renderLayerManager = new RenderLayerManager(game.layerCount, game.targetElement, game.backgroundColor, game.width, game.height);
+		this.renderLayerManager = new RenderLayerManager(scene, game.targetElement, game.width, game.height);
 
 		this.cachedBitmaps = new CachedBitmaps();
 	}
