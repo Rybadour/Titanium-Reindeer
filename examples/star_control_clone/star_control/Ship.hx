@@ -57,13 +57,13 @@ class Ship extends GameObject
 		super(scene);
 
 		this.isPlayer1 = isPlayer1;
-		var highlight:Color = this.isPlayer1 ? StarControlGame.PLAYER1_COLOR : StarControlGame.PLAYER2_COLOR;
+		var highlight:Color = this.isPlayer1 ? BattleScene.PLAYER1_COLOR : BattleScene.PLAYER2_COLOR;
 
-		this.sprite = new ImageRenderer(new ImageSource(StarControlGame.IMAGE_BASE + imagePath), Layers.SHIPS);
+		this.sprite = new ImageRenderer(new ImageSource(StarControlGame.IMAGE_BASE + imagePath), BattleScene.SHIPS_LAYER);
 		this.sprite.shadow = new Shadow(highlight, new Vector2(4, 4), 20);
 		this.addComponent("sprite", this.sprite);
 
-		this.playerHighlight = new CircleRenderer(COLLISION_RADIUS + 10, Layers.BELOW_SHIPS);
+		this.playerHighlight = new CircleRenderer(COLLISION_RADIUS + 10, BattleScene.BELOW_SHIPS_LAYER);
 		this.playerHighlight.fillColor = new Color(0, 0, 0, 1);
 		this.playerHighlight.shadow = new Shadow(highlight, new Vector2(0, 0), 0.5);
 		//this.addComponent("playerHighlight", this.playerHighlight);

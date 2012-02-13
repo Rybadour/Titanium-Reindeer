@@ -13,7 +13,7 @@ class FighterBullet extends Projectile
 
 	public function new(owner:Ship)
 	{
-		var sprite:CircleRenderer = new CircleRenderer(RADIUS, Layers.SHIPS);
+		var sprite:CircleRenderer = new CircleRenderer(RADIUS, BattleScene.SHIPS_LAYER);
 		sprite.fillColor = new Color(0, 0, 0, 0);
 		sprite.strokeColor = Color.White;
 		sprite.lineWidth = 2;

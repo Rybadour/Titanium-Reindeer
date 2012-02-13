@@ -32,7 +32,7 @@ class BladeTailSegment extends GameObject
 		this.segmentNumber = segmentNumber;
 		this.nextSegment = nextSegment;
 
-		this.sprite = new ImageRenderer(this.head.bladeTailSegmentSource, Layers.SHIPS);
+		this.sprite = new ImageRenderer(this.head.bladeTailSegmentSource, BattleScene.SHIPS_LAYER);
 		this.addComponent("segmentSprite_"+segmentNumber, this.sprite);
 
 		this.collision = new CollisionCircle(COLLISION_RADIUS, "main", CollisionGroups.SHIPS);

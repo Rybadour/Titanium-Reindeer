@@ -13,7 +13,7 @@ class ArtilleryShell extends Projectile
 
 	public function new(owner:Ship)
 	{
-		var sprite:RectRenderer = new RectRenderer(18, 10, Layers.SHIPS);
+		var sprite:RectRenderer = new RectRenderer(18, 10, BattleScene.SHIPS_LAYER);
 
 		var colorStops:Array<ColorStop> = new Array(); 
 		colorStops.push(new ColorStop(new Color(255, 127, 0), 0));

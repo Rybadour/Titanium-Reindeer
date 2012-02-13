@@ -14,7 +14,7 @@ class Mine extends Projectile
 
 	public function new(owner:Ship)
 	{
-		var sprite:ImageRenderer = new ImageRenderer(new ImageSource(StarControlGame.IMAGE_BASE + "mine.png"), Layers.SHIPS);
+		var sprite:ImageRenderer = new ImageRenderer(new ImageSource(StarControlGame.IMAGE_BASE + "mine.png"), BattleScene.SHIPS_LAYER);
 
 		super(owner, sprite, SPEED, DAMAGE, LIFE_TIME);
 	}

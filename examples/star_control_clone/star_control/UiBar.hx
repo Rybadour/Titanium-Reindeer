@@ -32,14 +32,14 @@ class UiBar extends GameObject
 
 		this.position = pos.add( new Vector2(WIDTH/2, HEIGHT/2) );
 
-		this.background = new RectRenderer(WIDTH, HEIGHT, Layers.UI_A);
+		this.background = new RectRenderer(WIDTH, HEIGHT, BattleScene.UI_A_LAYER);
 		this.background.fillColor = Color.Grey;
 		this.background.strokeColor = Color.Black;
 		this.background.lineWidth = 2;
 		this.addComponent("background", this.background);
 
-		this.p1Title = new TextRenderer("Player 1", Layers.UI_B);
-		this.p1Title.fillColor = StarControlGame.PLAYER1_COLOR;
+		this.p1Title = new TextRenderer("Player 1", BattleScene.UI_B_LAYER);
+		this.p1Title.fillColor = BattleScene.PLAYER1_COLOR;
 		this.p1Title.strokeColor = Color.Black;
 		this.p1Title.lineWidth = 1;
 		this.p1Title.fontSize = 22;
@@ -47,8 +47,8 @@ class UiBar extends GameObject
 		this.p1Title.offset = new Vector2(0, 80 - HEIGHT/2);
 		this.addComponent("p1Title", p1Title);
 
-		this.p2Title = new TextRenderer("Player 2", Layers.UI_B);
-		this.p2Title.fillColor = StarControlGame.PLAYER2_COLOR;
+		this.p2Title = new TextRenderer("Player 2", BattleScene.UI_B_LAYER);
+		this.p2Title.fillColor = BattleScene.PLAYER2_COLOR;
 		this.p2Title.strokeColor = Color.Black;
 		this.p2Title.lineWidth = 1;
 		this.p2Title.fontSize = 22;
@@ -56,8 +56,8 @@ class UiBar extends GameObject
 		this.p2Title.offset = new Vector2(0, HEIGHT/2 - 100 - ShipUi.HEIGHT - 20);
 		this.addComponent("p2Title", p2Title);
 
-		this.p1Score = new TextRenderer("0", Layers.UI_B);
-		this.p1Score.fillColor = StarControlGame.PLAYER1_COLOR;
+		this.p1Score = new TextRenderer("0", BattleScene.UI_B_LAYER);
+		this.p1Score.fillColor = BattleScene.PLAYER1_COLOR;
 		this.p1Score.strokeColor = Color.Black;
 		this.p1Score.lineWidth = 1;
 		this.p1Score.fontSize = 22;
@@ -65,8 +65,8 @@ class UiBar extends GameObject
 		this.p1Score.offset = new Vector2(0, -20);
 		this.addComponent("p1Score", p1Score);
 
-		this.p2Score = new TextRenderer("0", Layers.UI_B);
-		this.p2Score.fillColor = StarControlGame.PLAYER2_COLOR;
+		this.p2Score = new TextRenderer("0", BattleScene.UI_B_LAYER);
+		this.p2Score.fillColor = BattleScene.PLAYER2_COLOR;
 		this.p2Score.strokeColor = Color.Black;
 		this.p2Score.lineWidth = 1;
 		this.p2Score.fontSize = 22;
@@ -74,7 +74,7 @@ class UiBar extends GameObject
 		this.p2Score.offset = new Vector2(0, 20);
 		this.addComponent("p2Score", p2Score);
 
-		this.divideLine = new LineRenderer(new Vector2(WIDTH, 0), Layers.UI_B);
+		this.divideLine = new LineRenderer(new Vector2(WIDTH, 0), BattleScene.UI_B_LAYER);
 		this.divideLine.offset = new Vector2(-WIDTH/2, 0);
 		this.divideLine.lineWidth = 4;
 		this.divideLine.strokeColor = Color.Black;
