@@ -139,6 +139,7 @@ class Scene extends ObjectManager
 		}
 		this.componentManagers = null;
 
+		this.sceneManager.removeScene(this);
 		this.sceneManager = null;
 	}
 }

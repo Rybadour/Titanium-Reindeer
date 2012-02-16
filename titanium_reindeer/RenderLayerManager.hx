@@ -18,6 +18,8 @@ class RenderLayerManager
 	// Constructor
 	public function new(scene:Scene, targetElement:HtmlDom, gameWidth:Int, gameHeight:Int)
 	{
+		this.scene = scene;
+
 		this.gameWidth = gameWidth;
 		this.gameHeight = gameHeight;
 
@@ -97,13 +99,13 @@ class RenderLayerManager
 			var layer:RenderLayer = layers.pop();
 			layer.destroy();
 		}
-		layers = null;
+		this.layers = null;
 
 		this.pen = null;
 		this.canvas = null;
 
 		this.visiblePen = null;
-		var element:HtmlDom = js.Lib.document.getElementById("gameCanvas");
+		var element:HtmlDom = js.Lib.document.getElementById("gameCanvas_"+this.scene.name);
 		element.parentNode.removeChild(element);
 	}
 }

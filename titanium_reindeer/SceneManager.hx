@@ -21,6 +21,14 @@ class SceneManager
 		}
 	}
 
+	public function removeScene(scene:Scene):Void
+	{
+		if ( this.scenes.exists(scene.name) )
+		{
+			this.scenes.remove(scene.name);
+		}
+	}
+
 	public function update(msTimeStep:Int):Void
 	{
 		for (scene in this.scenes)

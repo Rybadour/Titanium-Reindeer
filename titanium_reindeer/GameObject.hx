@@ -168,6 +168,9 @@ class GameObject extends ManagedObject
 	
 	override public function finalDestroy():Void
 	{
+		if (this.scene != null)
+			this.scene.removeGameObject(this);
+
 		super.finalDestroy();
 
 		if (componentsToRemove != null)
