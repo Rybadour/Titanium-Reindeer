@@ -168,6 +168,11 @@ class RendererComponent extends Component
 	public var alpha(default, setAlpha):Float;
 	private function setAlpha(value:Float):Float
 	{
+		if (value < 0)
+			value = 0;
+		else if (value > 1)
+			value = 1;
+
 		if (value != alpha)
 		{
 			alpha = value;
