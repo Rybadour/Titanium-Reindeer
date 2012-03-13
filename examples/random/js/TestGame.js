@@ -587,10 +587,52 @@ titanium_reindeer.RendererComponent = function(width,height,layer) {
 	this.effects = new Hash();
 	this.lastIdentifier = "";
 	this.lastRenderedPosition = new titanium_reindeer.Vector2(0,0);
+	this.useFakes = false;
 }
 titanium_reindeer.RendererComponent.__name__ = ["titanium_reindeer","RendererComponent"];
 titanium_reindeer.RendererComponent.__super__ = titanium_reindeer.Component;
 for(var k in titanium_reindeer.Component.prototype ) titanium_reindeer.RendererComponent.prototype[k] = titanium_reindeer.Component.prototype[k];
+titanium_reindeer.RendererComponent.CompositionToString = function(comp) {
+	return (function($this) {
+		var $r;
+		switch( (comp)[1] ) {
+		case 0:
+			$r = "source-atop";
+			break;
+		case 1:
+			$r = "source-in";
+			break;
+		case 2:
+			$r = "source-out";
+			break;
+		case 3:
+			$r = "source-over";
+			break;
+		case 4:
+			$r = "destination-atop";
+			break;
+		case 5:
+			$r = "destination-in";
+			break;
+		case 6:
+			$r = "destination-out";
+			break;
+		case 7:
+			$r = "destination-over";
+			break;
+		case 8:
+			$r = "lighter";
+			break;
+		case 9:
+			$r = "copy";
+			break;
+		case 10:
+			$r = "xor";
+			break;
+		}
+		return $r;
+	}(this));
+}
 titanium_reindeer.RendererComponent.prototype.rendererManager = null;
 titanium_reindeer.RendererComponent.prototype.getRendererManager = function() {
 	if(this.manager == null) return null; else return (function($this) {
@@ -693,11 +735,16 @@ titanium_reindeer.RendererComponent.prototype.setRotation = function(value) {
 }
 titanium_reindeer.RendererComponent.prototype.alpha = null;
 titanium_reindeer.RendererComponent.prototype.setAlpha = function(value) {
+	if(value < 0) value = 0; else if(value > 1) value = 1;
 	if(value != this.alpha) {
 		this.alpha = value;
 		this.setRedraw(true);
 	}
 	return this.alpha;
+}
+titanium_reindeer.RendererComponent.prototype.renderComposition = null;
+titanium_reindeer.RendererComponent.prototype.getRenderComposition = function() {
+	if(this.layer == null) return titanium_reindeer.Composition.SourceOver; else return this.layer.renderComposition;
 }
 titanium_reindeer.RendererComponent.prototype.screenPos = null;
 titanium_reindeer.RendererComponent.prototype.getScreenPos = function() {
@@ -759,9 +806,11 @@ titanium_reindeer.RendererComponent.prototype.fixRotationOnPoint = function(p) {
 		this.getPen().translate(p.getX() - rotatedPoint.getX(),p.getY() - rotatedPoint.getY());
 	}
 }
+titanium_reindeer.RendererComponent.prototype.update = function(msTimeStep) {
+}
 titanium_reindeer.RendererComponent.prototype.preRender = function() {
 	this.getPen().save();
-	this.getPen().globalCompositeOperation = this.layer.compositionToString(this.layer.renderComposition);
+	this.getPen().globalCompositeOperation = titanium_reindeer.RendererComponent.CompositionToString(this.getRenderComposition());
 	this.getPen().translate(this.getScreenPos().getX(),this.getScreenPos().getY());
 	if(this.rotation != 0) this.getPen().rotate(this.rotation);
 	this.getPen().globalAlpha = this.alpha;
@@ -802,6 +851,16 @@ titanium_reindeer.RendererComponent.prototype.removeEffect = function(name) {
 	this.effects.remove(name);
 	this.setRedraw(true);
 }
+titanium_reindeer.RendererComponent.prototype.useAlternateCanvas = function(pen,newPosition) {
+	this.fakePen = pen;
+	if(newPosition == null) this.fakePosition = new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1); else this.fakePosition = newPosition;
+	this.useFakes = true;
+}
+titanium_reindeer.RendererComponent.prototype.disableAlternateCanvas = function() {
+	this.fakePen = null;
+	this.fakePosition = null;
+	this.useFakes = false;
+}
 titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 	if(this.getRendererManager() != null && Lambda.count(this.effects) != 0) {
 		var identifier = this.identify();
@@ -812,9 +871,7 @@ titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 			var canvas = js.Lib.document.createElement("canvas");
 			canvas.setAttribute("width",this.drawnWidth + 2 + "px");
 			canvas.setAttribute("height",this.drawnHeight + 2 + "px");
-			this.fakePen = canvas.getContext("2d");
-			this.fakePosition = new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1);
-			this.useFakes = true;
+			this.useAlternateCanvas(canvas.getContext("2d"),new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1));
 			this.preRender();
 			this.render();
 			this.postRender();
@@ -830,9 +887,7 @@ titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 			if(bitmap.isLoaded) this.cachedBitmapLoaded(null); else bitmap.registerLoadEvent($closure(this,"cachedBitmapLoaded"));
 			this.sharedBitmap = bitmap;
 			this.getRendererManager().cachedBitmaps.set(identifier,bitmap);
-			this.fakePen = null;
-			this.fakePosition = null;
-			this.useFakes = false;
+			this.disableAlternateCanvas();
 		}
 	} else {
 		this.usingSharedBitmap = false;
@@ -1925,7 +1980,7 @@ titanium_reindeer.Game.prototype.stopGame = function() {
 titanium_reindeer.Game.prototype.__class__ = titanium_reindeer.Game;
 TestGame = function(p) {
 	if( p === $_ ) return;
-	titanium_reindeer.Game.call(this,"TestGame",800,500,4,true,new titanium_reindeer.Color(255,255,100));
+	titanium_reindeer.Game.call(this,"TestGame",800,500,3,true,new titanium_reindeer.Color(255,255,100));
 	this.groundY = 240;
 	this.enabled = false;
 	this.toggle();
@@ -1935,27 +1990,20 @@ TestGame = function(p) {
 	this.inputManager.registerKeyEvent(titanium_reindeer.Key.Two,titanium_reindeer.KeyState.Up,$closure(this,"unsaturatedEffects"));
 	this.inputManager.registerKeyEvent(titanium_reindeer.Key.Three,titanium_reindeer.KeyState.Up,$closure(this,"pixelatedEffects"));
 	this.inputManager.registerKeyEvent(titanium_reindeer.Key.Esc,titanium_reindeer.KeyState.Up,$closure(this,"stopGame"));
-	this.imageMan = new titanium_reindeer.GameObject();
-	this.imageMan.setPosition(new titanium_reindeer.Vector2(-100,200));
-	var img = new titanium_reindeer.ImageRenderer(new titanium_reindeer.ImageSource("img/man.png"),2);
-	img.setShadow(new titanium_reindeer.Shadow(new titanium_reindeer.Color(0,0,0,0.5),new titanium_reindeer.Vector2(15,15),4));
-	img.setRotation(Math.PI / 8);
-	this.imageMan.addComponent("image",img);
-	var velo = new titanium_reindeer.MovementComponent();
-	velo.setVelocity(new titanium_reindeer.Vector2(1,0));
-	this.imageMan.addComponent("velo",velo);
+	this.man = new Man();
+	this.man.setPosition(new titanium_reindeer.Vector2(100,200));
 	this.imageBox = new titanium_reindeer.GameObject();
 	this.imageBox.setPosition(new titanium_reindeer.Vector2(-50,200));
-	var img1 = new titanium_reindeer.ImageRenderer(new titanium_reindeer.ImageSource("img/jupiter.png"),1,new titanium_reindeer.Rect(0,0,200,400),1000,1000);
-	img1.setVisible(false);
-	this.imageBox.addComponent("image",img1);
-	var velo1 = new titanium_reindeer.MovementComponent();
-	velo1.setVelocity(new titanium_reindeer.Vector2(0.7,0));
-	this.imageBox.addComponent("velo",velo1);
+	var img = new titanium_reindeer.ImageRenderer(new titanium_reindeer.ImageSource("img/jupiter.png"),0,new titanium_reindeer.Rect(0,0,200,400),1000,1000);
+	img.setVisible(false);
+	this.imageBox.addComponent("image",img);
+	var velo = new titanium_reindeer.MovementComponent();
+	velo.setVelocity(new titanium_reindeer.Vector2(0.7,0));
+	this.imageBox.addComponent("velo",velo);
 	var grad = new titanium_reindeer.LinearGradient(-300,0,300,0,[new titanium_reindeer.ColorStop(titanium_reindeer.Color.getBlackConst(),0.10),new titanium_reindeer.ColorStop(titanium_reindeer.Color.getBlueConst(),0.90)]);
 	this.circle = new CirclePlayer(this,titanium_reindeer.Key.LeftArrow,titanium_reindeer.Key.RightArrow,titanium_reindeer.Key.UpArrow,new titanium_reindeer.Color(100,255,255));
 	this.circle.setPosition(new titanium_reindeer.Vector2(80,100));
-	this.mText = new titanium_reindeer.TextRenderer("Hello World!",2);
+	this.mText = new titanium_reindeer.TextRenderer("Hello World!",1);
 	this.mText.setFontSize(50);
 	this.mText.setFontFamily("sans-serif");
 	this.mText.setFontWeight(titanium_reindeer.FontWeight.Size(700));
@@ -1972,12 +2020,12 @@ TestGame = function(p) {
 	this.circle2.friend = this.circle;
 	this.bottomEdge = new titanium_reindeer.GameObject();
 	this.bottomEdge.setPosition(new titanium_reindeer.Vector2(this.width / 2,this.height - this.getGroundHeight() / 2));
-	var rect = new titanium_reindeer.RectRenderer(this.width,this.getGroundHeight(),2);
+	var rect = new titanium_reindeer.RectRenderer(this.width,this.getGroundHeight(),1);
 	rect.setFill(new titanium_reindeer.Color(0,100,100));
 	rect.setStrokeColor(titanium_reindeer.Color.getGreyConst());
 	rect.setLineWidth(10);
 	this.bottomEdge.addComponent("mainRect",rect);
-	this.gameObjectManager.addGameObjects([this.imageMan,this.imageBox,this.circle,this.circle2,this.bottomEdge]);
+	this.gameObjectManager.addGameObjects([this.man,this.imageBox,this.circle,this.circle2,this.bottomEdge]);
 	var _g = 0;
 	while(_g < 10) {
 		var i = _g++;
@@ -2011,7 +2059,7 @@ TestGame.prototype.getGroundHeight = function() {
 TestGame.prototype.lastDrag = null;
 TestGame.prototype.circle = null;
 TestGame.prototype.circle2 = null;
-TestGame.prototype.imageMan = null;
+TestGame.prototype.man = null;
 TestGame.prototype.imageBox = null;
 TestGame.prototype.bottomEdge = null;
 TestGame.prototype.mText = null;
@@ -2146,7 +2194,7 @@ TestGame.prototype.destroy = function() {
 	this.circle = null;
 	this.circle2 = null;
 	this.bottomEdge = null;
-	this.imageMan = null;
+	this.man = null;
 	this.imageBox = null;
 }
 TestGame.prototype.__class__ = TestGame;
@@ -2954,47 +3002,6 @@ titanium_reindeer.RenderLayer.prototype.ensureYetToRedrawIsReady = function() {
 		}
 	}
 }
-titanium_reindeer.RenderLayer.prototype.compositionToString = function(comp) {
-	return (function($this) {
-		var $r;
-		switch( (comp)[1] ) {
-		case 0:
-			$r = "source-atop";
-			break;
-		case 1:
-			$r = "source-in";
-			break;
-		case 2:
-			$r = "source-out";
-			break;
-		case 3:
-			$r = "source-over";
-			break;
-		case 4:
-			$r = "destination-atop";
-			break;
-		case 5:
-			$r = "destination-in";
-			break;
-		case 6:
-			$r = "destination-out";
-			break;
-		case 7:
-			$r = "destination-over";
-			break;
-		case 8:
-			$r = "lighter";
-			break;
-		case 9:
-			$r = "copy";
-			break;
-		case 10:
-			$r = "xor";
-			break;
-		}
-		return $r;
-	}(this));
-}
 titanium_reindeer.RenderLayer.prototype.destroy = function() {
 	this.layerManager = null;
 	this.canvas = null;
@@ -3352,6 +3359,7 @@ titanium_reindeer.RendererComponentManager.prototype.postUpdate = function(msTim
 			$r = $t;
 			return $r;
 		}(this));
+		renderer.update(msTimeStep);
 		if(renderer.layer != null && renderer.getVisible() && (renderer.timeForRedraw || renderer.layer.redrawBackground)) {
 			renderer.preRender();
 			if(renderer.usingSharedBitmap) renderer.renderSharedBitmap(); else renderer.render();
@@ -3376,6 +3384,9 @@ titanium_reindeer.RendererComponentManager.prototype.destroy = function() {
 	this.cachedBitmaps = null;
 }
 titanium_reindeer.RendererComponentManager.prototype.__class__ = titanium_reindeer.RendererComponentManager;
+Layers = function() { }
+Layers.__name__ = ["Layers"];
+Layers.prototype.__class__ = Layers;
 titanium_reindeer.CollisionComponent = function(width,height,layer,group) {
 	if( width === $_ ) return;
 	titanium_reindeer.Component.call(this);
@@ -3496,6 +3507,147 @@ titanium_reindeer.CollisionComponent.prototype.destroy = function() {
 	titanium_reindeer.Component.prototype.destroy.call(this);
 }
 titanium_reindeer.CollisionComponent.prototype.__class__ = titanium_reindeer.CollisionComponent;
+titanium_reindeer.Animation = function(name,frames,frameRate) {
+	if( name === $_ ) return;
+	this.name = name;
+	this.frames = frames;
+	this.frameRate = frameRate;
+}
+titanium_reindeer.Animation.__name__ = ["titanium_reindeer","Animation"];
+titanium_reindeer.Animation.prototype.name = null;
+titanium_reindeer.Animation.prototype.frameRate = null;
+titanium_reindeer.Animation.prototype.frames = null;
+titanium_reindeer.Animation.prototype.currentFrame = null;
+titanium_reindeer.Animation.prototype.msTimeToFrameSwitch = null;
+titanium_reindeer.Animation.prototype.getFrame = function() {
+	if(this.currentFrame == -1) return -1; else return this.frames[this.currentFrame];
+}
+titanium_reindeer.Animation.prototype.update = function(msTimeStep) {
+	this.msTimeToFrameSwitch -= msTimeStep;
+	if(this.msTimeToFrameSwitch < 0) {
+		this.msTimeToFrameSwitch += Std["int"](1000 / this.frameRate);
+		this.currentFrame++;
+		if(this.frames.length <= this.currentFrame) this.currentFrame = -1;
+	}
+}
+titanium_reindeer.Animation.prototype.reset = function() {
+	this.currentFrame = 0;
+}
+titanium_reindeer.Animation.prototype.__class__ = titanium_reindeer.Animation;
+titanium_reindeer.ImageRenderer = function(image,layer,sourceRect,width,height) {
+	if( image === $_ ) return;
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	titanium_reindeer.RendererComponent.call(this,0,0,layer);
+	this.sourceRect = sourceRect;
+	this.destWidth = width;
+	this.destHeight = height;
+	this.setImage(image);
+}
+titanium_reindeer.ImageRenderer.__name__ = ["titanium_reindeer","ImageRenderer"];
+titanium_reindeer.ImageRenderer.__super__ = titanium_reindeer.RendererComponent;
+for(var k in titanium_reindeer.RendererComponent.prototype ) titanium_reindeer.ImageRenderer.prototype[k] = titanium_reindeer.RendererComponent.prototype[k];
+titanium_reindeer.ImageRenderer.prototype.image = null;
+titanium_reindeer.ImageRenderer.prototype.setImage = function(value) {
+	if(value != null && value != this.image) {
+		this.image = value;
+		if(this.image.isLoaded) this.imageLoaded(null); else this.image.registerLoadEvent($closure(this,"imageLoaded"));
+	}
+	return this.image;
+}
+titanium_reindeer.ImageRenderer.prototype.sourceRect = null;
+titanium_reindeer.ImageRenderer.prototype.destWidth = null;
+titanium_reindeer.ImageRenderer.prototype.destHeight = null;
+titanium_reindeer.ImageRenderer.prototype.render = function() {
+	titanium_reindeer.RendererComponent.prototype.render.call(this);
+	if(this.image.isLoaded) {
+		var x = 2;
+		this.getPen().drawImage(this.image.image,this.sourceRect.x,this.sourceRect.y,this.sourceRect.width,this.sourceRect.height,-this.destWidth / 2,-this.destHeight / 2,this.destWidth,this.destHeight);
+	} else this.setRedraw(true);
+}
+titanium_reindeer.ImageRenderer.prototype.imageLoaded = function(event) {
+	if(this.destWidth == 0) {
+		if(this.sourceRect == null) this.destWidth = this.image.width; else this.destWidth = this.sourceRect.width;
+	}
+	this.setInitialWidth(this.destWidth);
+	if(this.destHeight == 0) {
+		if(this.sourceRect != null) this.destHeight = this.sourceRect.height; else this.destHeight = this.image.height;
+	}
+	this.setInitialHeight(this.destHeight);
+	if(this.sourceRect == null) this.sourceRect = new titanium_reindeer.Rect(0,0,this.destWidth,this.destHeight);
+	this.setRedraw(true);
+}
+titanium_reindeer.ImageRenderer.prototype.identify = function() {
+	return titanium_reindeer.RendererComponent.prototype.identify.call(this) + "Image(" + this.image.identify() + ");";
+}
+titanium_reindeer.ImageRenderer.prototype.destroy = function() {
+	titanium_reindeer.RendererComponent.prototype.destroy.call(this);
+	this.setImage(null);
+}
+titanium_reindeer.ImageRenderer.prototype.__class__ = titanium_reindeer.ImageRenderer;
+titanium_reindeer.SpriteRenderer = function(image,layer,frameWidth,frameHeight,width,height) {
+	if( image === $_ ) return;
+	if(height == null) height = 0;
+	if(width == null) width = 0;
+	var sourceRect = new titanium_reindeer.Rect(0,0,frameWidth,frameHeight);
+	if(width == 0) width = frameWidth;
+	if(height == 0) height = frameHeight;
+	titanium_reindeer.ImageRenderer.call(this,image,layer,sourceRect,width,height);
+	this.isLooping = false;
+	this.lastFrame = -1;
+	this.frameWidth = frameWidth;
+	this.frameHeight = frameHeight;
+	this.animations = new Hash();
+	this.currentAnimation = null;
+}
+titanium_reindeer.SpriteRenderer.__name__ = ["titanium_reindeer","SpriteRenderer"];
+titanium_reindeer.SpriteRenderer.__super__ = titanium_reindeer.ImageRenderer;
+for(var k in titanium_reindeer.ImageRenderer.prototype ) titanium_reindeer.SpriteRenderer.prototype[k] = titanium_reindeer.ImageRenderer.prototype[k];
+titanium_reindeer.SpriteRenderer.prototype.animations = null;
+titanium_reindeer.SpriteRenderer.prototype.currentAnimation = null;
+titanium_reindeer.SpriteRenderer.prototype.isLooping = null;
+titanium_reindeer.SpriteRenderer.prototype.lastFrame = null;
+titanium_reindeer.SpriteRenderer.prototype.frameWidth = null;
+titanium_reindeer.SpriteRenderer.prototype.frameHeight = null;
+titanium_reindeer.SpriteRenderer.prototype.sheetWidth = null;
+titanium_reindeer.SpriteRenderer.prototype.sheetHeight = null;
+titanium_reindeer.SpriteRenderer.prototype.imageLoaded = function(event) {
+	titanium_reindeer.ImageRenderer.prototype.imageLoaded.call(this,event);
+	this.sheetWidth = this.image.width;
+	this.sheetHeight = this.image.height;
+}
+titanium_reindeer.SpriteRenderer.prototype.update = function(msTimeStep) {
+	titanium_reindeer.ImageRenderer.prototype.update.call(this,msTimeStep);
+	if(!this.image.isLoaded) return;
+	if(this.currentAnimation != null) {
+		this.animations.get(this.currentAnimation).update(msTimeStep);
+		var currentFrame = this.animations.get(this.currentAnimation).getFrame();
+		if(currentFrame == -1) {
+			if(this.isLooping) this.animations.get(this.currentAnimation).reset(); else this.stop();
+		} else if(this.lastFrame != currentFrame) {
+			this.lastFrame = currentFrame;
+			var x = Std["int"](currentFrame * this.frameWidth);
+			this.sourceRect.x = x % this.sheetWidth;
+			this.sourceRect.y = Math.floor(x / this.sheetWidth);
+			this.setRedraw(true);
+		}
+	}
+}
+titanium_reindeer.SpriteRenderer.prototype.play = function(animation,isLooping) {
+	if(this.animations.exists(animation)) {
+		this.currentAnimation = animation;
+		this.isLooping = isLooping;
+	}
+}
+titanium_reindeer.SpriteRenderer.prototype.stop = function() {
+	this.currentAnimation = null;
+	this.isLooping = false;
+}
+titanium_reindeer.SpriteRenderer.prototype.addAnimation = function(name,frames,frameRate) {
+	if(name == null || frames == null || frames.length <= 0) return;
+	this.animations.set(name,new titanium_reindeer.Animation(name,frames,frameRate));
+}
+titanium_reindeer.SpriteRenderer.prototype.__class__ = titanium_reindeer.SpriteRenderer;
 titanium_reindeer.Circle = function(radius,center) {
 	if( radius === $_ ) return;
 	this.radius = radius;
@@ -4603,6 +4755,22 @@ titanium_reindeer.GameObjectManager.prototype.destroy = function() {
 	this.game = null;
 }
 titanium_reindeer.GameObjectManager.prototype.__class__ = titanium_reindeer.GameObjectManager;
+Man = function(p) {
+	if( p === $_ ) return;
+	titanium_reindeer.GameObject.call(this);
+	this.motion = new titanium_reindeer.MovementComponent(new titanium_reindeer.Vector2(60,0));
+	this.addComponent("motion",this.motion);
+	this.sprite = new titanium_reindeer.SpriteRenderer(new titanium_reindeer.ImageSource("img/megaman_sheet.png"),2,45,37,90,74);
+	this.sprite.addAnimation("walk",[0,1,2,3,4,5,6,7,8,9],10);
+	this.addComponent("sprite",this.sprite);
+	this.sprite.play("walk",false);
+}
+Man.__name__ = ["Man"];
+Man.__super__ = titanium_reindeer.GameObject;
+for(var k in titanium_reindeer.GameObject.prototype ) Man.prototype[k] = titanium_reindeer.GameObject.prototype[k];
+Man.prototype.motion = null;
+Man.prototype.sprite = null;
+Man.prototype.__class__ = Man;
 StringBuf = function(p) {
 	if( p === $_ ) return;
 	this.b = new Array();
@@ -5614,57 +5782,6 @@ titanium_reindeer.InputManager.prototype.getKeyFromCode = function(keyCode) {
 	return key;
 }
 titanium_reindeer.InputManager.prototype.__class__ = titanium_reindeer.InputManager;
-titanium_reindeer.ImageRenderer = function(image,layer,sourceRect,width,height) {
-	if( image === $_ ) return;
-	if(height == null) height = 0;
-	if(width == null) width = 0;
-	titanium_reindeer.RendererComponent.call(this,0,0,layer);
-	this.sourceRect = sourceRect;
-	this.destWidth = width;
-	this.destHeight = height;
-	this.setImage(image);
-}
-titanium_reindeer.ImageRenderer.__name__ = ["titanium_reindeer","ImageRenderer"];
-titanium_reindeer.ImageRenderer.__super__ = titanium_reindeer.RendererComponent;
-for(var k in titanium_reindeer.RendererComponent.prototype ) titanium_reindeer.ImageRenderer.prototype[k] = titanium_reindeer.RendererComponent.prototype[k];
-titanium_reindeer.ImageRenderer.prototype.image = null;
-titanium_reindeer.ImageRenderer.prototype.setImage = function(value) {
-	if(value != null && value != this.image) {
-		this.image = value;
-		if(this.image.isLoaded) this.imageLoaded(null); else this.image.registerLoadEvent($closure(this,"imageLoaded"));
-	}
-	return this.image;
-}
-titanium_reindeer.ImageRenderer.prototype.sourceRect = null;
-titanium_reindeer.ImageRenderer.prototype.destWidth = null;
-titanium_reindeer.ImageRenderer.prototype.destHeight = null;
-titanium_reindeer.ImageRenderer.prototype.render = function() {
-	titanium_reindeer.RendererComponent.prototype.render.call(this);
-	if(this.image.isLoaded) {
-		var x = 2;
-		this.getPen().drawImage(this.image.image,this.sourceRect.x,this.sourceRect.y,this.sourceRect.width,this.sourceRect.height,-this.destWidth / 2,-this.destHeight / 2,this.destWidth,this.destHeight);
-	} else this.setRedraw(true);
-}
-titanium_reindeer.ImageRenderer.prototype.imageLoaded = function(event) {
-	if(this.destWidth == 0) {
-		if(this.sourceRect == null) this.destWidth = this.image.width; else this.destWidth = this.sourceRect.width;
-	}
-	this.setInitialWidth(this.destWidth);
-	if(this.destHeight == 0) {
-		if(this.sourceRect != null) this.destHeight = this.sourceRect.height; else this.destHeight = this.image.height;
-	}
-	this.setInitialHeight(this.destHeight);
-	if(this.sourceRect == null) this.sourceRect = new titanium_reindeer.Rect(0,0,this.destWidth,this.destHeight);
-	this.setRedraw(true);
-}
-titanium_reindeer.ImageRenderer.prototype.identify = function() {
-	return titanium_reindeer.RendererComponent.prototype.identify.call(this) + "Image(" + this.image.identify() + ");";
-}
-titanium_reindeer.ImageRenderer.prototype.destroy = function() {
-	titanium_reindeer.RendererComponent.prototype.destroy.call(this);
-	this.setImage(null);
-}
-titanium_reindeer.ImageRenderer.prototype.__class__ = titanium_reindeer.ImageRenderer;
 titanium_reindeer.CollisionComponentManager = function(gameObjectManager) {
 	if( gameObjectManager === $_ ) return;
 	titanium_reindeer.ComponentManager.call(this,gameObjectManager);
@@ -6074,7 +6191,7 @@ titanium_reindeer.WatchedVector2.prototype.setX = function(value) {
 	return this.mX;
 }
 titanium_reindeer.WatchedVector2.prototype.setY = function(value) {
-	if(value != this.getY() && this.changeCallback != null) this.changeCallback();
+	if(value != this.mY && this.changeCallback != null) this.changeCallback();
 	titanium_reindeer.Vector2.prototype.setY.call(this,value);
 	return this.mY;
 }
@@ -6202,7 +6319,7 @@ CircleObj = function(bounds,color) {
 	if( bounds === $_ ) return;
 	titanium_reindeer.GameObject.call(this);
 	this.setPosition(new titanium_reindeer.Vector2(bounds.center.getX() + bounds.radius,bounds.center.getY() + bounds.radius));
-	this.renderer = new titanium_reindeer.CircleRenderer(bounds.radius,3);
+	this.renderer = new titanium_reindeer.CircleRenderer(bounds.radius,2);
 	this.renderer.setAlpha(0.3);
 	this.renderer.setFill(color);
 	this.addComponent("mainRect",this.renderer);
@@ -6916,6 +7033,10 @@ if(typeof(haxe_timers) == "undefined") haxe_timers = [];
 	}
 }
 titanium_reindeer.Game.DEFAULT_UPDATES_TIME_MS = Math.round(1000 / 60);
+Layers.BACKGROUND = 0;
+Layers.MID = 1;
+Layers.SPRITES = 2;
+Layers.NUM_LAYERS = 3;
 titanium_reindeer.InputManager.DEFAULT_OFFSET_RECALC_DELAY_MS = 1000;
 js.Lib.onerror = null;
 TestGame.main()

@@ -39,7 +39,7 @@ class CirclePlayer extends MovableObject
 
 		this.color = color;
 
-		var circ:RectRenderer = new RectRenderer(this.radius*2, this.radius*2, 1);
+		var circ:RectRenderer = new RectRenderer(this.radius*2, this.radius*2, Layers.MID);
 		circ.alpha = 0.6;
 		circ.fillColor = color;
 		circ.lineWidth = 2;
