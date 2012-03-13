@@ -322,6 +322,10 @@ class RendererComponent extends Component
 		}
 	}
 
+	public function update(msTimeStep:Int):Void
+	{
+	}
+
 	public function preRender():Void
 	{
 		pen.save();

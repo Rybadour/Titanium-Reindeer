@@ -24,6 +24,9 @@ class RendererComponentManager extends ComponentManager
 		for (component in components)
 		{
 			var renderer:RendererComponent = cast(component, RendererComponent);
+			
+			renderer.update(msTimeStep);
+
 			if (renderer.layer != null && renderer.visible && (renderer.timeForRedraw || renderer.layer.redrawBackground))
 			{
 				renderer.preRender();
