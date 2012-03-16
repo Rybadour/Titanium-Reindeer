@@ -168,6 +168,11 @@ class RendererComponent extends Component
 	public var alpha(default, setAlpha):Float;
 	private function setAlpha(value:Float):Float
 	{
+		if (value < 0)
+			value = 0;
+		else if (value > 1)
+			value = 1;
+
 		if (value != alpha)
 		{
 			alpha = value;
@@ -315,6 +320,10 @@ class RendererComponent extends Component
 			var rotatedPoint:Vector2 = p.getRotate(this.rotation - 2*Math.PI);
 			pen.translate(p.x - rotatedPoint.x, p.y - rotatedPoint.y);
 		}
+	}
+
+	public function update(msTimeStep:Int):Void
+	{
 	}
 
 	public function preRender():Void

@@ -16,7 +16,7 @@ class WatchedVector2 extends Vector2
 
 	override private function setY(value:Float):Float
 	{
-		if (value != y && this.changeCallback != null)
+		if (value != mY && this.changeCallback != null)
 		{
 			this.changeCallback();
 		}

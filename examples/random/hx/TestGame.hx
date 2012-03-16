@@ -43,7 +43,7 @@ class TestGame extends Game
 
 	private var circle:CirclePlayer;
 	private var circle2:CirclePlayer;
-	private var imageMan:GameObject;
+	private var man:Man;
 	private var imageBox:GameObject;
 	private var bottomEdge:GameObject; 
 	private var mText:TextRenderer;
@@ -53,7 +53,7 @@ class TestGame extends Game
 
 	public function new()
 	{
-		super("TestGame", 800, 500, 4, true, new Color(255, 255, 100));
+		super("TestGame", 800, 500, Layers.NUM_LAYERS, true, new Color(255, 255, 100));
 
 		this.groundY = 240;
 		this.enabled = false;
@@ -67,22 +67,14 @@ class TestGame extends Game
 
 		this.inputManager.registerKeyEvent(Key.Esc, KeyState.Up, stopGame);
 
-		// Image man
-		imageMan = new GameObject(this.globalScene);
-		imageMan.position = new Vector2(-100, 200);
-			var img:ImageRenderer = new ImageRenderer(new ImageSource("img/man.png"), 2);
-			img.shadow = new Shadow(new Color(0, 0, 0, 0.5), new Vector2(15, 15), 4);
-			img.rotation = Math.PI/8;
-		imageMan.addComponent("image", img);
-			var velo:MovementComponent = new MovementComponent();
-			velo.velocity = new Vector2(1, 0);
-		imageMan.addComponent("velo", velo);
-		//gameObjectManager.addGameObject(imageMan);
+
+		this.man = new Man();
+		this.man.position = new Vector2(100, 200);
 
 		// Image box
 		imageBox = new GameObject(this.globalScene);
 		imageBox.position = new Vector2(-50, 200);
-			var img:ImageRenderer = new ImageRenderer(new ImageSource("img/jupiter.png"), 1, new Rect(0, 0, 200, 400), 1000, 1000);
+			var img:ImageRenderer = new ImageRenderer(new ImageSource("img/jupiter.png"), Layers.BACKGROUND, new Rect(0, 0, 200, 400), 1000, 1000);
 			img.visible = false;
 		imageBox.addComponent("image", img);
 			var velo:MovementComponent = new MovementComponent();
@@ -95,7 +87,7 @@ class TestGame extends Game
 
 		circle = new CirclePlayer(this, Key.LeftArrow, Key.RightArrow, Key.UpArrow, new Color(100, 255, 255));
 		circle.position = new Vector2(80, 100);
-			mText = new TextRenderer("Hello World!", 2);
+			mText = new TextRenderer("Hello World!", Layers.MID);
 			mText.fontSize = 50;
 			mText.fontFamily = "sans-serif";
 			mText.fontWeight = FontWeight.Size(700);
@@ -115,11 +107,13 @@ class TestGame extends Game
 
 		bottomEdge = new GameObject(this.globalScene);
 		bottomEdge.position = new Vector2(this.width/2, this.height - this.groundHeight/2);
-			var rect:RectRenderer = new RectRenderer(this.width, this.groundHeight, 2);
+			var rect:RectRenderer = new RectRenderer(this.width, this.groundHeight, Layers.MID);
 			rect.fillColor = new Color(0, 100, 100);
 			rect.strokeColor = Color.Grey;
 			rect.lineWidth = 10;
 		bottomEdge.addComponent("mainRect", rect);
+
+		gameObjectManager.addGameObjects([man, imageBox, circle, circle2, bottomEdge]);
 
 		for (i in 0...10)
 		{
@@ -255,7 +249,7 @@ class TestGame extends Game
 		circle = null;
 		circle2 = null;
 		bottomEdge = null;
-		imageMan = null;
+		man = null;
 		imageBox = null;
 	}
 }
