@@ -23,6 +23,8 @@ class BattleScene extends Scene
 	public static inline var PLAYER1_COLOR 	= new Color(0, 162, 232);
 	public static inline var PLAYER2_COLOR 	= new Color(193, 29, 37);
 
+	private var starControlGame:StarControlGame;
+
 	private var player1:Player;
 	private var player2:Player;
 
@@ -34,6 +36,8 @@ class BattleScene extends Scene
 	public function new(game:StarControlGame)
 	{
 		super(game, "battleScene", 0, NUM_LAYERS, Color.Black);
+
+		this.starControlGame = game;
 
 		this.player1Score = 0;
 		this.player2Score = 0;
@@ -56,6 +60,8 @@ class BattleScene extends Scene
 		collisionManager.getLayer("main").getGroup(CollisionGroups.SHIPS).addCollidingGroup(CollisionGroups.BULLETS);
 		collisionManager.getLayer("main").getGroup(CollisionGroups.BULLETS).addCollidingGroup(CollisionGroups.SHIPS);
 		//collisionManager.getLayer("main").enableDebugView("debugCanvas", new Vector2(OFFSCREEN_EDGE + 20, OFFSCREEN_EDGE + 20));
+
+		this.game.inputManager.registerKeyEvent(Key.Space, KeyState.Up, pauseButton);
 	}
 
 	public function notifyShipDied(player:Player):Void
@@ -73,5 +79,10 @@ class BattleScene extends Scene
 
 		var rendererManager:RendererComponentManager = cast(this.getManager(RendererComponentManager), RendererComponentManager);
 		rendererManager.renderLayerManager.getLayer(SHIPS_LAYER).redrawBackground = true;
+	}
+
+	private function pauseButton():Void
+	{
+		this.starControlGame.startMenu();
 	}
 }

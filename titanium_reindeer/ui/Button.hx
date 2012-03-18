@@ -214,11 +214,17 @@ class Button extends GameObject
 
 		this.flushAndDestroyComponents();
 
-		this.mouseHandler.unregisterMouseMoveEvent(MouseRegionMoveEvent.Enter, mouseEnter);
-		this.mouseHandler.unregisterMouseMoveEvent(MouseRegionMoveEvent.Exit, mouseExit);
-		this.mouseHandler.unregisterMouseButtonEvent(MouseRegionButtonEvent.Down, mouseDown);
-		this.mouseHandler.unregisterMouseButtonEvent(MouseRegionButtonEvent.Up, mouseUp);
+		if (this.mouseHandler != null)
+		{
+			this.mouseHandler.unregisterMouseMoveEvent(MouseRegionMoveEvent.Enter, mouseEnter);
+			this.mouseHandler.unregisterMouseMoveEvent(MouseRegionMoveEvent.Exit, mouseExit);
+			this.mouseHandler.unregisterMouseButtonEvent(MouseRegionButtonEvent.Down, mouseDown);
+			this.mouseHandler.unregisterMouseButtonEvent(MouseRegionButtonEvent.Up, mouseUp);
+			this.mouseHandler.destroy();
+			this.mouseHandler = null;
+		}
 
-		this.scene.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
+		if (this.scene != null)
+			this.scene.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
 	}
 }

@@ -31,5 +31,20 @@ class StarControlGame extends Game
 		// Set the global sound volume to a reasonable level
 		this.soundManager.globalVolume = 0.2;
 	}
+
+	public function startMenu():Void
+	{
+		if (this.menuScene == null)
+			this.menuScene = new MenuScene(this);
+	}
+
+	public function stopMenu():Void
+	{
+		if (this.menuScene != null)
+		{
+			this.menuScene.destroy();
+			this.menuScene = null;
+		}
+	}
 }
 

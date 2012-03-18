@@ -14,12 +14,16 @@ class MenuScene extends Scene
 	public static inline var FORE_LAYER:Int		= 2;
 	public static inline var NUM_LAYERS:Int		= 3;
 
+	private var starControlGame:StarControlGame;
+
 	public var menuBackground:GameObject;
-	public var startButton:RectButton;
+	public var resumeButton:RectButton;
 
 	public function new(game:StarControlGame)
 	{
 		super(game, "menuScene", 1, NUM_LAYERS, Color.Clear);
+
+		this.starControlGame = game;
 
 		this.menuBackground = new GameObject(this);
 		var rect:RectRenderer = new RectRenderer(120, 200, BACK_LAYER);
@@ -27,7 +31,27 @@ class MenuScene extends Scene
 		rect.strokeColor = Color.Red;
 		rect.lineWidth = 2;
 		this.menuBackground.addComponent("rect", rect);
+		this.menuBackground.position = new Vector2(this.game.width/2, this.game.height/2);
 
-		this.startButton = new RectButton(this, 100, 50, MID_LAYER, FORE_LAYER); 
+		this.resumeButton = new RectButton(this, 100, 50, MID_LAYER, FORE_LAYER); 
+		this.resumeButton.text = "Resume!";
+		this.resumeButton.position = this.menuBackground.position;
+		this.resumeButton.registerMouseClickEvent(resumeClick);
+	}
+
+	private function resumeClick(mousePos:Vector2)
+	{
+		this.starControlGame.stopMenu();
+	}
+
+	public override function destroy():Void
+	{
+		this.menuBackground.destroy();
+		this.menuBackground = null;
+
+		this.resumeButton.destroy();
+		this.resumeButton = null;
+
+		super.destroy();
 	}
 }
