@@ -245,7 +245,12 @@ class MouseRegionHandler
 		}
 	}
 
-	public function finaldestroy():Void
+	public function destroy():Void
+	{
+		this.manager.removeHandler(this);
+	}
+
+	public function finalDestroy():Void
 	{
 		this.collisionRegion = null;
 

@@ -9,6 +9,8 @@ class Scene extends ObjectManager
 		return this.sceneManager.game;
 	}
 
+	private var toBeDestroyed:Bool;
+
 	public var name(default, null):String;
 	public var input(default, null):SceneInputBridge;
 	public var renderDepth(default, null):Int;
@@ -126,15 +128,23 @@ class Scene extends ObjectManager
 		{
 			manager.removeComponents();
 		}
+		
+		if (this.toBeDestroyed)
+			this.finalDestroy();
 	}
 
-	override public function destroy():Void
+	public function destroy():Void
 	{
-		super.destroy();
+		this.toBeDestroyed = true;
+	}
+
+	override public function finalDestroy():Void
+	{
+		super.finalDestroy();
 
 		for (managerName in this.componentManagers.keys())
 		{
-			this.componentManagers.get(managerName).destroy();
+			this.componentManagers.get(managerName).finalDestroy();
 			this.componentManagers.remove(managerName);
 		}
 		this.componentManagers = null;

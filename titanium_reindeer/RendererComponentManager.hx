@@ -57,10 +57,10 @@ class RendererComponentManager extends ComponentManager
 		return imageSource;
 	}
 
-	override public function destroy():Void
+	override public function finalDestroy():Void
 	{
 		// destroy my children
-		super.destroy();
+		super.finalDestroy();
 
 		renderLayerManager.destroy();
 		renderLayerManager = null;

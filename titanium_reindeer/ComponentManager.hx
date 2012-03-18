@@ -57,9 +57,9 @@ class ComponentManager extends ObjectManager
 		componentsChanged = true;
 	}
 
-	override public function destroy():Void
+	override public function finalDestroy():Void
 	{
-		super.destroy();
+		super.finalDestroy();
 
 		this.components = null;
 
