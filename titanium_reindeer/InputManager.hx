@@ -750,11 +750,11 @@ class InputManager
 
 		for (data in this.queuedMouseMoveRegisters)
 			this.registerMouseMoveEvent(data.cb);
-		this.queuedMouseWheelRegisters = new Array();
+		this.queuedMouseMoveRegisters = new Array();
 
 		for (data in this.queuedMouseWheelRegisters)
 			this.registerMouseWheelEvent(data.cb);
-		this.queuedMouseButtonAnyRegisters = new Array();
+		this.queuedMouseWheelRegisters = new Array();
 
 		for (data in this.queuedMouseButtonAnyRegisters)
 			this.registerMouseButtonAnyEvent(data.cb);
