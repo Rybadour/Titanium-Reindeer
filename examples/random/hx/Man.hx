@@ -1,3 +1,4 @@
+import titanium_reindeer.Scene;
 import titanium_reindeer.Circle;
 import titanium_reindeer.GameObject;
 import titanium_reindeer.Color;
@@ -11,9 +12,9 @@ class Man extends GameObject
 	public var motion:MovementComponent;
 	public var sprite:SpriteRenderer;
 
-	public function new()
+	public function new(scene:Scene)
 	{
-		super();
+		super(scene);
 
 		this.motion = new MovementComponent( new Vector2(60, 0) );
 		this.addComponent("motion", this.motion);
