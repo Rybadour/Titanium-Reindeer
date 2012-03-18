@@ -16,6 +16,7 @@ class Scene extends ObjectManager
 	public var renderDepth(default, null):Int;
 	public var layerCount(default, null):Int;
 	public var backgroundColor(default, null):Color;
+	public var isPaused(default, null):Bool;
 
 	private var componentManagers:Hash<ComponentManager>;
 
@@ -28,6 +29,7 @@ class Scene extends ObjectManager
 		this.renderDepth = renderDepth;
 		this.layerCount = layerCount;
 		this.backgroundColor = backgroundColor == null ? new Color(255, 255, 255) : backgroundColor;
+		this.isPaused = false;
 
 		this.sceneManager = game.sceneManager;
 		this.sceneManager.addScene(this);
@@ -82,6 +84,22 @@ class Scene extends ObjectManager
 		return manager;
 	}
 
+	public function unpause():Void
+	{
+		if (this.isPaused)
+		{
+			this.isPaused = false;
+		}
+	}
+
+	public function pause():Void
+	{
+		if (!this.isPaused)
+		{
+			this.isPaused = true;
+		}
+	}
+
 	// Internal functions Only
 	public function delegateComponent(component:Component)
 	{
@@ -93,6 +111,9 @@ class Scene extends ObjectManager
 
 	public function update(msTimeStep:Int):Void
 	{
+		if (this.isPaused)
+			return;
+
 		// Pre-Update on component managers
 		for (manager in this.componentManagers)
 		{
