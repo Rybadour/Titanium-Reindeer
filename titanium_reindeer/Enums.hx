@@ -42,6 +42,21 @@ enum KeyState
 	Up;
 }
 
+enum InputEvent
+{
+	MouseDown;
+	MouseUp;
+	MouseMove;
+	MouseWheel;
+	KeyUp;
+	KeyDown;
+
+	MouseHeldEvent;
+	KeyHeldEvent;
+	MouseAnyEvent;
+	KeyAnyEvent;
+}
+
 enum Composition
 {
 	SourceAtop; SourceIn; SourceOut; SourceOver;

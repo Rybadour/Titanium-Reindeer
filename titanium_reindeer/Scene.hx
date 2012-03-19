@@ -12,11 +12,12 @@ class Scene extends ObjectManager
 	private var toBeDestroyed:Bool;
 
 	public var name(default, null):String;
-	public var input(default, null):SceneInputBridge;
 	public var renderDepth(default, null):Int;
 	public var layerCount(default, null):Int;
 	public var backgroundColor(default, null):Color;
 	public var isPaused(default, null):Bool;
+
+	public var inputManager(default, null):SceneInputManager;
 
 	private var componentManagers:Hash<ComponentManager>;
 
@@ -25,7 +26,7 @@ class Scene extends ObjectManager
 		super();
 
 		this.name = name;
-		this.input = new SceneInputBridge();
+		this.inputManager = new SceneInputManager(this);
 		this.renderDepth = renderDepth;
 		this.layerCount = layerCount;
 		this.backgroundColor = backgroundColor == null ? new Color(255, 255, 255) : backgroundColor;
@@ -119,6 +120,7 @@ class Scene extends ObjectManager
 		{
 			manager.preUpdate(msTimeStep);
 		}
+		inputManager.preUpdate(msTimeStep);
 
 		// All state change should happen here
 		// Update game objects
@@ -131,12 +133,14 @@ class Scene extends ObjectManager
 		{
 			manager.update(msTimeStep);
 		}
+		inputManager.update(msTimeStep);
 
 		// Post-Update on component managers
 		for (manager in this.componentManagers)
 		{
 			manager.postUpdate(msTimeStep);
 		}
+		inputManager.postUpdate(msTimeStep);
 
 		// Remove Objects which were flagged to be removed
 		super.removeObjects();
