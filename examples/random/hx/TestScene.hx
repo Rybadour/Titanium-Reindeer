@@ -54,10 +54,12 @@ class TestScene extends Scene
 		this.toggle();
 		this.currentEffect = "";
 
-		this.game.inputManager.registerKeyEvent(Key.Shift, KeyState.Up, toggle);
-		this.game.inputManager.registerKeyEvent(Key.One, KeyState.Up, noEffects);
-		this.game.inputManager.registerKeyEvent(Key.Two, KeyState.Up, unsaturatedEffects);
-		this.game.inputManager.registerKeyEvent(Key.Three, KeyState.Up, pixelatedEffects);
+		this.inputManager.registerKeyEvent(Key.Shift, KeyState.Up, toggle);
+		this.inputManager.registerKeyEvent(Key.One, KeyState.Up, noEffects);
+		this.inputManager.registerKeyEvent(Key.Two, KeyState.Up, unsaturatedEffects);
+		this.inputManager.registerKeyEvent(Key.Three, KeyState.Up, pixelatedEffects);
+
+		this.game.inputManager.registerKeyEvent(Key.Space, KeyState.Up, togglePause);
 
 		this.man = new Man(this);
 		this.man.position = new Vector2(100, 200);
@@ -116,23 +118,31 @@ class TestScene extends Scene
 		collisionManager.getLayer("main").getGroup("onlyGroup").addCollidingGroup("onlyGroup");
 	}
 
+	private function togglePause():Void
+	{
+		if (this.isPaused)
+			this.unpause();
+		else
+			this.pause();
+	}
+
 	private function toggle():Void
 	{
 		if (this.enabled)
 		{
-			this.game.inputManager.unregisterMouseWheelEvent(mouseWheel);
-			this.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Down, mouseDown);
-			//this.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Held, mouseHeld);
-			this.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUp);
-			this.game.inputManager.unregisterMouseMoveEvent(mouseHeld);
+			this.inputManager.unregisterMouseWheelEvent(mouseWheel);
+			this.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Down, mouseDown);
+			//this.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Held, mouseHeld);
+			this.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUp);
+			this.inputManager.unregisterMouseMoveEvent(mouseHeld);
 		}
 		else
 		{
-			this.game.inputManager.registerMouseWheelEvent(mouseWheel);
-			this.game.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Down, mouseDown);
-			//this.game.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Held, mouseHeld);
-			this.game.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUp);
-			this.game.inputManager.registerMouseMoveEvent(mouseHeld);
+			this.inputManager.registerMouseWheelEvent(mouseWheel);
+			this.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Down, mouseDown);
+			//this.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Held, mouseHeld);
+			this.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUp);
+			this.inputManager.registerMouseMoveEvent(mouseHeld);
 		}
 
 		this.enabled = !this.enabled;
@@ -200,7 +210,7 @@ class TestScene extends Scene
 
 	private function mouseHeld(mousePos:Vector2):Void
 	{
-		if (game.inputManager.isMouseButtonDown(MouseButton.Left))
+		if (inputManager.isMouseButtonDown(MouseButton.Left))
 		{
 			groundY += mousePos.y - this.lastDrag.y;
 			this.updateGround();

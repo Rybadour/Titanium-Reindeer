@@ -31,6 +31,6 @@ class Man extends GameObject
 		this.addComponent("sprite", this.sprite);
 		/* */
 
-		this.sprite.play("walk", false);
+		this.sprite.play("walk", true);
 	}
 }
