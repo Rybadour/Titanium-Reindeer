@@ -3,21 +3,6 @@ package titanium_reindeer;
 import js.Dom;
 import titanium_reindeer.Enums;
 
-enum InputEvent
-{
-	MouseDown;
-	MouseUp;
-	MouseMove;
-	MouseWheel;
-	KeyUp;
-	KeyDown;
-
-	MouseHeldEvent;
-	KeyHeldEvent;
-	MouseAnyEvent;
-	KeyAnyEvent;
-}
-
 class RecordedEvent
 {
 	public var type:InputEvent;
@@ -101,9 +86,6 @@ class KeyAnyData
 
 class InputManager
 {
-	public static inline var DEFAULT_OFFSET_RECALC_DELAY_MS:Int		= 1000;
-
-
 	private var mouseButtonsRegistered:IntHash<IntHash<Array<Vector2 -> Void>>>; // Array<(mousePos) -> Void>
 		private var downMouseButtonsRegistered(getDownMouseButtonsRegistered, null):IntHash<Array<Vector2 -> Void>>;
 		private function getDownMouseButtonsRegistered():IntHash<Array<Vector2 -> Void>>
@@ -157,11 +139,9 @@ class InputManager
 
 	private var queueRegisters:Bool;
 
-	private var targetElement:HtmlDom;
 	private var targetDocumentOffset:Vector2;
-	private var timeLeftToRecalculateOffsetMs:Int;
 
-	public function new(targetElement:HtmlDom)
+	public function new()
 	{
 		this.mouseButtonsRegistered = new IntHash();
 			this.mouseButtonsRegistered.set(Type.enumIndex(MouseButtonState.Down), new IntHash());
@@ -199,53 +179,42 @@ class InputManager
 
 		this.queueRegisters = false;
 
-		this.targetElement = targetElement;
-		this.recalculateCanvasOffset();
-
-		this.timeLeftToRecalculateOffsetMs = InputManager.DEFAULT_OFFSET_RECALC_DELAY_MS;
-
-		untyped
-		{
-			var me = this;
-			targetElement.onmousedown = function(event) { me.recordEvent(InputEvent.MouseDown, event); };
-			targetElement.onmouseup = function(event) { me.recordEvent(InputEvent.MouseUp, event); };
-			targetElement.onmousemove = function(event) { me.recordEvent(InputEvent.MouseMove, event); };
-
-			targetElement.oncontextmenu = this.contextMenu;
-
-			var firefoxReg:EReg = new EReg("Firefox", "i");
-			var wheelFunc = function(event) { me.recordEvent(InputEvent.MouseWheel, event); };
-			if (firefoxReg.match(js.Lib.window.navigator.userAgent))
-				js.Lib.document.addEventListener("DOMMouseScroll", wheelFunc, true);
-			else
-				js.Lib.document.onmousewheel = wheelFunc;
-
-			js.Lib.document.onkeydown = function(event) { me.recordEvent(InputEvent.KeyDown, event); };
-			js.Lib.document.onkeyup = function(event) { me.recordEvent(InputEvent.KeyUp, event); };
-		}
+		this.targetDocumentOffset = new Vector2(0, 0);
 	}
-
-	private function recordEvent(type:InputEvent, event:Dynamic):Void
-	{
-		this.recordedEvents.push(new RecordedEvent(type, event));
-	}
-
-	private function contextMenu(event:Dynamic):Bool
-	{
-		var found:Bool = false;
-		if ( upMouseButtonsRegistered.exists(Type.enumIndex(MouseButton.Right)) )
-		{
-			found = upMouseButtonsRegistered.get(Type.enumIndex(MouseButton.Right)).length != 0;
-		}
-
-		return !(found || this.mouseButtonsAnyRegistered.length != 0);
-	}
-
 
 	/*
 		Input Event Handlers
 		------------------------------------------------
 	*/
+	public function receiveEvent(recordedEvent:RecordedEvent)
+	{
+		var func:Dynamic -> Void;
+		switch (recordedEvent.type)
+		{
+			case MouseDown:
+				func = this.mouseDown;
+
+			case MouseUp:
+				func = this.mouseUp;
+
+			case MouseMove:
+				func = this.mouseMove;
+
+			case MouseWheel:
+				func = this.mouseWheel;
+
+			case KeyDown:
+				func = this.keyDown;
+
+			case KeyUp:
+				func = this.keyUp;
+
+			default:
+				func = null;
+		}
+		func(recordedEvent.event);
+	}
+
 	private function mouseDown(event:Dynamic):Void
 	{
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
@@ -364,47 +333,13 @@ class InputManager
 		Usual Framework type Functions
 		------------------------------------------------
 	*/
+	public function preUpdate(msTimeStep:Int):Void
+	{
+		this.queueRegisters = true;
+	}
+
 	public function update(msTimeStep:Int):Void
 	{
-		// Get all recorded events into a temporary store so that new events don't affect the loop
-		var tempEvents:Array<RecordedEvent> = new Array();
-		for (recordedEvent in this.recordedEvents)
-		{
-			tempEvents.push(recordedEvent);
-		}
-		this.recordedEvents = new Array();
-
-		// Call recorded events
-		this.queueRegisters = true;
-		for (recordedEvent in tempEvents)
-		{
-			var func:Dynamic -> Void;
-			switch (recordedEvent.type)
-			{
-				case MouseDown:
-					func = this.mouseDown;
-				
-				case MouseUp:
-					func = this.mouseUp;
-				
-				case MouseMove:
-					func = this.mouseMove;
-				
-				case MouseWheel:
-					func = this.mouseWheel;
-				
-				case KeyDown:
-					func = this.keyDown;
-				
-				case KeyUp:
-					func = this.keyUp;
-
-				default:
-					func = null;
-			}
-			func(recordedEvent.event);
-		}
-
 		for (key in heldKeys)
 		{
 			if (heldKeysRegistered.exists(Type.enumIndex(key)))
@@ -429,16 +364,12 @@ class InputManager
 				}
 			}
 		}
+	}
 
+	public function postUpdate(msTimeStep:Int):Void
+	{
 		this.queueRegisters = false;
 		this.flushQueues();
-
-		this.timeLeftToRecalculateOffsetMs -= msTimeStep;
-		if (this.timeLeftToRecalculateOffsetMs <= 0)
-		{
-			this.timeLeftToRecalculateOffsetMs = InputManager.DEFAULT_OFFSET_RECALC_DELAY_MS;
-			this.recalculateCanvasOffset();
-		}
 	}
 
 	public function destroy():Void
@@ -485,24 +416,6 @@ class InputManager
 		for (key in heldKeys.keys())
 			heldKeys.remove(key);
 		heldKeys = null;
-
-		untyped
-		{
-			this.targetElement.onmousedown = null;
-			this.targetElement.onmouseup = null;
-			this.targetElement.onmousemove = null;
-
-			this.targetElement.oncontextmenu = null;
-			js.Lib.document.onmousewheel = null;
-			js.Lib.document.onkeydown = null;
-			js.Lib.document.onkeyup = null;
-			var firefoxReg:EReg = new EReg("Firefox", "i");
-			if (firefoxReg.match(js.Lib.window.navigator.userAgent))
-				js.Lib.document.removeEventListener("DOMMouseScroll", this.mouseWheel, true);
-			else
-				js.Lib.document.onmousewheel = null;
-		}
-		this.targetElement = null;
 	}
 
 	/*
@@ -750,11 +663,11 @@ class InputManager
 
 		for (data in this.queuedMouseMoveRegisters)
 			this.registerMouseMoveEvent(data.cb);
-		this.queuedMouseWheelRegisters = new Array();
+		this.queuedMouseMoveRegisters = new Array();
 
 		for (data in this.queuedMouseWheelRegisters)
 			this.registerMouseWheelEvent(data.cb);
-		this.queuedMouseButtonAnyRegisters = new Array();
+		this.queuedMouseWheelRegisters = new Array();
 
 		for (data in this.queuedMouseButtonAnyRegisters)
 			this.registerMouseButtonAnyEvent(data.cb);
@@ -809,29 +722,15 @@ class InputManager
 		return heldKeys.exists(Type.enumIndex(key));
 	}
 
-	public function recalculateCanvasOffset():Void
-	{
-		var offset:Vector2 = new Vector2(0, 0);
-
-		if (this.targetElement != null && this.targetElement.offsetParent != null)
-		{
-			var ele:HtmlDom = this.targetElement;
-			do
-			{
-				offset.x += ele.offsetLeft;
-				offset.y += ele.offsetTop;
-				ele = ele.offsetParent;
-			}
-			while (ele != null);
-		}
-
-		this.targetDocumentOffset = offset;
-	}
-
 	/*
 		Key and Button Mapping functions	
 		------------------------------------------
 	*/
+	public function setDocumentOffset(value:Vector2):Void
+	{
+		this.targetDocumentOffset = value;
+	}
+
 	private function getMousePositionFromEvent(event:Dynamic):Vector2
 	{
 		if (event == null)

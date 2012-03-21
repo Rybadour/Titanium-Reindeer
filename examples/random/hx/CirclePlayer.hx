@@ -1,3 +1,4 @@
+import titanium_reindeer.Scene;
 import titanium_reindeer.InputManager;
 import titanium_reindeer.Game;
 import titanium_reindeer.GameObject;
@@ -13,7 +14,7 @@ import titanium_reindeer.Enums;
 
 class CirclePlayer extends MovableObject
 {
-	private var game:TestGame;
+	public var testScene:TestScene;
 
 	public var friend:CirclePlayer;
 
@@ -28,18 +29,18 @@ class CirclePlayer extends MovableObject
 	private var rightKey:Key;
 	private var upKey:Key;
 
-	public function new(game:TestGame, leftKey:Key, rightKey:Key, upKey:Key, color:Color)
+	public function new(scene:TestScene, leftKey:Key, rightKey:Key, upKey:Key, color:Color)
 	{		
-		super(game.globalScene, new Vector2(0, 0));
+		super(scene, new Vector2(0, 0));
 
-		this.game = game;
+		this.testScene = scene;
 
 		this.radius = 20;
 		this.jumpSpeed = 50;
 
 		this.color = color;
 
-		var circ:RectRenderer = new RectRenderer(this.radius*2, this.radius*2, 1);
+		var circ:RectRenderer = new RectRenderer(this.radius*2, this.radius*2, Layers.MID);
 		circ.alpha = 0.6;
 		circ.fillColor = color;
 		circ.lineWidth = 2;
@@ -51,20 +52,20 @@ class CirclePlayer extends MovableObject
 		this.rightKey = rightKey;
 		this.upKey = upKey;
 
-		game.inputManager.registerKeyEvent(Key.Shift, KeyState.Up, toggle);
+		this.scene.game.inputManager.registerKeyEvent(Key.Shift, KeyState.Up, toggle);
 		this.enabled = false;
 		this.toggle();
 	}
 
 	override public function update(msTimeStep:Int):Void
 	{
-		if (this.position.y + this.radius < game.groundY)
+		if (this.position.y + this.radius < testScene.groundY)
 		{
 			this.velocity.y += 1;
 		}
 		else
 		{
-			this.position.y = game.groundY - this.radius;
+			this.position.y = testScene.groundY - this.radius;
 		}
 	}
 
@@ -79,7 +80,7 @@ class CirclePlayer extends MovableObject
 
 	private function up():Void
 	{
-		if (this.position.y + this.radius >= game.groundY)
+		if (this.position.y + this.radius >= testScene.groundY)
 			this.velocity.y = -this.jumpSpeed;
 		else
 		{
@@ -93,15 +94,15 @@ class CirclePlayer extends MovableObject
 	{
 		if (this.enabled)
 		{
-			game.inputManager.unregisterKeyEvent(rightKey, KeyState.Held, right);
-			game.inputManager.unregisterKeyEvent(leftKey, KeyState.Held, left);
-			game.inputManager.unregisterKeyEvent(upKey, KeyState.Down, up);
+			this.scene.game.inputManager.unregisterKeyEvent(rightKey, KeyState.Held, right);
+			this.scene.game.inputManager.unregisterKeyEvent(leftKey, KeyState.Held, left);
+			this.scene.game.inputManager.unregisterKeyEvent(upKey, KeyState.Down, up);
 		}
 		else
 		{
-			game.inputManager.registerKeyEvent(rightKey, KeyState.Held, right);
-			game.inputManager.registerKeyEvent(leftKey, KeyState.Held, left);
-			game.inputManager.registerKeyEvent(upKey, KeyState.Down, up);
+			this.scene.game.inputManager.registerKeyEvent(rightKey, KeyState.Held, right);
+			this.scene.game.inputManager.registerKeyEvent(leftKey, KeyState.Held, left);
+			this.scene.game.inputManager.registerKeyEvent(upKey, KeyState.Down, up);
 		}
 
 		this.enabled = !this.enabled;
@@ -111,7 +112,7 @@ class CirclePlayer extends MovableObject
 	{
 		super.destroy();
 
-		game = null;
+		testScene = null;
 		friend = null;
 	
 		color = null;

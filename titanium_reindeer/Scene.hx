@@ -9,11 +9,15 @@ class Scene extends ObjectManager
 		return this.sceneManager.game;
 	}
 
+	private var toBeDestroyed:Bool;
+
 	public var name(default, null):String;
-	public var input(default, null):SceneInputBridge;
 	public var renderDepth(default, null):Int;
 	public var layerCount(default, null):Int;
 	public var backgroundColor(default, null):Color;
+	public var isPaused(default, null):Bool;
+
+	public var inputManager(default, null):SceneInputManager;
 
 	private var componentManagers:Hash<ComponentManager>;
 
@@ -22,10 +26,11 @@ class Scene extends ObjectManager
 		super();
 
 		this.name = name;
-		this.input = new SceneInputBridge();
+		this.inputManager = new SceneInputManager(this);
 		this.renderDepth = renderDepth;
 		this.layerCount = layerCount;
 		this.backgroundColor = backgroundColor == null ? new Color(255, 255, 255) : backgroundColor;
+		this.isPaused = false;
 
 		this.sceneManager = game.sceneManager;
 		this.sceneManager.addScene(this);
@@ -80,6 +85,22 @@ class Scene extends ObjectManager
 		return manager;
 	}
 
+	public function unpause():Void
+	{
+		if (this.isPaused)
+		{
+			this.isPaused = false;
+		}
+	}
+
+	public function pause():Void
+	{
+		if (!this.isPaused)
+		{
+			this.isPaused = true;
+		}
+	}
+
 	// Internal functions Only
 	public function delegateComponent(component:Component)
 	{
@@ -91,11 +112,15 @@ class Scene extends ObjectManager
 
 	public function update(msTimeStep:Int):Void
 	{
+		if (this.isPaused)
+			return;
+
 		// Pre-Update on component managers
 		for (manager in this.componentManagers)
 		{
 			manager.preUpdate(msTimeStep);
 		}
+		inputManager.preUpdate(msTimeStep);
 
 		// All state change should happen here
 		// Update game objects
@@ -108,12 +133,14 @@ class Scene extends ObjectManager
 		{
 			manager.update(msTimeStep);
 		}
+		inputManager.update(msTimeStep);
 
 		// Post-Update on component managers
 		for (manager in this.componentManagers)
 		{
 			manager.postUpdate(msTimeStep);
 		}
+		inputManager.postUpdate(msTimeStep);
 
 		// Remove Objects which were flagged to be removed
 		super.removeObjects();
@@ -126,15 +153,23 @@ class Scene extends ObjectManager
 		{
 			manager.removeComponents();
 		}
+		
+		if (this.toBeDestroyed)
+			this.finalDestroy();
 	}
 
-	override public function destroy():Void
+	public function destroy():Void
 	{
-		super.destroy();
+		this.toBeDestroyed = true;
+	}
+
+	override public function finalDestroy():Void
+	{
+		super.finalDestroy();
 
 		for (managerName in this.componentManagers.keys())
 		{
-			this.componentManagers.get(managerName).destroy();
+			this.componentManagers.get(managerName).finalDestroy();
 			this.componentManagers.remove(managerName);
 		}
 		this.componentManagers = null;

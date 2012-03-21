@@ -64,7 +64,7 @@ class ObjectManager
 		}
 	}
 
-	public function destroy():Void
+	public function finalDestroy():Void
 	{
 		for (i in this.objects.keys())
 		{

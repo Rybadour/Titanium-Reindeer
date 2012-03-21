@@ -26,7 +26,7 @@ class CircleObj extends GameObject
 
 		this.position = new Vector2(bounds.center.x + bounds.radius, bounds.center.y + bounds.radius);
 
-		this.renderer = new CircleRenderer(bounds.radius, 3);
+		this.renderer = new CircleRenderer(bounds.radius, Layers.SPRITES);
 		this.renderer.alpha = 0.3;
 		this.renderer.fillColor = color;
 		this.addComponent("mainRect", renderer);

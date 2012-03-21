@@ -35,7 +35,11 @@ class StarControlGame extends Game
 	public function startMenu():Void
 	{
 		if (this.menuScene == null)
+		{
 			this.menuScene = new MenuScene(this);
+
+			this.battleScene.pause();
+		}
 	}
 
 	public function stopMenu():Void
@@ -44,6 +48,8 @@ class StarControlGame extends Game
 		{
 			this.menuScene.destroy();
 			this.menuScene = null;
+
+			this.battleScene.unpause();
 		}
 	}
 }

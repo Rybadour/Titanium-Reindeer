@@ -13,6 +13,21 @@ class SceneManager
 		this.scenes = new Hash();
 	}
 
+	public function getAllScenes():Iterator<Scene>
+	{
+		return this.scenes.iterator();
+	}
+
+	public function getScene(sceneName:String):Scene
+	{
+		if ( !this.scenes.exists(sceneName) )
+		{
+			return this.scenes.get(sceneName);
+		}
+
+		return null;
+	}
+
 	public function addScene(scene:Scene):Void
 	{
 		if ( !this.scenes.exists(scene.name) )

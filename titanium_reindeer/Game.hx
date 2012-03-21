@@ -31,7 +31,7 @@ class Game
 
 	// Managers
 	public var sceneManager(default, null):SceneManager;
-	public var inputManager(default, null):InputManager;
+	public var inputManager(default, null):GameInputManager;
 	public var soundManager(default, null):SoundManager;
 	public var cursor(default, null):Cursor;
 
@@ -49,7 +49,7 @@ class Game
 		this.exitGame = false;
 
 		this.sceneManager = new SceneManager(this);
-		this.inputManager = new InputManager(this.targetElement);
+		this.inputManager = new GameInputManager(this, this.targetElement);
 		this.soundManager = new SoundManager();
 		this.cursor = new Cursor(this.targetElement);
 
@@ -83,20 +83,19 @@ class Game
 
 			var msTimeStep:Int;
 			if (now == null)
-			{
 				msTimeStep = Game.DEFAULT_UPDATES_TIME_MS;
-			}
 			else
-			{
 				msTimeStep = Std.int(Math.min(now - this.msLastTimeStep, this.maxAllowedUpdateLengthMs));
-			}
 			this.msLastTimeStep = now;
 
-			this.update(msTimeStep);
-
 			// Game Logic
+			inputManager.preUpdate(msTimeStep);
+
+			this.update(msTimeStep);
 			sceneManager.update(msTimeStep);
 			inputManager.update(msTimeStep);
+
+			inputManager.postUpdate(msTimeStep);
 
 			// Request a game loop tick from the browser
 			requestAnimFrame();

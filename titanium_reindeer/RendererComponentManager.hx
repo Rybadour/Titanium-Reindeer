@@ -24,6 +24,9 @@ class RendererComponentManager extends ComponentManager
 		for (component in components)
 		{
 			var renderer:RendererComponent = cast(component, RendererComponent);
+			
+			renderer.update(msTimeStep);
+
 			if (renderer.layer != null && renderer.visible && (renderer.timeForRedraw || renderer.layer.redrawBackground))
 			{
 				renderer.preRender();
@@ -54,10 +57,10 @@ class RendererComponentManager extends ComponentManager
 		return imageSource;
 	}
 
-	override public function destroy():Void
+	override public function finalDestroy():Void
 	{
 		// destroy my children
-		super.destroy();
+		super.finalDestroy();
 
 		renderLayerManager.destroy();
 		renderLayerManager = null;
