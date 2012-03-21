@@ -95,7 +95,7 @@ class Button extends GameObject
 		this.mouseHandler.registerMouseButtonEvent(MouseRegionButtonEvent.Down, mouseDown);
 		this.mouseHandler.registerMouseButtonEvent(MouseRegionButtonEvent.Up, mouseUp);
 
-		this.scene.game.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
+		this.scene.inputManager.registerMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
 	}
 
 	// Publicly usable methods
@@ -225,6 +225,6 @@ class Button extends GameObject
 		}
 
 		if (this.scene != null)
-			this.scene.game.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
+			this.scene.inputManager.unregisterMouseButtonEvent(MouseButton.Left, MouseButtonState.Up, mouseUpGlobal);
 	}
 }
