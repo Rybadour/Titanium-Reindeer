@@ -18,6 +18,7 @@ class Scene extends ObjectManager
 	public var isPaused(default, null):Bool;
 
 	public var inputManager(default, null):SceneInputManager;
+	public var soundManager(default, null):SoundManager;
 
 	private var componentManagers:Hash<ComponentManager>;
 
