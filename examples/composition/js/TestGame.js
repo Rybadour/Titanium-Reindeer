@@ -503,6 +503,7 @@ titanium_reindeer.RendererComponent.prototype.setRotation = function(value) {
 }
 titanium_reindeer.RendererComponent.prototype.alpha = null;
 titanium_reindeer.RendererComponent.prototype.setAlpha = function(value) {
+	if(value < 0) value = 0; else if(value > 1) value = 1;
 	if(value != this.alpha) {
 		this.alpha = value;
 		this.setRedraw(true);
@@ -572,6 +573,8 @@ titanium_reindeer.RendererComponent.prototype.fixRotationOnPoint = function(p) {
 		var rotatedPoint = p.getRotate(this.rotation - 2 * Math.PI);
 		this.getPen().translate(p.getX() - rotatedPoint.getX(),p.getY() - rotatedPoint.getY());
 	}
+}
+titanium_reindeer.RendererComponent.prototype.update = function(msTimeStep) {
 }
 titanium_reindeer.RendererComponent.prototype.preRender = function() {
 	this.getPen().save();
@@ -2921,6 +2924,7 @@ titanium_reindeer.RendererComponentManager.prototype.postUpdate = function(msTim
 			$r = $t;
 			return $r;
 		}(this));
+		renderer.update(msTimeStep);
 		if(renderer.layer != null && renderer.getVisible() && (renderer.timeForRedraw || renderer.layer.redrawBackground)) {
 			renderer.preRender();
 			if(renderer.usingSharedBitmap) renderer.renderSharedBitmap(); else renderer.render();
@@ -4314,7 +4318,7 @@ titanium_reindeer.GameObjectManager.prototype.update = function(msTimeStep) {
 	var $it1 = this.objects.iterator();
 	while( $it1.hasNext() ) {
 		var obj = $it1.next();
-		((function($this) {
+		if(!obj.toBeDestroyed) ((function($this) {
 			var $r;
 			var $t = obj;
 			if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";
@@ -5833,7 +5837,7 @@ titanium_reindeer.WatchedVector2.prototype.setX = function(value) {
 	return this.mX;
 }
 titanium_reindeer.WatchedVector2.prototype.setY = function(value) {
-	if(value != this.getY() && this.changeCallback != null) this.changeCallback();
+	if(value != this.mY && this.changeCallback != null) this.changeCallback();
 	titanium_reindeer.Vector2.prototype.setY.call(this,value);
 	return this.mY;
 }

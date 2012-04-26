@@ -520,10 +520,52 @@ titanium_reindeer.RendererComponent = function(width,height,layer) {
 	this.effects = new Hash();
 	this.lastIdentifier = "";
 	this.lastRenderedPosition = new titanium_reindeer.Vector2(0,0);
+	this.useFakes = false;
 }
 titanium_reindeer.RendererComponent.__name__ = ["titanium_reindeer","RendererComponent"];
 titanium_reindeer.RendererComponent.__super__ = titanium_reindeer.Component;
 for(var k in titanium_reindeer.Component.prototype ) titanium_reindeer.RendererComponent.prototype[k] = titanium_reindeer.Component.prototype[k];
+titanium_reindeer.RendererComponent.CompositionToString = function(comp) {
+	return (function($this) {
+		var $r;
+		switch( (comp)[1] ) {
+		case 0:
+			$r = "source-atop";
+			break;
+		case 1:
+			$r = "source-in";
+			break;
+		case 2:
+			$r = "source-out";
+			break;
+		case 3:
+			$r = "source-over";
+			break;
+		case 4:
+			$r = "destination-atop";
+			break;
+		case 5:
+			$r = "destination-in";
+			break;
+		case 6:
+			$r = "destination-out";
+			break;
+		case 7:
+			$r = "destination-over";
+			break;
+		case 8:
+			$r = "lighter";
+			break;
+		case 9:
+			$r = "copy";
+			break;
+		case 10:
+			$r = "xor";
+			break;
+		}
+		return $r;
+	}(this));
+}
 titanium_reindeer.RendererComponent.prototype.rendererManager = null;
 titanium_reindeer.RendererComponent.prototype.getRendererManager = function() {
 	if(this.manager == null) return null; else return (function($this) {
@@ -626,11 +668,16 @@ titanium_reindeer.RendererComponent.prototype.setRotation = function(value) {
 }
 titanium_reindeer.RendererComponent.prototype.alpha = null;
 titanium_reindeer.RendererComponent.prototype.setAlpha = function(value) {
+	if(value < 0) value = 0; else if(value > 1) value = 1;
 	if(value != this.alpha) {
 		this.alpha = value;
 		this.setRedraw(true);
 	}
 	return this.alpha;
+}
+titanium_reindeer.RendererComponent.prototype.renderComposition = null;
+titanium_reindeer.RendererComponent.prototype.getRenderComposition = function() {
+	if(this.layer == null) return titanium_reindeer.Composition.SourceOver; else return this.layer.renderComposition;
 }
 titanium_reindeer.RendererComponent.prototype.screenPos = null;
 titanium_reindeer.RendererComponent.prototype.getScreenPos = function() {
@@ -692,9 +739,11 @@ titanium_reindeer.RendererComponent.prototype.fixRotationOnPoint = function(p) {
 		this.getPen().translate(p.getX() - rotatedPoint.getX(),p.getY() - rotatedPoint.getY());
 	}
 }
+titanium_reindeer.RendererComponent.prototype.update = function(msTimeStep) {
+}
 titanium_reindeer.RendererComponent.prototype.preRender = function() {
 	this.getPen().save();
-	this.getPen().globalCompositeOperation = this.layer.compositionToString(this.layer.renderComposition);
+	this.getPen().globalCompositeOperation = titanium_reindeer.RendererComponent.CompositionToString(this.getRenderComposition());
 	this.getPen().translate(this.getScreenPos().getX(),this.getScreenPos().getY());
 	if(this.rotation != 0) this.getPen().rotate(this.rotation);
 	this.getPen().globalAlpha = this.alpha;
@@ -735,6 +784,16 @@ titanium_reindeer.RendererComponent.prototype.removeEffect = function(name) {
 	this.effects.remove(name);
 	this.setRedraw(true);
 }
+titanium_reindeer.RendererComponent.prototype.useAlternateCanvas = function(pen,newPosition) {
+	this.fakePen = pen;
+	if(newPosition == null) this.fakePosition = new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1); else this.fakePosition = newPosition;
+	this.useFakes = true;
+}
+titanium_reindeer.RendererComponent.prototype.disableAlternateCanvas = function() {
+	this.fakePen = null;
+	this.fakePosition = null;
+	this.useFakes = false;
+}
 titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 	if(this.getRendererManager() != null && Lambda.count(this.effects) != 0) {
 		var identifier = this.identify();
@@ -745,9 +804,7 @@ titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 			var canvas = js.Lib.document.createElement("canvas");
 			canvas.setAttribute("width",this.drawnWidth + 2 + "px");
 			canvas.setAttribute("height",this.drawnHeight + 2 + "px");
-			this.fakePen = canvas.getContext("2d");
-			this.fakePosition = new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1);
-			this.useFakes = true;
+			this.useAlternateCanvas(canvas.getContext("2d"),new titanium_reindeer.Vector2(this.drawnWidth / 2 + 1,this.drawnHeight / 2 + 1));
 			this.preRender();
 			this.render();
 			this.postRender();
@@ -763,9 +820,7 @@ titanium_reindeer.RendererComponent.prototype.recreateBitmapData = function() {
 			if(bitmap.isLoaded) this.cachedBitmapLoaded(null); else bitmap.registerLoadEvent($closure(this,"cachedBitmapLoaded"));
 			this.sharedBitmap = bitmap;
 			this.getRendererManager().cachedBitmaps.set(identifier,bitmap);
-			this.fakePen = null;
-			this.fakePosition = null;
-			this.useFakes = false;
+			this.disableAlternateCanvas();
 		}
 	} else {
 		this.usingSharedBitmap = false;
@@ -2806,47 +2861,6 @@ titanium_reindeer.RenderLayer.prototype.ensureYetToRedrawIsReady = function() {
 		}
 	}
 }
-titanium_reindeer.RenderLayer.prototype.compositionToString = function(comp) {
-	return (function($this) {
-		var $r;
-		switch( (comp)[1] ) {
-		case 0:
-			$r = "source-atop";
-			break;
-		case 1:
-			$r = "source-in";
-			break;
-		case 2:
-			$r = "source-out";
-			break;
-		case 3:
-			$r = "source-over";
-			break;
-		case 4:
-			$r = "destination-atop";
-			break;
-		case 5:
-			$r = "destination-in";
-			break;
-		case 6:
-			$r = "destination-out";
-			break;
-		case 7:
-			$r = "destination-over";
-			break;
-		case 8:
-			$r = "lighter";
-			break;
-		case 9:
-			$r = "copy";
-			break;
-		case 10:
-			$r = "xor";
-			break;
-		}
-		return $r;
-	}(this));
-}
 titanium_reindeer.RenderLayer.prototype.destroy = function() {
 	this.layerManager = null;
 	this.canvas = null;
@@ -3305,6 +3319,7 @@ titanium_reindeer.RendererComponentManager.prototype.postUpdate = function(msTim
 			$r = $t;
 			return $r;
 		}(this));
+		renderer.update(msTimeStep);
 		if(renderer.layer != null && renderer.getVisible() && (renderer.timeForRedraw || renderer.layer.redrawBackground)) {
 			renderer.preRender();
 			if(renderer.usingSharedBitmap) renderer.renderSharedBitmap(); else renderer.render();
@@ -4600,7 +4615,7 @@ titanium_reindeer.GameObjectManager.prototype.update = function(msTimeStep) {
 	var $it1 = this.objects.iterator();
 	while( $it1.hasNext() ) {
 		var obj = $it1.next();
-		((function($this) {
+		if(!obj.toBeDestroyed) ((function($this) {
 			var $r;
 			var $t = obj;
 			if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";
@@ -6119,7 +6134,7 @@ titanium_reindeer.WatchedVector2.prototype.setX = function(value) {
 	return this.mX;
 }
 titanium_reindeer.WatchedVector2.prototype.setY = function(value) {
-	if(value != this.getY() && this.changeCallback != null) this.changeCallback();
+	if(value != this.mY && this.changeCallback != null) this.changeCallback();
 	titanium_reindeer.Vector2.prototype.setY.call(this,value);
 	return this.mY;
 }

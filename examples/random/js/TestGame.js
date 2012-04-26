@@ -4707,7 +4707,7 @@ titanium_reindeer.GameObjectManager.prototype.update = function(msTimeStep) {
 	var $it1 = this.objects.iterator();
 	while( $it1.hasNext() ) {
 		var obj = $it1.next();
-		((function($this) {
+		if(!obj.toBeDestroyed) ((function($this) {
 			var $r;
 			var $t = obj;
 			if(Std["is"]($t,titanium_reindeer.GameObject)) $t; else throw "Class cast error";

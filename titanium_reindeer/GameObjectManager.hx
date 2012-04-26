@@ -85,7 +85,8 @@ class GameObjectManager extends ObjectManager
 		// Update game objects
 		for (obj in objects)
 		{
-			cast(obj, GameObject).update(msTimeStep);
+			if ( !obj.toBeDestroyed )
+				cast(obj, GameObject).update(msTimeStep);
 		}
 		// Update on component managers
 		for (manager in this.componentManagers)
