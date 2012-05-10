@@ -24,7 +24,7 @@ class Fighter extends Ship
 	{
 		super(scene, highlight, "fighter.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
 
-		this.fireSound = this.scene.game.soundManager.getSound(Fighter.FIRE_SOUND);
+		this.fireSound = this.scene.getSound(Fighter.FIRE_SOUND);
 	}
 
 	public override function shoot(msTimeStep:Int):Void

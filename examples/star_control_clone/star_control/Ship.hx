@@ -70,8 +70,8 @@ class Ship extends GameObject
 		this.velocity = new MovementComponent();
 		this.addComponent("velocity", this.velocity);
 
-		this.hitSound = this.scene.game.soundManager.getSound(Ship.HIT_SOUND);
-		this.hitSound2 = this.scene.game.soundManager.getSound(Ship.HIT_SOUND2);
+		this.hitSound = this.scene.getSound(Ship.HIT_SOUND);
+		this.hitSound2 = this.scene.getSound(Ship.HIT_SOUND2);
 
 		this.shipUi = shipUi;
 
