@@ -9,7 +9,6 @@ import titanium_reindeer.Color;
 import titanium_reindeer.RendererComponent;
 import titanium_reindeer.InputManager;
 import titanium_reindeer.ImageRenderer;
-import titanium_reindeer.ImageSource;
 import titanium_reindeer.Rect;
 import titanium_reindeer.Circle;
 import titanium_reindeer.UnsaturateEffect;
@@ -67,7 +66,7 @@ class TestScene extends Scene
 		// Image box
 		imageBox = new GameObject(this);
 		imageBox.position = new Vector2(-50, 200);
-			var img:ImageRenderer = new ImageRenderer(new ImageSource("img/jupiter.png"), Layers.BACKGROUND, new Rect(0, 0, 200, 400), 1000, 1000);
+			var img:ImageRenderer = new ImageRenderer(this.getImage("img/jupiter.png"), Layers.BACKGROUND, new Rect(0, 0, 200, 400), 1000, 1000);
 			img.visible = false;
 		imageBox.addComponent("image", img);
 			var velo:MovementComponent = new MovementComponent();
@@ -87,7 +86,7 @@ class TestScene extends Scene
 			mText.strokeColor = Color.Black;
 			mText.lineWidth = 1;
 			mText.alpha = 0.5;
-			mText.fillPattern = new Pattern(new ImageSource("img/patternA.png"), PatternOption.Repeat);
+			mText.fillPattern = new Pattern(this.getImage("img/patternA.png"), PatternOption.Repeat);
 			mText.fillGradient = grad;
 			mText.strokeGradient = grad;
 		circle.addComponent("text", mText);
