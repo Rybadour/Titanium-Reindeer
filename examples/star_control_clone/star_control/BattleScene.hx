@@ -1,6 +1,5 @@
 package star_control;
 
-import titanium_reindeer.Scene;
 import titanium_reindeer.ui.RectButton;
 import titanium_reindeer.Color;
 import titanium_reindeer.Vector2;
@@ -8,7 +7,7 @@ import titanium_reindeer.Enums;
 import titanium_reindeer.CollisionComponentManager;
 import titanium_reindeer.RendererComponentManager;
 
-class BattleScene extends Scene
+class BattleScene extends StarControlScene
 {
 	// Render layers for this scene
 	public static inline var BACKGROUND_LAYER:Int 	= 0;
@@ -45,12 +44,12 @@ class BattleScene extends Scene
 		this.ui = new UiBar(this, new Vector2(StarControlGame.FIELD_SIZE, 0));
 
 		// Player 1
-		var ship1:Ship = new Fighter(this, true, this.ui.ship1Ui);
+		var ship1:Ship = new MineLayer(this, BattleScene.PLAYER1_COLOR, this.ui.ship1Ui);
 		ship1.position = new Vector2(50, 50);
 		this.player1 = new Player(this, ship1, Key.W, Key.D, Key.A, Key.Q);
 
 		// Player 2
-		var ship2:Ship = new Artillery(this, false, this.ui.ship2Ui);
+		var ship2:Ship = new Artillery(this, BattleScene.PLAYER2_COLOR, this.ui.ship2Ui);
 		ship2.position = new Vector2(550, 550);
 		this.player2 = new Player(this, ship2, Key.UpArrow, Key.RightArrow, Key.LeftArrow, Key.Period);
 

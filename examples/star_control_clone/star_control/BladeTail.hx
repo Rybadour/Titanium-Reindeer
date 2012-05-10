@@ -5,6 +5,7 @@ import titanium_reindeer.ImageSource;
 import titanium_reindeer.CollisionCircle;
 import titanium_reindeer.CollisionComponent;
 import titanium_reindeer.Vector2;
+import titanium_reindeer.Color;
 
 class BladeTail extends Ship
 {
@@ -29,25 +30,23 @@ class BladeTail extends Ship
 	public var bladeTailSegmentSource(default, null):ImageSource;
 	public var bladeTailSegmentOnSource(default, null):ImageSource;
 
-	public function new(scene:Scene, isPlayer1:Bool, shipUi:ShipUi)
+	public function new(scene:Scene, highlight:Color, shipUi:ShipUi)
 	{
-		super(scene, isPlayer1, "bladeTailHead.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
+		super(scene, highlight, "bladeTailHead.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
 
 		this.activeWeapon = false;
 		this.lastHit = 0;
 		this.segments = new Array();
 
-		this.bladeTailSegmentSource = new ImageSource("img/bladeTailSegment.png");
-		this.bladeTailSegmentOnSource = new ImageSource("img/bladeTailSegmentOn.png");
-	}
+		this.bladeTailSegmentSource = this.scene.getImage("bladeTailSegment.png");
+		this.bladeTailSegmentOnSource = this.scene.getImage("bladeTailSegmentOn.png");
 
-	private override function hasInitialized():Void
-	{
+		// Build the rest of the tail segments
 		var lastSegment:BladeTailSegment = null;
 		for (i in 0...SEGMENTS)
 		{
-			segments.push( new BladeTailSegment(this, i, lastSegment) );
-			lastSegment = segments[i];
+			lastSegment = new BladeTailSegment(this, i, lastSegment);
+			segments.push(lastSegment);
 			this.scene.addGameObject(lastSegment);
 		}
 	}

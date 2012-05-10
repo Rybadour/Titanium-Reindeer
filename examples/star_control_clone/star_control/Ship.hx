@@ -5,7 +5,6 @@ import titanium_reindeer.Scene;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.ImageRenderer;
 import titanium_reindeer.CircleRenderer;
-import titanium_reindeer.ImageSource;
 import titanium_reindeer.MovementComponent;
 import titanium_reindeer.Enums;
 import titanium_reindeer.Rect;
@@ -33,7 +32,6 @@ class Ship extends GameObject
 	private var hitSound2:SoundSource;
 
 	private var shipUi:ShipUi;
-	private var isPlayer1:Bool;
 
 	public var maxHealth(default, null):Int;
 	public var maxAmmo(default, null):Int;
@@ -52,14 +50,11 @@ class Ship extends GameObject
 	public var facing(default, null):Float;
 	private var projectiles:IntHash<Projectile>;
 
-	public function new(scene:Scene, isPlayer1:Bool, imagePath:String, shipUi:ShipUi, maxHealth:Int, maxAmmo:Int, rechargeRate:Int, fireRate:Int, primaryAmmoCost:Int, turnRate:Float, thrustAccel:Int, maxThrust:Int)
+	public function new(scene:Scene, highlight:Color, imagePath:String, shipUi:ShipUi, maxHealth:Int, maxAmmo:Int, rechargeRate:Int, fireRate:Int, primaryAmmoCost:Int, turnRate:Float, thrustAccel:Int, maxThrust:Int)
 	{
 		super(scene);
 
-		this.isPlayer1 = isPlayer1;
-		var highlight:Color = this.isPlayer1 ? BattleScene.PLAYER1_COLOR : BattleScene.PLAYER2_COLOR;
-
-		this.sprite = new ImageRenderer(new ImageSource(StarControlGame.IMAGE_BASE + imagePath), BattleScene.SHIPS_LAYER);
+		this.sprite = new ImageRenderer(this.scene.getImage(imagePath), BattleScene.SHIPS_LAYER);
 		this.sprite.shadow = new Shadow(highlight, new Vector2(4, 4), 20);
 		this.addComponent("sprite", this.sprite);
 

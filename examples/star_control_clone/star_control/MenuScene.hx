@@ -1,13 +1,12 @@
 package star_control;
 
-import titanium_reindeer.Scene;
 import titanium_reindeer.ui.RectButton;
 import titanium_reindeer.GameObject;
 import titanium_reindeer.RectRenderer;
 import titanium_reindeer.Color;
 import titanium_reindeer.Vector2;
 
-class MenuScene extends Scene
+class MenuScene extends StarControlScene
 {
 	public static inline var BACK_LAYER:Int		= 0;
 	public static inline var MID_LAYER:Int		= 1;

@@ -1,6 +1,7 @@
 package star_control;
 
 import titanium_reindeer.Scene;
+import titanium_reindeer.Color;
 import titanium_reindeer.SoundSource;
 
 class Artillery extends Ship
@@ -19,9 +20,9 @@ class Artillery extends Ship
 
 	private var fireSound:SoundSource;
 
-	public function new(scene:Scene, isPlayer1:Bool, shipUi:ShipUi)
+	public function new(scene:Scene, highlight:Color, shipUi:ShipUi)
 	{
-		super(scene, isPlayer1, "artillery.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
+		super(scene, highlight, "artillery.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
 
 		this.fireSound = this.scene.game.soundManager.getSound(Artillery.FIRE_SOUND);
 	}
