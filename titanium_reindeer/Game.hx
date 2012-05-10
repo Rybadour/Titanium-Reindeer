@@ -32,7 +32,8 @@ class Game
 	// Managers
 	public var sceneManager(default, null):SceneManager;
 	public var inputManager(default, null):GameInputManager;
-	public var soundManager(default, null):SoundManager;
+	public var soundManager(default, null):GameSoundManager;
+	public var bitmapCache(default, null):BitmapCache;
 	public var cursor(default, null):Cursor;
 
 	public function new(targetHtmlId:String, ?width:Int, ?height:Int, ?debugMode:Bool)
@@ -50,7 +51,8 @@ class Game
 
 		this.sceneManager = new SceneManager(this);
 		this.inputManager = new GameInputManager(this, this.targetElement);
-		this.soundManager = new SoundManager();
+		this.soundManager = new GameSoundManager();
+		this.bitmapCache = new BitmapCache();
 		this.cursor = new Cursor(this.targetElement);
 
 		if (debugMode)

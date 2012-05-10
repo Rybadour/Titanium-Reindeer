@@ -18,7 +18,12 @@ class Scene extends ObjectManager
 	public var isPaused(default, null):Bool;
 
 	public var inputManager(default, null):SceneInputManager;
-	public var soundManager(default, null):SoundManager;
+	public var soundManager(default, null):SceneSoundManager;
+	public var bitmapCache(getBitmapCache, null):BitmapCache;
+	public function getBitmapCache():BitmapCache
+	{
+		return this.game.bitmapCache;
+	}
 
 	private var componentManagers:Hash<ComponentManager>;
 
@@ -28,6 +33,7 @@ class Scene extends ObjectManager
 
 		this.name = name;
 		this.inputManager = new SceneInputManager(this);
+		this.soundManager = new SceneSoundManager(this);
 		this.renderDepth = renderDepth;
 		this.layerCount = layerCount;
 		this.backgroundColor = backgroundColor == null ? new Color(255, 255, 255) : backgroundColor;
@@ -65,6 +71,24 @@ class Scene extends ObjectManager
 	public function getGameObject(id:Int):GameObject
 	{
 		return cast( super.getObject(id), GameObject );
+	}
+
+	public function getImage(filePath:String):ImageSource
+	{
+		// append a uniqueish phrase so that name clashes with renderer identifiers are impossible
+		var pathIdentifier:String = "filePath:" + filePath;
+
+		if (this.bitmapCache.exists(pathIdentifier))
+			return this.bitmapCache.get(pathIdentifier);
+
+		var imageSource:ImageSource = new ImageSource(filePath);
+		this.bitmapCache.set(pathIdentifier, imageSource);
+		return imageSource;
+	}
+
+	public function getSound(filePath:String):SoundSource
+	{
+		return this.soundManager.getSound(filePath);
 	}
 
 	public function getManager(managerType:Class<ComponentManager>):ComponentManager

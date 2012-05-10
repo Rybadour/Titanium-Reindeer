@@ -52,32 +52,16 @@ class SoundManager
 	private var soundChannels:Array<Dynamic>;
 	private var lastChannelUsed:Int;
 
-	private var cachedSounds:Hash<SoundSource>;
-
 	public function new()
 	{
 		this.soundChannels = new Array();
 		this.lastChannelUsed = -1;
-
-		this.cachedSounds = new Hash();
 
 		this.maxSoundChannels = 32;
 		this.globalVolume = 1;
 		this.isMuted = false;
 	}
 	
-	public function getSound(filePath:String):SoundSource
-	{
-		if (cachedSounds.exists(filePath))
-			return cachedSounds.get(filePath);
-		else
-		{
-			var newSound:SoundSource = new SoundSource(filePath);
-			cachedSounds.set(filePath, newSound);
-			return newSound;
-		}
-	}
-
 	public function playSound(sound:SoundSource):Void
 	{
 		if (this.isMuted || sound == null || !sound.isLoaded)

@@ -2,7 +2,7 @@ package titanium_reindeer;
 
 import js.Dom;
 
-class CachedBitmaps
+class BitmapCache
 {
 	private var cachedBitmaps:Hash<ImageSource>;
 
@@ -39,7 +39,7 @@ class CachedBitmaps
 
 	public function destroy():Void
 	{
-		for (image in cachedBitmaps)
+		for (image in this.cachedBitmaps)
 			image.destroy();
 
 		this.cachedBitmaps = null;

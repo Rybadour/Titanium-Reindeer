@@ -3,7 +3,12 @@ package titanium_reindeer;
 class RendererComponentManager extends ComponentManager
 {
 	public var renderLayerManager(default, null):RenderLayerManager;
-	public var cachedBitmaps(default, null):CachedBitmaps; 
+
+	public var bitmapCache(getBitmapCache, null):BitmapCache;
+	public function getBitmapCache():BitmapCache
+	{
+		return this.scene.bitmapCache;
+	}
 
 	public function new(scene:Scene)
 	{
@@ -12,8 +17,6 @@ class RendererComponentManager extends ComponentManager
 		var game:Game = this.scene.game;
 
 		this.renderLayerManager = new RenderLayerManager(scene, game.targetElement, game.width, game.height);
-
-		this.cachedBitmaps = new CachedBitmaps();
 	}
 
 	override public function postUpdate(msTimeStep:Int):Void
@@ -44,19 +47,6 @@ class RendererComponentManager extends ComponentManager
 		renderLayerManager.display();
 	}
 
-	public function getImageFromPath(path:String):ImageSource
-	{
-		// append a uniqueish phrase so that name clashes with renderer identify's are improbable
-		var pathIdentifier:String = "filePath:" + path;
-
-		if (this.cachedBitmaps.exists(pathIdentifier))
-			return this.cachedBitmaps.get(pathIdentifier);
-
-		var imageSource:ImageSource = new ImageSource(path);
-		this.cachedBitmaps.set(pathIdentifier, imageSource);
-		return imageSource;
-	}
-
 	override public function finalDestroy():Void
 	{
 		// destroy my children
@@ -64,8 +54,5 @@ class RendererComponentManager extends ComponentManager
 
 		renderLayerManager.destroy();
 		renderLayerManager = null;
-
-		cachedBitmaps.destroy();
-		cachedBitmaps = null;
 	}
 }
