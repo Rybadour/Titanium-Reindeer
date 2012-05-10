@@ -2,7 +2,7 @@ package titanium_reindeer;
 
 import js.Dom;
 
-class SoundSource
+class SoundSource extends SoundBase
 {
 	public var sound(default, null):Dynamic;
 
