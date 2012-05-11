@@ -86,7 +86,7 @@ class Scene extends ObjectManager
 		return imageSource;
 	}
 
-	public function getSound(filePath:String):SoundSource
+	public function getSound(filePath:String):Sound
 	{
 		return this.soundManager.getSound(filePath);
 	}

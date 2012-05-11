@@ -11,7 +11,7 @@ class GameSoundManager extends SoundManager
 		this.cachedSounds = new Hash();
 	}
 
-	public function getSound(filePath:String):SoundSource
+	public function getSoundSource(filePath:String):SoundSource
 	{
 		if (cachedSounds.exists(filePath))
 			return cachedSounds.get(filePath);

@@ -13,25 +13,43 @@ class SoundBase
 				value = 0.0;
 
 			this.volume = value;
+			this.updateTrueVolume();
 		}
 
 		return this.volume;
 	}
 
-	private var modifiedVolume(default, setModifiedVolume):Float;
-	private function setModifiedVolume(value:Float):Float
+	private var volumeModifier(default, setVolumeModifier):Float;
+	private function setVolumeModifier(value:Float):Float
 	{
-		if (this.modifiedVolume != value)
+		if (this.volumeModifier != value)
 		{
 			if (value > 1.0)
 				value = 1.0;
 			else if (value < 0.0)
 				value = 0.0;
 
-			this.modifiedVolume = value;
+			this.volumeModifier = value;
+			this.updateTrueVolume();
 		}
 
-		return this.modifiedVolume;
+		return this.volumeModifier;
+	}
+
+	public var trueVolume(default, null):Float;
+	private function setTrueVolume(value:Float):Float
+	{
+		if (this.trueVolume != value)
+		{
+			if (value > 1.0)
+				value = 1.0;
+			else if (value < 0.0)
+				value = 0.0;
+
+			this.trueVolume = value;
+		}
+
+		return this.trueVolume;
 	}
 
 	public var isMuted(default, null):Bool;
@@ -41,10 +59,15 @@ class SoundBase
 	{
 		super();
 
-		this.modifiedVolume = 1.0;
+		this.volumeModifier = 1.0;
 		this.volume = 1.0;
 		this.isMuted = false;
 		this.isPaused = false;
+	}
+
+	private function updateTrueVolume():Void
+	{
+		this.setTrueVolume(this.volume * this.volumeModifier);
 	}
 
 	public function mute():Void

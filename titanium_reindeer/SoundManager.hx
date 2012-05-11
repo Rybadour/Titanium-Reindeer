@@ -2,38 +2,50 @@ package titanium_reindeer;
 
 class SoundManager extends SoundBase
 {
+	private var sounds:Hash<Sound>;
+	private var soundGroups:IntHash<SoundSource>;
+
+	private var nextGroupId:Int;
+
 	public function new()
 	{
-		this.maxSoundChannels = 32;
-		this.volume = 1;
-		this.isMuted = false;
+		this.sounds = new Hash();
+		this.soundGroups = new IntHash();
+
+		this.nextGroupId = 0;
+	}
+
+	public function getSound(filePath:String):Sound
+	{
+		if (this.sounds.exists(filePath))
+		{
+			return this.sounds.get(filePath);
+		}
+
+		var newSound:Sound = new Sound(this, this.getSoundSource(filePath));
+		this.sounds.set(filePath, newSound);
+		return newSound;
 	}
 	
-	public function playSound(sound:SoundSource):Void
+	// No Proper Abstract methods in Haxe, this will get overrided
+	public function getSoundSource(filePath:String):SoundSource
 	{
-		if (this.isMuted || sound == null || !sound.isLoaded)
-			return;
-		
-		this.lastChannelUsed = (this.lastChannelUsed == this.soundChannels.length-1 ? 0 : this.lastChannelUsed+1);
-
-		var channel:Dynamic = this.soundChannels[this.lastChannelUsed];
-		channel.src = sound.sound.src;
-		channel.load();
-		channel.play();
+		return null;
 	}
 
-	public function playRandomSound(possibleSounds:Array<SoundSource>):Int
+	public function addGroup(soundGroup:SoundGroup):Void
 	{
-		if (possibleSounds == null || possibleSounds.length == 0)
-			return -1;
+		if (soundGroup == null)
+			return;
 
-		var r:Int = Std.random(possibleSounds.length);
-		if (possibleSounds[r] == null)
-			return -1;
-		else
-		{
-			playSound(possibleSounds[r]);
-			return r;
-		}
+		this.soundGroups.set(this.nextGroupId, soundGroup);
+
+		soundGroup.id = this.nextGroupId;
+		this.nextGroupId++;
+	}
+
+	public function removeGroup(soundGroup:SoundGroup):Void
+	{
+
 	}
 }

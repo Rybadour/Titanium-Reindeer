@@ -2,7 +2,7 @@ package titanium_reindeer;
 
 import js.Dom;
 
-class SoundSource extends SoundBase
+class SoundSource
 {
 	public var sound(default, null):Dynamic;
 
@@ -22,6 +22,17 @@ class SoundSource extends SoundBase
 		}
 	}
 
+	public function registerLoadEvent(cb:Event -> Void):Void
+	{
+		if (this.isLoaded)
+			return;
+
+		if (loadedFunctions == null)
+			loadedFunctions = new List();
+
+		loadedFunctions.push(cb);
+	}
+
 	private function soundLoaded(event:Event):Void
 	{
 		if (this.sound == null)
@@ -37,17 +48,6 @@ class SoundSource extends SoundBase
 			loadedFunctions.clear();
 			loadedFunctions = null;
 		}
-	}
-
-	public function registerLoadEvent(cb:Event -> Void):Void
-	{
-		if (this.isLoaded)
-			return;
-
-		if (loadedFunctions == null)
-			loadedFunctions = new List();
-
-		loadedFunctions.push(cb);
 	}
 
 	public function identify():String
