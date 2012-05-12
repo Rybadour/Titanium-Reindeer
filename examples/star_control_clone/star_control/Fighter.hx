@@ -1,6 +1,8 @@
 package star_control;
 
-import titanium_reindeer.SoundSource;
+import titanium_reindeer.Scene;
+import titanium_reindeer.Color;
+import titanium_reindeer.SoundGroup;
 
 class Fighter extends Ship
 {
@@ -16,19 +18,14 @@ class Fighter extends Ship
 	public static inline var FIRE_SOUND			= "sound/fighter_fire.mp3";
 
 
-	private var fireSound:SoundSource;
+	private var fireSounds:SoundGroup;
 
-	public function new(isPlayer1:Bool, shipUi:ShipUi)
+	public function new(scene:Scene, highlight:Color, shipUi:ShipUi)
 	{
-		super(isPlayer1, "fighter.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
-	}
+		super(scene, highlight, "fighter.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
 
-	override private function hasInitialized():Void
-	{
-		super.hasInitialized();
-
-		if (this.fireSound == null)
-			this.fireSound = this.objectManager.game.soundManager.getSound(Fighter.FIRE_SOUND);
+		this.fireSounds = new SoundGroup(this.scene.soundManager, 10);
+		this.fireSounds.addSound("fire", this.scene.getSound(FIRE_SOUND));
 	}
 
 	public override function shoot(msTimeStep:Int):Void
@@ -36,7 +33,7 @@ class Fighter extends Ship
 		var newProjectile:Projectile = new FighterBullet(this);
 		this.addProjectile(newProjectile);
 
-		this.objectManager.game.soundManager.playSound(this.fireSound);
+		this.fireSounds.playSound("fire");
 	}
 
 	public override function shooting(msTimeStep:Int):Void

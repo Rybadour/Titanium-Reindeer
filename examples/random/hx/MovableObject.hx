@@ -1,3 +1,4 @@
+import titanium_reindeer.Scene;
 import titanium_reindeer.GameObject;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.MovementComponent;
@@ -15,9 +16,9 @@ class MovableObject extends GameObject
 		return velocity;
 	}
 
-	public function new(velocity:Vector2)
+	public function new(scene:Scene, velocity:Vector2)
 	{
-		super();
+		super(scene);
 
 		super.addComponent("velocity", new MovementComponent(velocity));
 	}

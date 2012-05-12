@@ -1,21 +1,15 @@
 package star_control;
 
 import titanium_reindeer.Game;
-import titanium_reindeer.Color;
-import titanium_reindeer.Vector2;
-import titanium_reindeer.Enums;
+import titanium_reindeer.Scene;
 import titanium_reindeer.Rect;
-import titanium_reindeer.CollisionComponentManager;
-import titanium_reindeer.RendererComponentManager;
+import titanium_reindeer.Enums;
 
 class StarControlGame extends Game
 {
 	public static inline var IMAGE_BASE 	= "img/";
 	public static inline var FIELD_SIZE 	= 600;
 	public static inline var OFFSCREEN_EDGE = 30;
-
-	public static inline var PLAYER1_COLOR 	= new Color(0, 162, 232);
-	public static inline var PLAYER2_COLOR 	= new Color(193, 29, 37);
 
 	public static function getFieldRect():Rect
 	{
@@ -25,70 +19,40 @@ class StarControlGame extends Game
 					FIELD_SIZE + OFFSCREEN_EDGE*2);
 	}
 
-	private var player1:Player;
-	private var player2:Player;
-
-	private var ui:UiBar;
-
-	private var player1Score:Int;
-	private var player2Score:Int;
+	public var battleScene(default, null):BattleScene;
+	public var menuScene(default, null):MenuScene;
 
 	public function new()
 	{
-		super("TestGame", FIELD_SIZE + UiBar.WIDTH, FIELD_SIZE, Layers.NUM_LAYERS, true, Color.Black);
+		super("TestGame", FIELD_SIZE + UiBar.WIDTH, FIELD_SIZE, true);
 
-		this.player1Score = 0;
-		this.player2Score = 0;
-
-		this.ui = new UiBar(new Vector2(FIELD_SIZE, 0));
-		this.gameObjectManager.addGameObject(this.ui);
-
-
-		// Player 1
-		var ship1:Ship = new Fighter(true, this.ui.ship1Ui);
-		ship1.position = new Vector2(50, 50);
-		this.gameObjectManager.addGameObject(ship1);
-
-		this.player1 = new Player(this, ship1, Key.W, Key.D, Key.A, Key.Q);
-		this.gameObjectManager.addGameObject(this.player1);
-		
-
-		// Player 2
-		var ship2:Ship = new Artillery(false, this.ui.ship2Ui);
-		ship2.position = new Vector2(550, 550);
-		this.gameObjectManager.addGameObject(ship2);
-
-		this.player2 = new Player(this, ship2, Key.UpArrow, Key.RightArrow, Key.LeftArrow, Key.Period);
-		this.gameObjectManager.addGameObject(this.player2);
-
-
-		// Setup collision groups
-		var collisionManager:CollisionComponentManager = cast(this.gameObjectManager.getManager(CollisionComponentManager), CollisionComponentManager);
-		collisionManager.getLayer("main").getGroup(CollisionGroups.SHIPS).addCollidingGroup(CollisionGroups.SHIPS);
-		collisionManager.getLayer("main").getGroup(CollisionGroups.SHIPS).addCollidingGroup(CollisionGroups.BULLETS);
-		collisionManager.getLayer("main").getGroup(CollisionGroups.BULLETS).addCollidingGroup(CollisionGroups.SHIPS);
-
-		//collisionManager.getLayer("main").enableDebugView("debugCanvas", new Vector2(OFFSCREEN_EDGE + 20, OFFSCREEN_EDGE + 20));
+		this.battleScene = new BattleScene(this);
 
 		// Set the global sound volume to a reasonable level
-		this.soundManager.globalVolume = 0.2;
+		this.soundManager.volume = 0.5;
+
+		this.startMenu();
 	}
 
-	public function notifyShipDied(player:Player):Void
+	public function startMenu():Void
 	{
-		if (player1 == player)
-			player2Score++;
-		else
-			player1Score++;
+		if (this.menuScene == null)
+		{
+			this.menuScene = new MenuScene(this);
 
-		this.player1.ship.reset(new Vector2(50, 50));
+			this.battleScene.pause();
+		}
+	}
 
-		this.player2.ship.reset(new Vector2(550, 550));
+	public function stopMenu():Void
+	{
+		if (this.menuScene != null)
+		{
+			this.menuScene.destroy();
+			this.menuScene = null;
 
-		this.ui.updateScore(this.player1Score, this.player2Score);
-
-		var rendererManager:RendererComponentManager = cast(this.gameObjectManager.getManager(RendererComponentManager), RendererComponentManager);
-		rendererManager.renderLayerManager.getLayer(Layers.SHIPS).redrawBackground = true;
+			this.battleScene.unpause();
+		}
 	}
 }
 

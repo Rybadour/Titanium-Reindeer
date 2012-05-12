@@ -2,13 +2,13 @@ package titanium_reindeer;
 
 class GameObject extends ManagedObject
 {
-	public var objectManager(getManager, null):GameObjectManager;
-	public function getManager():GameObjectManager
+	public var scene(getManager, null):Scene;
+	public function getManager():Scene
 	{
 		if (this.manager == null)
 			return null;
 		else
-			return cast(this.manager, GameObjectManager);
+			return cast(this.manager, Scene);
 	}
 
 	private var components:Hash<Component>;
@@ -35,13 +35,19 @@ class GameObject extends ManagedObject
 	}
 
 	// Constructor
-	public function new()
+	public function new(scene:Scene)
 	{
 		super();
 
 		this.watchedPosition = new WatchedVector2(0, 0, positionChanged);
 
 		this.components = new Hash();
+
+		if (scene != null)
+		{
+			scene.addGameObject(this);
+			this.setManager(scene);
+		}
 	}
 
 	public function update(msTimeStep:Int):Void { }
@@ -58,9 +64,9 @@ class GameObject extends ManagedObject
 		this.components.set(name, component);
 		component.setOwner(this);
 
-		if (this.objectManager != null)
+		if (this.scene != null)
 		{
-			this.objectManager.delegateComponent(component);
+			this.scene.delegateComponent(component);
 		}
 	}
 
@@ -107,22 +113,18 @@ class GameObject extends ManagedObject
 		}
 	}
 
-	// A function safe for overriding, called when manager is finally set
-	private function hasInitialized():Void
-	{
-	}
-
 	// Internal Only
 	override public function setManager(manager:ObjectManager):Void
 	{
+		if (this.manager == manager)
+			return;
+
 		super.setManager(manager);
 
 		for (component in components)
 		{
-			this.objectManager.delegateComponent(component);
+			this.scene.delegateComponent(component);
 		}
-
-		this.hasInitialized();
 	}
 
 	// Internal Only
@@ -166,6 +168,12 @@ class GameObject extends ManagedObject
 	
 	override public function finalDestroy():Void
 	{
+		if (this.scene != null)
+		{
+			this.scene.removeGameObject(this);
+			this.scene = null;
+		}
+
 		super.finalDestroy();
 
 		if (componentsToRemove != null)

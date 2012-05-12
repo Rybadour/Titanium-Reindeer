@@ -3,17 +3,20 @@ package titanium_reindeer;
 class RendererComponentManager extends ComponentManager
 {
 	public var renderLayerManager(default, null):RenderLayerManager;
-	public var cachedBitmaps(default, null):CachedBitmaps; 
 
-	public function new(gameObjectManager:GameObjectManager)
+	public var bitmapCache(getBitmapCache, null):BitmapCache;
+	public function getBitmapCache():BitmapCache
 	{
-		super(gameObjectManager);
+		return this.scene.bitmapCache;
+	}
 
-		var game:Game = this.gameObjectManager.game;
+	public function new(scene:Scene)
+	{
+		super(scene);
 
-		this.renderLayerManager = new RenderLayerManager(game.layerCount, game.targetElement, game.backgroundColor, game.width, game.height);
+		var game:Game = this.scene.game;
 
-		this.cachedBitmaps = new CachedBitmaps();
+		this.renderLayerManager = new RenderLayerManager(scene, game.targetElement, game.width, game.height);
 	}
 
 	override public function postUpdate(msTimeStep:Int):Void
@@ -44,28 +47,12 @@ class RendererComponentManager extends ComponentManager
 		renderLayerManager.display();
 	}
 
-	public function getImageFromPath(path:String):ImageSource
-	{
-		// append a uniqueish phrase so that name clashes with renderer identify's are improbable
-		var pathIdentifier:String = "filePath:" + path;
-
-		if (this.cachedBitmaps.exists(pathIdentifier))
-			return this.cachedBitmaps.get(pathIdentifier);
-
-		var imageSource:ImageSource = new ImageSource(path);
-		this.cachedBitmaps.set(pathIdentifier, imageSource);
-		return imageSource;
-	}
-
-	override public function destroy():Void
+	override public function finalDestroy():Void
 	{
 		// destroy my children
-		super.destroy();
+		super.finalDestroy();
 
 		renderLayerManager.destroy();
 		renderLayerManager = null;
-
-		cachedBitmaps.destroy();
-		cachedBitmaps = null;
 	}
 }

@@ -1,7 +1,6 @@
 package star_control;
 
 import titanium_reindeer.ImageRenderer;
-import titanium_reindeer.ImageSource;
 
 class Mine extends Projectile
 {
@@ -10,11 +9,10 @@ class Mine extends Projectile
 	public static inline var LIFE_TIME 	= -1; 	// ms
 
 	public static inline var DRAG		= 100; 	// pixels /s/s
-	//public static var mineImage:ImageSource = new ImageSource(StarControlGame.IMAGE_BASE + "mine.png");
 
 	public function new(owner:Ship)
 	{
-		var sprite:ImageRenderer = new ImageRenderer(new ImageSource(StarControlGame.IMAGE_BASE + "mine.png"), Layers.SHIPS);
+		var sprite:ImageRenderer = new ImageRenderer(owner.scene.getImage("mine.png"), BattleScene.SHIPS_LAYER);
 
 		super(owner, sprite, SPEED, DAMAGE, LIFE_TIME);
 	}

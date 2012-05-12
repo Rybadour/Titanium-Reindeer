@@ -1,6 +1,7 @@
 package star_control;
 
 import titanium_reindeer.GameObject;
+import titanium_reindeer.Scene;
 import titanium_reindeer.RectRenderer;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.Color;
@@ -31,11 +32,11 @@ class ShipUi extends GameObject
 	private var lastHealth:Int;
 	private var lastAmmo:Int;
 
-	public function new()
+	public function new(scene:Scene)
 	{
-		super();
+		super(scene);
 
-		this.background = new RectRenderer(WIDTH, HEIGHT, Layers.UI_B);
+		this.background = new RectRenderer(WIDTH, HEIGHT, BattleScene.UI_B_LAYER);
 		this.background.fillColor = Color.Grey;
 		this.background.strokeColor = Color.Black;
 		this.background.lineWidth = 2;
@@ -53,7 +54,7 @@ class ShipUi extends GameObject
 		this.healthBars = new Array();
 		for (i in 0...this.maxHealth)
 		{
-			var healthBar:RectRenderer = new RectRenderer(12, 6, Layers.UI_C);
+			var healthBar:RectRenderer = new RectRenderer(12, 6, BattleScene.UI_C_LAYER);
 			healthBar.fillColor = HEALTH_FILLED;
 			healthBar.strokeColor = Color.Black;
 			healthBar.lineWidth = 2;
@@ -72,7 +73,7 @@ class ShipUi extends GameObject
 		this.ammoBars = new Array();
 		for (i in 0...this.maxAmmo)
 		{
-			var ammoBar:RectRenderer = new RectRenderer(12, 6, Layers.UI_C);
+			var ammoBar:RectRenderer = new RectRenderer(12, 6, BattleScene.UI_C_LAYER);
 			ammoBar.fillColor = AMMO_FILLED;
 			ammoBar.strokeColor = Color.Black;
 			ammoBar.lineWidth = 2;
