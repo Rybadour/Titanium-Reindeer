@@ -110,19 +110,23 @@ class Scene extends ObjectManager
 		return manager;
 	}
 
-	public function unpause():Void
-	{
-		if (this.isPaused)
-		{
-			this.isPaused = false;
-		}
-	}
-
 	public function pause():Void
 	{
 		if (!this.isPaused)
 		{
 			this.isPaused = true;
+
+			this.soundManager.pause(true);
+		}
+	}
+
+	public function unpause():Void
+	{
+		if (this.isPaused)
+		{
+			this.isPaused = false;
+
+			this.soundManager.unpause();
 		}
 	}
 

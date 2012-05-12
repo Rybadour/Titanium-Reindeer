@@ -11,7 +11,7 @@ class SceneSoundManager extends SoundManager
 		this.scene = scene;
 	}
 
-	public function getSoundSource(filePath:String):SoundSource
+	public override function getSoundSource(filePath:String):SoundSource
 	{
 		return this.scene.game.soundManager.getSoundSource(filePath);
 	}

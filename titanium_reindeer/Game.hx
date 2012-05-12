@@ -51,7 +51,7 @@ class Game
 
 		this.sceneManager = new SceneManager(this);
 		this.inputManager = new GameInputManager(this, this.targetElement);
-		this.soundManager = new GameSoundManager();
+		this.soundManager = new GameSoundManager(this);
 		this.bitmapCache = new BitmapCache();
 		this.cursor = new Cursor(this.targetElement);
 

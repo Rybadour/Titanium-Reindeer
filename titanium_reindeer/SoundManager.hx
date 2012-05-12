@@ -3,16 +3,14 @@ package titanium_reindeer;
 class SoundManager extends SoundBase
 {
 	private var sounds:Hash<Sound>;
-	private var soundGroups:IntHash<SoundSource>;
-
-	private var nextGroupId:Int;
+	private var soundGroups:Array<SoundGroup>;
 
 	public function new()
 	{
 		this.sounds = new Hash();
-		this.soundGroups = new IntHash();
+		this.soundGroups = new Array();
 
-		this.nextGroupId = 0;
+		super();
 	}
 
 	public function getSound(filePath:String):Sound
@@ -35,17 +33,33 @@ class SoundManager extends SoundBase
 
 	public function addGroup(soundGroup:SoundGroup):Void
 	{
-		if (soundGroup == null)
+		if (soundGroup == null || soundGroup.soundManager != this || this.containsGroup(soundGroup))
 			return;
 
-		this.soundGroups.set(this.nextGroupId, soundGroup);
+		this.soundGroups.push(soundGroup);
+	}
 
-		soundGroup.id = this.nextGroupId;
-		this.nextGroupId++;
+	public function containsGroup(soundGroup:SoundGroup):Bool
+	{
+		for (mySoundGroup in this.soundGroups)
+		{
+			if (soundGroup == mySoundGroup)
+				return true;
+		}
+		return false;
 	}
 
 	public function removeGroup(soundGroup:SoundGroup):Void
 	{
+		this.soundGroups.remove(soundGroup);
+	}
 
+	private override function propagateCall(methodName:String, params:Array<Dynamic>):Void
+	{
+		for (sound in this.sounds)
+			Reflect.callMethod(sound, Reflect.field(sound, methodName), params);
+
+		for (soundGroup in this.soundGroups)
+			Reflect.callMethod(soundGroup, Reflect.field(soundGroup, methodName), params);
 	}
 }

@@ -2,16 +2,18 @@ package titanium_reindeer;
 
 class GameSoundManager extends SoundManager
 {
+	private var game:Game;
 	private var cachedSounds:Hash<SoundSource>;
 
-	public function new()
+	public function new(game:Game)
 	{
-		super();
-
+		this.game = game;
 		this.cachedSounds = new Hash();
+
+		super();
 	}
 
-	public function getSoundSource(filePath:String):SoundSource
+	public override function getSoundSource(filePath:String):SoundSource
 	{
 		if (cachedSounds.exists(filePath))
 			return cachedSounds.get(filePath);
@@ -21,5 +23,13 @@ class GameSoundManager extends SoundManager
 			cachedSounds.set(filePath, newSound);
 			return newSound;
 		}
+	}
+
+	private override function propagateCall(methodName:String, params:Array<Dynamic>):Void
+	{
+		super.propagateCall(methodName, params);
+
+		for (scene in this.game.sceneManager.getAllScenes())
+			Reflect.callMethod(scene.soundManager, Reflect.field(scene.soundManager, methodName), params);
 	}
 }
