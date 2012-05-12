@@ -44,7 +44,7 @@ class BattleScene extends StarControlScene
 		this.ui = new UiBar(this, new Vector2(StarControlGame.FIELD_SIZE, 0));
 
 		// Player 1
-		var ship1:Ship = new MineLayer(this, BattleScene.PLAYER1_COLOR, this.ui.ship1Ui);
+		var ship1:Ship = new Fighter(this, BattleScene.PLAYER1_COLOR, this.ui.ship1Ui);
 		ship1.position = new Vector2(50, 50);
 		this.player1 = new Player(this, ship1, Key.W, Key.D, Key.A, Key.Q);
 
@@ -60,7 +60,7 @@ class BattleScene extends StarControlScene
 		collisionManager.getLayer("main").getGroup(CollisionGroups.BULLETS).addCollidingGroup(CollisionGroups.SHIPS);
 		//collisionManager.getLayer("main").enableDebugView("debugCanvas", new Vector2(OFFSCREEN_EDGE + 20, OFFSCREEN_EDGE + 20));
 
-		this.game.inputManager.registerKeyEvent(Key.Space, KeyState.Up, pauseButton);
+		this.inputManager.registerKeyEvent(Key.Space, KeyState.Down, pauseButton);
 	}
 
 	public function notifyShipDied(player:Player):Void

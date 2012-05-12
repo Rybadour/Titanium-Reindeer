@@ -3,6 +3,7 @@ package star_control;
 import titanium_reindeer.Game;
 import titanium_reindeer.Scene;
 import titanium_reindeer.Rect;
+import titanium_reindeer.Enums;
 
 class StarControlGame extends Game
 {
@@ -25,11 +26,12 @@ class StarControlGame extends Game
 	{
 		super("TestGame", FIELD_SIZE + UiBar.WIDTH, FIELD_SIZE, true);
 
-		this.menuScene = new MenuScene(this);
 		this.battleScene = new BattleScene(this);
 
 		// Set the global sound volume to a reasonable level
-		this.soundManager.globalVolume = 0.2;
+		this.soundManager.volume = 0.5;
+
+		this.startMenu();
 	}
 
 	public function startMenu():Void

@@ -2,7 +2,7 @@ package star_control;
 
 import titanium_reindeer.Scene;
 import titanium_reindeer.Color;
-import titanium_reindeer.SoundSource;
+import titanium_reindeer.Sound;
 
 class Artillery extends Ship
 {
@@ -18,13 +18,13 @@ class Artillery extends Ship
 	public static inline var FIRE_SOUND			= "sound/artillery_fire.mp3";
 
 
-	private var fireSound:SoundSource;
+	private var fireSound:Sound;
 
 	public function new(scene:Scene, highlight:Color, shipUi:ShipUi)
 	{
 		super(scene, highlight, "artillery.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
 
-		this.fireSound = this.scene.getSound(Artillery.FIRE_SOUND);
+		this.fireSound = this.scene.getSound(FIRE_SOUND);
 	}
 
 	public override function shoot(msTimeStep:Int):Void
@@ -32,7 +32,7 @@ class Artillery extends Ship
 		var newProjectile:Projectile = new ArtilleryShell(this);
 		this.addProjectile(newProjectile);
 
-		this.scene.game.soundManager.playSound(this.fireSound);
+		this.fireSound.play();
 	}
 
 	public override function shooting(msTimeStep:Int):Void

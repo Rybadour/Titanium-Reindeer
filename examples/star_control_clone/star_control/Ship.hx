@@ -12,7 +12,7 @@ import titanium_reindeer.CollisionCircle;
 import titanium_reindeer.CollisionComponent;
 import titanium_reindeer.Color;
 import titanium_reindeer.Shadow;
-import titanium_reindeer.SoundSource;
+import titanium_reindeer.SoundGroup;
 
 class Ship extends GameObject
 {
@@ -28,8 +28,7 @@ class Ship extends GameObject
 	private var collision:CollisionCircle;
 	private var velocity:MovementComponent;
 	
-	private var hitSound:SoundSource;
-	private var hitSound2:SoundSource;
+	private var hitSounds:SoundGroup;
 
 	private var shipUi:ShipUi;
 
@@ -70,8 +69,9 @@ class Ship extends GameObject
 		this.velocity = new MovementComponent();
 		this.addComponent("velocity", this.velocity);
 
-		this.hitSound = this.scene.getSound(Ship.HIT_SOUND);
-		this.hitSound2 = this.scene.getSound(Ship.HIT_SOUND2);
+		this.hitSounds = new SoundGroup(this.scene.soundManager);
+		this.hitSounds.addSound("hit1", this.scene.getSound(HIT_SOUND));
+		this.hitSounds.addSound("hit2", this.scene.getSound(HIT_SOUND2));
 
 		this.shipUi = shipUi;
 
@@ -220,7 +220,7 @@ class Ship extends GameObject
 			var projectile:Projectile = cast(other.owner, Projectile);
 			this.setHealth(this.health - projectile.damage);
 
-			this.scene.game.soundManager.playRandomSound([this.hitSound, this.hitSound2]);
+			this.hitSounds.playRandomSound(["hit1", "hit2"]);
 		}
 	}
 
