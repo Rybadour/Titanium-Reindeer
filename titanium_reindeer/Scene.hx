@@ -139,17 +139,20 @@ class Scene extends ObjectManager
 		component.initialize();
 	}
 
-	public function update(msTimeStep:Int):Void
+	public function preUpdate(msTimeStep:Int):Void
 	{
-		if (this.isPaused)
-			return;
-
 		// Pre-Update on component managers
 		for (manager in this.componentManagers)
 		{
 			manager.preUpdate(msTimeStep);
 		}
 		inputManager.preUpdate(msTimeStep);
+	}
+
+	public function update(msTimeStep:Int):Void
+	{
+		if (this.isPaused)
+			return;
 
 		// All state change should happen here
 		// Update game objects
@@ -163,13 +166,16 @@ class Scene extends ObjectManager
 			manager.update(msTimeStep);
 		}
 		inputManager.update(msTimeStep);
+	}
 
+	public function postUpdate(msTimeStep:Int):Void
+	{
 		// Post-Update on component managers
 		for (manager in this.componentManagers)
 		{
 			manager.postUpdate(msTimeStep);
 		}
-		inputManager.postUpdate(msTimeStep);
+		this.inputManager.postUpdate(msTimeStep);
 
 		// Remove Objects which were flagged to be removed
 		super.removeObjects();

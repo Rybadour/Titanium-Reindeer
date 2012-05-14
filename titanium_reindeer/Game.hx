@@ -91,13 +91,11 @@ class Game
 			this.msLastTimeStep = now;
 
 			// Game Logic
-			inputManager.preUpdate(msTimeStep);
+			this.preUpdate(msTimeStep);
 
 			this.update(msTimeStep);
-			sceneManager.update(msTimeStep);
-			inputManager.update(msTimeStep);
-
-			inputManager.postUpdate(msTimeStep);
+	
+			this.postUpdate(msTimeStep);
 
 			// Request a game loop tick from the browser
 			requestAnimFrame();
@@ -131,7 +129,23 @@ class Game
 		}
 	}
 
-	public function update(msTimeStep:Int):Void { }
+	private function preUpdate(msTimeStep:Int):Void
+	{
+		inputManager.preUpdate(msTimeStep);
+		sceneManager.preUpdate(msTimeStep);
+	}
+
+	private function update(msTimeStep:Int):Void
+	{
+		sceneManager.update(msTimeStep);
+		inputManager.update(msTimeStep);
+	}
+
+	private function postUpdate(msTimeStep:Int):Void
+	{
+		sceneManager.postUpdate(msTimeStep);
+		inputManager.postUpdate(msTimeStep);
+	}
 
 	public function destroy():Void
 	{

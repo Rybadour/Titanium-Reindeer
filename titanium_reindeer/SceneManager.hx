@@ -44,11 +44,27 @@ class SceneManager
 		}
 	}
 
+	public function preUpdate(msTimeStep:Int):Void
+	{
+		for (scene in this.scenes)
+		{
+			scene.preUpdate(msTimeStep);
+		}
+	}
+
 	public function update(msTimeStep:Int):Void
 	{
 		for (scene in this.scenes)
 		{
 			scene.update(msTimeStep);
+		}
+	}
+
+	public function postUpdate(msTimeStep:Int):Void
+	{
+		for (scene in this.scenes)
+		{
+			scene.postUpdate(msTimeStep);
 		}
 	}
 
