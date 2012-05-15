@@ -26,7 +26,7 @@ class Projectile extends GameObject
 
 	public function new(owner:Ship, sprite:RendererComponent, speed:Int, damage:Int, msLifeTime:Int)
 	{
-		super();
+		super(owner.scene);
 
 		this.owner = owner;
 

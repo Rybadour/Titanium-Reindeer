@@ -1,10 +1,10 @@
 package star_control;
 
 import titanium_reindeer.GameObject;
+import titanium_reindeer.Scene;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.ImageRenderer;
 import titanium_reindeer.CircleRenderer;
-import titanium_reindeer.ImageSource;
 import titanium_reindeer.MovementComponent;
 import titanium_reindeer.Enums;
 import titanium_reindeer.Rect;
@@ -12,7 +12,7 @@ import titanium_reindeer.CollisionCircle;
 import titanium_reindeer.CollisionComponent;
 import titanium_reindeer.Color;
 import titanium_reindeer.Shadow;
-import titanium_reindeer.SoundSource;
+import titanium_reindeer.SoundGroup;
 
 class Ship extends GameObject
 {
@@ -28,11 +28,9 @@ class Ship extends GameObject
 	private var collision:CollisionCircle;
 	private var velocity:MovementComponent;
 	
-	private var hitSound:SoundSource;
-	private var hitSound2:SoundSource;
+	private var hitSounds:SoundGroup;
 
 	private var shipUi:ShipUi;
-	private var isPlayer1:Bool;
 
 	public var maxHealth(default, null):Int;
 	public var maxAmmo(default, null):Int;
@@ -51,18 +49,15 @@ class Ship extends GameObject
 	public var facing(default, null):Float;
 	private var projectiles:IntHash<Projectile>;
 
-	public function new(isPlayer1:Bool, imagePath:String, shipUi:ShipUi, maxHealth:Int, maxAmmo:Int, rechargeRate:Int, fireRate:Int, primaryAmmoCost:Int, turnRate:Float, thrustAccel:Int, maxThrust:Int)
+	public function new(scene:Scene, highlight:Color, imagePath:String, shipUi:ShipUi, maxHealth:Int, maxAmmo:Int, rechargeRate:Int, fireRate:Int, primaryAmmoCost:Int, turnRate:Float, thrustAccel:Int, maxThrust:Int)
 	{
-		super();
+		super(scene);
 
-		this.isPlayer1 = isPlayer1;
-		var highlight:Color = this.isPlayer1 ? StarControlGame.PLAYER1_COLOR : StarControlGame.PLAYER2_COLOR;
-
-		this.sprite = new ImageRenderer(new ImageSource(StarControlGame.IMAGE_BASE + imagePath), Layers.SHIPS);
+		this.sprite = new ImageRenderer(this.scene.getImage(imagePath), BattleScene.SHIPS_LAYER);
 		this.sprite.shadow = new Shadow(highlight, new Vector2(4, 4), 20);
 		this.addComponent("sprite", this.sprite);
 
-		this.playerHighlight = new CircleRenderer(COLLISION_RADIUS + 10, Layers.BELOW_SHIPS);
+		this.playerHighlight = new CircleRenderer(COLLISION_RADIUS + 10, BattleScene.BELOW_SHIPS_LAYER);
 		this.playerHighlight.fillColor = new Color(0, 0, 0, 1);
 		this.playerHighlight.shadow = new Shadow(highlight, new Vector2(0, 0), 0.5);
 		//this.addComponent("playerHighlight", this.playerHighlight);
@@ -73,6 +68,10 @@ class Ship extends GameObject
 
 		this.velocity = new MovementComponent();
 		this.addComponent("velocity", this.velocity);
+
+		this.hitSounds = new SoundGroup(this.scene.soundManager);
+		this.hitSounds.addSound("hit1", this.scene.getSound(HIT_SOUND));
+		this.hitSounds.addSound("hit2", this.scene.getSound(HIT_SOUND2));
 
 		this.shipUi = shipUi;
 
@@ -99,15 +98,6 @@ class Ship extends GameObject
 		this.projectiles = new IntHash();
 	}
 
-	override private function hasInitialized():Void
-	{
-		if (this.hitSound == null)
-			this.hitSound = this.objectManager.game.soundManager.getSound(Ship.HIT_SOUND);
-
-		if (this.hitSound2 == null)
-			this.hitSound2 = this.objectManager.game.soundManager.getSound(Ship.HIT_SOUND2);
-	}
-
 	public function reset(startPos:Vector2):Void
 	{
 		this.position = startPos;
@@ -123,7 +113,7 @@ class Ship extends GameObject
 		for (projectile in tempProjectiles)
 		{
 			projectile.destroy();
-			this.objectManager.removeGameObject(projectile);
+			this.scene.removeGameObject(projectile);
 			this.projectiles.remove(projectile.id);
 		}
 	}
@@ -230,7 +220,7 @@ class Ship extends GameObject
 			var projectile:Projectile = cast(other.owner, Projectile);
 			this.setHealth(this.health - projectile.damage);
 
-			this.objectManager.game.soundManager.playRandomSound([this.hitSound, this.hitSound2]);
+			this.hitSounds.playRandomSound(["hit1", "hit2"]);
 		}
 	}
 
@@ -252,7 +242,7 @@ class Ship extends GameObject
 
 	private function addProjectile(projectile:Projectile):Void
 	{
-		this.objectManager.addGameObject(projectile);
+		this.scene.addGameObject(projectile);
 		this.projectiles.set(projectile.id, projectile);
 	}
 
@@ -260,7 +250,7 @@ class Ship extends GameObject
 	{
 		if (projectiles.exists(projectile.id))
 		{
-			this.objectManager.removeGameObject(projectile);
+			this.scene.removeGameObject(projectile);
 			this.projectiles.remove(projectile.id);
 		}
 	}

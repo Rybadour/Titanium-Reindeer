@@ -5,7 +5,8 @@ import titanium_reindeer.GameObject;
 
 class Player extends GameObject
 {
-	private var game:StarControlGame;
+	private var battleScene:BattleScene;
+
 	public var ship(default, null):Ship;
 
 	public var isThrusting:Bool;
@@ -18,11 +19,12 @@ class Player extends GameObject
 	private var turnLeftKey:Key;
 	private var shootKey:Key;
 
-	public function new(game:StarControlGame, ship:Ship, thrustKey:Key, turnRightKey:Key, turnLeftKey:Key, shootKey:Key)
+	public function new(scene:BattleScene, ship:Ship, thrustKey:Key, turnRightKey:Key, turnLeftKey:Key, shootKey:Key)
 	{
-		super();
+		super(scene);
 
-		this.game = game;
+		this.battleScene = scene;
+
 		this.ship = ship;
 
 		this.isThrusting = false;
@@ -36,17 +38,17 @@ class Player extends GameObject
 		this.shootKey = shootKey;
 
 		// Input handling
-		this.game.inputManager.registerKeyEvent(thrustKey, KeyState.Down, thrustDown);
-		this.game.inputManager.registerKeyEvent(thrustKey, KeyState.Up, thrustUp);
+		this.scene.game.inputManager.registerKeyEvent(thrustKey, KeyState.Down, thrustDown);
+		this.scene.game.inputManager.registerKeyEvent(thrustKey, KeyState.Up, thrustUp);
 
-		this.game.inputManager.registerKeyEvent(turnRightKey, KeyState.Down, rightDown);
-		this.game.inputManager.registerKeyEvent(turnRightKey, KeyState.Up, rightUp);
+		this.scene.game.inputManager.registerKeyEvent(turnRightKey, KeyState.Down, rightDown);
+		this.scene.game.inputManager.registerKeyEvent(turnRightKey, KeyState.Up, rightUp);
 
-		this.game.inputManager.registerKeyEvent(turnLeftKey, KeyState.Down, leftDown);
-		this.game.inputManager.registerKeyEvent(turnLeftKey, KeyState.Up, leftUp);
+		this.scene.game.inputManager.registerKeyEvent(turnLeftKey, KeyState.Down, leftDown);
+		this.scene.game.inputManager.registerKeyEvent(turnLeftKey, KeyState.Up, leftUp);
 
-		this.game.inputManager.registerKeyEvent(shootKey, KeyState.Down, shootDown);
-		this.game.inputManager.registerKeyEvent(shootKey, KeyState.Up, shootUp);
+		this.scene.game.inputManager.registerKeyEvent(shootKey, KeyState.Down, shootDown);
+		this.scene.game.inputManager.registerKeyEvent(shootKey, KeyState.Up, shootUp);
 	}
 
 	private function thrustDown():Void
@@ -95,7 +97,7 @@ class Player extends GameObject
 	{
 		if (this.ship.health <= 0)
 		{
-			this.game.notifyShipDied(this);
+			this.battleScene.notifyShipDied(this);
 		}
 
 		if (this.isThrusting)

@@ -1,5 +1,8 @@
 package star_control;
 
+import titanium_reindeer.Color;
+import titanium_reindeer.Scene;
+
 class MineLayer extends Ship
 {
 	public static inline var MAX_HEALTH 		= 16;
@@ -12,9 +15,9 @@ class MineLayer extends Ship
 	public static inline var MAX_THRUST 		= 250;			// pixels /s
 
 
-	public function new(isPlayer1:Bool, shipUi:ShipUi)
+	public function new(scene:Scene, highlight:Color, shipUi:ShipUi)
 	{
-		super(isPlayer1, "mineLayer.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
+		super(scene, highlight, "mineLayer.png", shipUi, MAX_HEALTH, MAX_AMMO, RECHARGE_RATE, FIRE_RATE, PRIMARY_AMMO_COST, TURN_RATE, THRUST_ACCEL, MAX_THRUST);
 	}
 
 	public override function shoot(msTimeStep:Int):Void

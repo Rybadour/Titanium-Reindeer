@@ -2,7 +2,7 @@ package titanium_reindeer;
 
 class ComponentManager extends ObjectManager
 {
-	public var gameObjectManager(default, null):GameObjectManager;
+	public var scene(default, null):Scene;
 
 	public var components(getComponents, null):Array<Component>;
 	public function getComponents():Array<Component>
@@ -23,11 +23,11 @@ class ComponentManager extends ObjectManager
 	
 	private var componentsChanged:Bool;
 
-	public function new(gameObjectManager:GameObjectManager)
+	public function new(scene:Scene)
 	{
 		super();
 
-		this.gameObjectManager = gameObjectManager;
+		this.scene = scene;
 
 		componentsChanged = true;
 	}
@@ -57,12 +57,12 @@ class ComponentManager extends ObjectManager
 		componentsChanged = true;
 	}
 
-	override public function destroy():Void
+	override public function finalDestroy():Void
 	{
-		super.destroy();
+		super.finalDestroy();
 
 		this.components = null;
 
-		gameObjectManager = null;
+		this.scene = null;
 	}
 }

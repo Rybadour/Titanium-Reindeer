@@ -12,7 +12,6 @@ class Game
 	public var width:Int;
 	public var height:Int;
 
-	public var layerCount:Int;
 	public var backgroundColor:Color;
 
 	public var debugMode:Bool;
@@ -31,33 +30,29 @@ class Game
 	private var msLastTimeStep:Int;
 
 	// Managers
-	public var gameObjectManager(default, null):GameObjectManager;
-	public var inputManager(default, null):InputManager;
-	public var soundManager(default, null):SoundManager;
+	public var sceneManager(default, null):SceneManager;
+	public var inputManager(default, null):GameInputManager;
+	public var soundManager(default, null):GameSoundManager;
+	public var bitmapCache(default, null):BitmapCache;
 	public var cursor(default, null):Cursor;
-	// TODO: Screen manager
 
-	public function new(?targetHtmlId:String, ?width:Int, ?height:Int, ?layerCount:Int, ?debugMode:Bool, ?backgroundColor:Color)
+	public function new(targetHtmlId:String, ?width:Int, ?height:Int, ?debugMode:Bool)
 	{
-		if (targetHtmlId == null || targetHtmlId == "")
-			this.targetElement = js.Lib.document.createElement("div");
-		else
-			this.targetElement = js.Lib.document.getElementById(targetHtmlId);
+		this.targetElement = js.Lib.document.getElementById(targetHtmlId);
+		this.targetElement.style.position = "relative";
 
 		this.width = width == null ? 400 : width;
 		this.height = height == null ? 300 : height;
-
-		this.layerCount = layerCount == null ? 1 : layerCount;
-		this.backgroundColor = backgroundColor == null ? new Color(255, 255, 255) : backgroundColor;
 
 		this.debugMode = debugMode == null ? false : debugMode;
 		this.maxAllowedUpdateLengthMs = 1000; // 1 fps
 
 		this.exitGame = false;
 
-		this.gameObjectManager = new GameObjectManager(this);
-		this.inputManager = new InputManager(this.targetElement);
-		this.soundManager = new SoundManager();
+		this.sceneManager = new SceneManager(this);
+		this.inputManager = new GameInputManager(this, this.targetElement);
+		this.soundManager = new GameSoundManager(this);
+		this.bitmapCache = new BitmapCache();
 		this.cursor = new Cursor(this.targetElement);
 
 		if (debugMode)
@@ -90,20 +85,17 @@ class Game
 
 			var msTimeStep:Int;
 			if (now == null)
-			{
 				msTimeStep = Game.DEFAULT_UPDATES_TIME_MS;
-			}
 			else
-			{
 				msTimeStep = Std.int(Math.min(now - this.msLastTimeStep, this.maxAllowedUpdateLengthMs));
-			}
 			this.msLastTimeStep = now;
 
-			this.update(msTimeStep);
-
 			// Game Logic
-			gameObjectManager.update(msTimeStep);
-			inputManager.update(msTimeStep);
+			this.preUpdate(msTimeStep);
+
+			this.update(msTimeStep);
+	
+			this.postUpdate(msTimeStep);
 
 			// Request a game loop tick from the browser
 			requestAnimFrame();
@@ -137,19 +129,35 @@ class Game
 		}
 	}
 
-	public function update(msTimeStep:Int):Void { }
+	private function preUpdate(msTimeStep:Int):Void
+	{
+		inputManager.preUpdate(msTimeStep);
+		sceneManager.preUpdate(msTimeStep);
+	}
+
+	private function update(msTimeStep:Int):Void
+	{
+		sceneManager.update(msTimeStep);
+		inputManager.update(msTimeStep);
+	}
+
+	private function postUpdate(msTimeStep:Int):Void
+	{
+		sceneManager.postUpdate(msTimeStep);
+		inputManager.postUpdate(msTimeStep);
+	}
 
 	public function destroy():Void
 	{
-		targetElement = null;
-		backgroundColor = null;
+		this.targetElement = null;
+		this.backgroundColor = null;
 
-		gameObjectManager.destroy();
-		inputManager.destroy();
+		this.sceneManager.destroy();
+		this.inputManager.destroy();
 	}
 
 	public function stopGame():Void
 	{
-		exitGame = true;
+		this.exitGame = true;
 	}
 }

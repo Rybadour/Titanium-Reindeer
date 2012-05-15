@@ -39,6 +39,7 @@ class MouseRegionManager
 
 	// [layerName] -> IntHash( [componentId] -> [ComponentHandlerPair] )
 	private var layerToPairsMap:Hash< IntHash<ComponentHandlerPair> >;
+	private var handlersToBeRemoved:Array<MouseRegionHandler>;
 
 	private var exclusionRegions:IntHash<MouseExclusionRegion>;
 	private var exclusionRTree:RTreeFastInt;
@@ -47,10 +48,11 @@ class MouseRegionManager
 	public function new(manager:CollisionComponentManager)
 	{
 		this.collisionManager = manager;
-		this.collisionManager.gameObjectManager.game.inputManager.registerMouseMoveEvent(mouseMoveHandle);
-		this.collisionManager.gameObjectManager.game.inputManager.registerMouseButtonAnyEvent(mouseButtonHandle);
+		this.collisionManager.scene.inputManager.registerMouseMoveEvent(mouseMoveHandle);
+		this.collisionManager.scene.inputManager.registerMouseButtonAnyEvent(mouseButtonHandle);
 
 		this.layerToPairsMap = new Hash();
+		this.handlersToBeRemoved = new Array();
 
 		this.exclusionRegions = new IntHash();
 		this.exclusionRTree = new RTreeFastInt();
@@ -65,9 +67,7 @@ class MouseRegionManager
 		// It is impossible to gaurentee that each component will get one and only one unique handler unless it's initialized
 		// So we have to turn down the request for a handler until it's initialized
 		if (component.id == null)
-		{
 			return null;
-		}
 
 		var handler:MouseRegionHandler;
 		var pairs:IntHash<ComponentHandlerPair>;
@@ -88,6 +88,44 @@ class MouseRegionManager
 		}
 
 		return handler;
+	}
+
+	public function removeHandler(handler:MouseRegionHandler):Void
+	{
+		if (handler == null || handler.collisionRegion == null)
+			return;
+
+		var pairs:IntHash<ComponentHandlerPair>;
+		if (this.layerToPairsMap.exists(handler.collisionRegion.layerName))
+			pairs = this.layerToPairsMap.get(handler.collisionRegion.layerName);
+		else
+			return;	// We assume we don't have this handler
+
+		if ( pairs.exists(handler.collisionRegion.id) )
+		{
+			this.handlersToBeRemoved.push(handler);
+		}
+		// else do nothing
+	}
+
+	public function removeHandlers():Void
+	{
+		if (this.handlersToBeRemoved.length > 0)
+		{
+			for (handler in this.handlersToBeRemoved)
+			{
+				var pairs:IntHash<ComponentHandlerPair>;
+				if (this.layerToPairsMap.exists(handler.collisionRegion.layerName))
+					pairs = this.layerToPairsMap.get(handler.collisionRegion.layerName);
+				else
+					return;	// We assume we don't have this handler
+
+				pairs.remove(handler.collisionRegion.id);
+				handler.finalDestroy();
+			}
+
+			this.handlersToBeRemoved = new Array();
+		}
 	}
 
 	public function createExclusionRegion(depth:Int, shape:Shape):MouseExclusionRegion
@@ -241,8 +279,11 @@ class MouseRegionManager
 
 	public function destroy():Void
 	{
-		this.collisionManager.gameObjectManager.game.inputManager.unregisterMouseMoveEvent(mouseMoveHandle);
-		this.collisionManager.gameObjectManager.game.inputManager.unregisterMouseButtonAnyEvent(mouseButtonHandle);
+		this.collisionManager.scene.inputManager.unregisterMouseMoveEvent(mouseMoveHandle);
+		this.collisionManager.scene.inputManager.unregisterMouseButtonAnyEvent(mouseButtonHandle);
+
+		this.removeHandlers();
+		this.handlersToBeRemoved = null;
 
 		this.collisionManager = null;
 			
@@ -251,12 +292,11 @@ class MouseRegionManager
 			var pairs:IntHash<ComponentHandlerPair> = this.layerToPairsMap.get(layerName);
 			for (id in pairs.keys())
 			{
-				pairs.get(id).handler.destroy();
+				pairs.get(id).handler.finalDestroy();
 				pairs.get(id).handler = null;
 				pairs.get(id).component = null;
 				pairs.remove(id);
 			}
-			pairs = null;
 			
 			this.layerToPairsMap.remove(layerName);
 		}

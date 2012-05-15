@@ -6,9 +6,9 @@ class CollisionComponentManager extends ComponentManager
 
 	public var mouseRegionManager(default, null):MouseRegionManager;
 
-	public function new(gameObjectManager:GameObjectManager)
+	public function new(scene:Scene)
 	{
-		super(gameObjectManager);
+		super(scene);
 
 		this.collisionLayers = new Hash();
 
@@ -46,14 +46,22 @@ class CollisionComponentManager extends ComponentManager
 		}
 	}
 
-	override public function destroy():Void
+	override public function removeComponents():Void
 	{
-		super.destroy();
+		this.mouseRegionManager.removeHandlers();
+	}
+
+	override public function finalDestroy():Void
+	{
+		this.mouseRegionManager.destroy();
+		this.mouseRegionManager = null;
 
 		for (layerName in this.collisionLayers.keys())
 		{
 			this.collisionLayers.get(layerName).destroy();
 			this.collisionLayers.remove(layerName);
 		}
+
+		super.finalDestroy();
 	}
 }

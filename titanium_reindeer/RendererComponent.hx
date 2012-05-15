@@ -431,8 +431,8 @@ class RendererComponent extends Component
 			this.usingSharedBitmap = true;
 
 			// Use whats already there
-			if ( this.rendererManager.cachedBitmaps.exists(identifier) )
-				this.sharedBitmap = this.rendererManager.cachedBitmaps.get(identifier);
+			if ( this.rendererManager.bitmapCache.exists(identifier) )
+				this.sharedBitmap = this.rendererManager.bitmapCache.get(identifier);
 			else
 			{
 				// Time to setup some cached bitmap data to share
@@ -471,7 +471,7 @@ class RendererComponent extends Component
 					else
 						bitmap.registerLoadEvent(this.cachedBitmapLoaded);
 					sharedBitmap = bitmap;
-					this.rendererManager.cachedBitmaps.set(identifier, bitmap);
+					this.rendererManager.bitmapCache.set(identifier, bitmap);
 				}
 				
 				this.disableAlternateCanvas();
@@ -498,7 +498,7 @@ class RendererComponent extends Component
 		bitmap.registerLoadEvent(cachedBitmapLoaded);
 		sharedBitmap = bitmap;
 		usingSharedBitmap = true;
-		rendererManager.cachedBitmaps.set(event.data.identifier, bitmap);
+		rendererManager.bitmapCache.set(event.data.identifier, bitmap);
 
 		canvas = null;
 		pen = null;
