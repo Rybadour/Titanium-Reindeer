@@ -154,7 +154,7 @@ class GameObject extends ManagedObject
 
 	// A function of convenience for the common use case that components are
 	// just going to be destroyed and removed during destruction
-	private function flushAndDestroyComponents():Void
+	public function flushAndDestroyComponents():Void
 	{
 		if (components != null)
 		{
