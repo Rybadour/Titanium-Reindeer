@@ -30,81 +30,90 @@ class WebSocketClient
 		return ReadyState.None;
 	}
 
-	public var onOpen(null, bindOnOpen):Void -> Void;
-	public var onMessage(null, bindOnMessage):String -> Void;
-	public var onError(null, bindOnError):Void -> Void;
-	public var onClose(null, bindOnClose):Void -> Void;
+	private var eventBinder:EventBinder;
+	public var onOpen(null, bindOpen):Void -> Void;
+	public var onMessage(null, bindMessage):String -> Void;
+	public var onError(null, bindError):Void -> Void;
+	public var onClose(null, bindClose):Void -> Void;
 
 	public function new(host:String)
 	{
-		untyped
-		{
-			__js__("this.socket = new WebSocket(host);");
-			this.socket.onopen = this.onOpenHandle;
-			this.socket.onmessage = this.onMessageHandle;
-			this.socket.onerror = this.onErrorHandle;
-			this.socket.onclose = this.onCloseHandle;
-		}
+		this.socket = untyped __js__("new WebSocket(host)");
+		this.socket.onopen = this.onOpenHandle;
+		this.socket.onmessage = this.onMessageHandle;
+		this.socket.onerror = this.onErrorHandle;
+		this.socket.onclose = this.onCloseHandle;
+
+		this.eventBinder = new EventBinder(["open", "message", "error", "close"]);
+	}
+
+	public function send(message:String):Void
+	{
+		this.socket.send(message);
 	}
 
 	private function onOpenHandle(event:Dynamic):Void
 	{
-		var msg = event;
+		this.eventBinder.callBindsVoid("open");
 	}
 
 	private function onMessageHandle(event:Dynamic):Void
 	{
-		var msg = event;
+		this.eventBinder.callBinds1Arg("message", event.data);
 	}
 
 	private function onErrorHandle(event:Dynamic):Void
 	{
-		var msg = event;
+		this.eventBinder.callBindsVoid("error");
 	}
 
 	private function onCloseHandle(event:Dynamic):Void
 	{
-		var msg = event;
+		this.eventBinder.callBindsVoid("close");
 	}
 
 	// Bindings for handler functions
-	public function bindOnOpen(func:Void -> Void):Void -> Void
+	public function bindOpen(func:Void -> Void):Void -> Void
 	{
-		return null;
+		this.eventBinder.bindFunc("open", func);
+		return func;
 	}
 
-	public function bindOnMessage(func:String -> Void):String -> Void
+	public function bindMessage(func:String -> Void):String -> Void
 	{
-		return null;
+		this.eventBinder.bindFunc("message", func);
+		return func;
 	}
 
-	public function bindOnError(func:Void -> Void):Void -> Void
+	public function bindError(func:Void -> Void):Void -> Void
 	{
-		return null;
+		this.eventBinder.bindFunc("error", func);
+		return func;
 	}
 
-	public function bindOnClose(func:Void -> Void):Void -> Void
+	public function bindClose(func:Void -> Void):Void -> Void
 	{
-		return null;
+		this.eventBinder.bindFunc("close", func);
+		return func;
 	}
 
-	public function unbindOnOpen(func:Void -> Void):Void
+	public function unbindOpen(func:Void -> Void):Void
 	{
-		return null;
+		this.eventBinder.unbindFunc("open", func);
 	}
 
-	public function unbindOnMessage(func:String -> Void):Void
+	public function unbindMessage(func:String -> Void):Void
 	{
-		return null;
+		this.eventBinder.unbindFunc("message", func);
 	}
 
-	public function unbindOnError(func:Void -> Void):Void
+	public function unbindError(func:Void -> Void):Void
 	{
-		return null;
+		this.eventBinder.unbindFunc("error", func);
 	}
 
-	public function unbindOnClose(func:Void -> Void):Void
+	public function unbindClose(func:Void -> Void):Void
 	{
-		return null;
+		this.eventBinder.unbindFunc("close", func);
 	}
 }
