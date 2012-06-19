@@ -7,6 +7,18 @@ class Vector2
 		return Math.sqrt( (b.x-a.x)*(b.x-a.x) + (b.y-a.y)*(b.y-a.y) );
 	}
 
+	public static function getReflected(surfaceNormal:Vector2, incoming:Vector2)
+	{
+		var outgoing:Vector2 = new Vector2(1, 0);
+		var surfaceRadians:Float = surfaceNormal.getRadians();
+		var incomingRadians:Float = incoming.getReverse().getRadians();
+
+		var rad:Float = (surfaceRadians*2 - incomingRadians) % (Math.PI*2); 
+		outgoing.rotate(rad);
+
+		return outgoing;
+	}
+
 	private var mX:Float;
 	public var x(getX, setX):Float;
 	private function getX():Float { return mX; }
@@ -29,18 +41,6 @@ class Vector2
 	{
 		this.mX = x;
 		this.mY = y;
-	}
-
-	public static function getReflected(surfaceNormal, incoming)
-	{
-		var outgoing:Vector2 = new Vector2(1, 0);
-		var surfaceRadians:Float = surfaceNormal.getRadians();
-		var incomingRadians:Float = incoming.getReverse().getRadians();
-
-		var rad:Float = (surfaceRadians*2 - incomingRadians) % (Math.PI*2); 
-		outgoing.rotate(rad);
-
-		return outgoing;
 	}
 	
 	public function getCopy()
