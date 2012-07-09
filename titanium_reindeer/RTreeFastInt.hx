@@ -57,7 +57,7 @@ class RTreeFastBranch extends RTreeFastNode
 	}
 }
 
-class RTreeFastInt
+class RTreeFastInt implements SpacePartition
 {
 	// Flags and values for optimizations
 	public var maxChildren(default, setMaxChildren):Int;

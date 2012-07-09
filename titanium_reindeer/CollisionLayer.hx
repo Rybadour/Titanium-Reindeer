@@ -7,7 +7,7 @@ class CollisionLayer
 	public var manager(default, null):CollisionComponentManager;
 	public var name(default, null):String;
 
-	private var componentsRTree:RTreeFastInt;
+	private var componentsPartition:SpacePartition;
 	public var groups(default, null):Hash<CollisionGroup>;
 
 	private var debugView:Bool;
@@ -17,7 +17,7 @@ class CollisionLayer
 		this.manager = manager;
 		this.name = name;
 
-		this.componentsRTree = new RTreeFastInt();
+		this.componentsPartition = new BinPartition(10, new Vector2(-20, -20), 100, 100);
 		this.groups = new Hash();
 
 		this.debugView = false;
@@ -39,7 +39,7 @@ class CollisionLayer
 	// Retrieves probable ids from the RTree and then does more accurate checks on the components themselves
 	public function getIdsIntersectingPoint(point:Vector2):Array<Int>
 	{
-		var ids:Array<Int> = componentsRTree.getPointIntersectingValues(point);
+		var ids:Array<Int> = componentsPartition.getPointIntersectingValues(point);
 
 		var collidingIds:Array<Int> = new Array();
 		for (id in ids)
@@ -58,7 +58,7 @@ class CollisionLayer
 	/*
 	public function getIdsIntersectingRect(rect:Rect):Array<Int>
 	{
-		var ids:Array<Int> = componentsRTree.getRectIntersectingValues(rect);
+		var ids:Array<Int> = componentsPartition.getRectIntersectingValues(rect);
 
 		var collidingIds:Array<Int> = new Array();
 		for (id in ids)
@@ -84,27 +84,27 @@ class CollisionLayer
 		else
 		{
 			group.members.set(component.id, component);
-			this.componentsRTree.insert(component.getMinBoundingRect(), component.id);
+			this.componentsPartition.insert(component.getMinBoundingRect(), component.id);
 		}
 	}
 
 	public function updateComponent(component:CollisionComponent):Void
 	{
-		this.componentsRTree.update(component.getMinBoundingRect(), component.id);
+		this.componentsPartition.update(component.getMinBoundingRect(), component.id);
 	}
 
 	public function removeComponent(component:CollisionComponent):Void
 	{
 		var group:CollisionGroup = this.getGroup(component.groupName);
 		group.members.remove(component.id);
-		this.componentsRTree.remove(component.id);
+		this.componentsPartition.remove(component.id);
 	}
 
 	public function enableDebugView(debugCanvas:String, debugOffset:Vector2)
 	{
 		this.debugView = true;
-		this.componentsRTree.debugCanvas = debugCanvas;
-		this.componentsRTree.debugOffset = debugOffset;
+		this.componentsPartition.debugCanvas = debugCanvas;
+		this.componentsPartition.debugOffset = debugOffset;
 	}
 
 	public function update():Void
@@ -113,7 +113,7 @@ class CollisionLayer
 		{
 			for (component in group.members)
 			{
-				var collidingIds:Array<Int> = this.componentsRTree.getRectIntersectingValues(component.getMinBoundingRect());  
+				var collidingIds:Array<Int> = this.componentsPartition.getRectIntersectingValues(component.getMinBoundingRect());  
 				for (id in collidingIds)
 				{
 					// Only reguster a collision if it isn't colliding with itself
@@ -138,7 +138,7 @@ class CollisionLayer
 
 		if (this.debugView)
 		{
-			this.componentsRTree.drawDebug();
+			this.componentsPartition.drawDebug();
 		}
 	}
 
