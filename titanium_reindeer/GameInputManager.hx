@@ -13,6 +13,8 @@ class GameInputManager extends InputManager
 	private var targetElement:HtmlDom;
 	private var timeLeftToRecalculateOffsetMs:Int;
 
+	private var keyDowns:IntHash<Bool>;
+
 	public function new(game:Game, targetElement:HtmlDom)
 	{
 		super();
@@ -20,6 +22,8 @@ class GameInputManager extends InputManager
 		this.game = game;
 		this.targetElement = targetElement;
 		this.recalculateCanvasOffset();
+
+		this.keyDowns = new IntHash();
 
 		this.timeLeftToRecalculateOffsetMs = DEFAULT_OFFSET_RECALC_DELAY_MS;
 
@@ -57,6 +61,20 @@ class GameInputManager extends InputManager
 
 	private function recordEvent(type:InputEvent, event:Dynamic):Void
 	{
+		if (type == InputEvent.KeyDown)
+		{
+			var key:Int = event.keyCode; 
+			if (this.keyDowns.exists(key) && this.keyDowns.get(key))
+				return;
+
+			this.keyDowns.set(key, true);
+		}
+		else if (type == InputEvent.KeyUp)
+		{
+			var key:Int = event.keyCode; 
+			this.keyDowns.set(key, false);
+		}
+
 		this.recordedEvents.push(new RecordedEvent(type, event));
 	}
 
