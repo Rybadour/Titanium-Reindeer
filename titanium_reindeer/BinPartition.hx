@@ -92,9 +92,9 @@ class BinPartition implements SpacePartition
 			var topRight:BinCoord = this.getBinCoord(new Vector2(rect.right, rect.top));
 			var bottomLeft:BinCoord = this.getBinCoord(new Vector2(rect.left, rect.bottom));
 
-			for (x in topLeft.x...topRight.x)
+			for (x in topLeft.x...topRight.x+1)
 			{
-				for (y in topLeft.y...bottomLeft.y)
+				for (y in topLeft.y...bottomLeft.y+1)
 					collidingBins.set( indexFromCoord(x, y), 1 );
 			}
 		}
@@ -109,9 +109,9 @@ class BinPartition implements SpacePartition
 	
 	private function getBinCoord(p:Vector2):BinCoord
 	{
-		p.subtractFrom(this.originOffset);
+		var coord:Vector2 = p.subtract(this.originOffset);
 
-		return new BinCoord(Math.floor(p.x/this.binSize), Math.floor(p.y/this.binSize));
+		return new BinCoord(Math.floor(coord.x/this.binSize), Math.floor(coord.y/this.binSize));
 	}
 
 	// Get the index of a specific bin if numbering when left to right

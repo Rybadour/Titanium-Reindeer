@@ -3,3 +3,4 @@
 /examples/composition/js/TestGame.js
 /examples/random/js/TestGame.js
 *.swp
+/examples\millions_of_entities\js/TestGame.js
