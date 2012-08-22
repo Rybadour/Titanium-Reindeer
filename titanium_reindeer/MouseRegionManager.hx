@@ -1,5 +1,6 @@
 package titanium_reindeer;
 
+import titanium_reindeer.components.IShape;
 import titanium_reindeer.Enums;
 
 enum MouseAction
@@ -128,7 +129,7 @@ class MouseRegionManager
 		}
 	}
 
-	public function createExclusionRegion(depth:Int, shape:Shape):MouseExclusionRegion
+	public function createExclusionRegion(depth:Int, shape:IShape):MouseExclusionRegion
 	{
 		if (shape == null)
 			return null;
@@ -136,7 +137,7 @@ class MouseRegionManager
 		var newExclusionRegion:MouseExclusionRegion = new MouseExclusionRegion(this, this.nextExclusionId, depth, shape);
 
 		this.exclusionRegions.set(this.nextExclusionId, newExclusionRegion);
-		this.exclusionRTree.insert(shape.getMinBoundingRect(), this.nextExclusionId);
+		this.exclusionRTree.insert(shape.getBoundingRect(), this.nextExclusionId);
 		this.nextExclusionId += 1;
 
 		return newExclusionRegion;
@@ -148,7 +149,7 @@ class MouseRegionManager
 		if (exclusionRegion == null || !this.exclusionRegions.exists(exclusionRegion.id))
 			return;
 
-		this.exclusionRTree.update(exclusionRegion.shape.getMinBoundingRect(), exclusionRegion.id);
+		this.exclusionRTree.update(exclusionRegion.shape.getBoundingRect(), exclusionRegion.id);
 	}
 
 	public function removeExclusionRegion(exclusionRegion:MouseExclusionRegion):Void
@@ -253,7 +254,7 @@ class MouseRegionManager
 	// Builds a structure containing intersecting exclusions for quick lookup
 	private function organizeIntersectingExclusions(mousePos:Vector2):ExclusionsMaxDepthPair
 	{
-		var exclusionIds:Array<Int> = this.exclusionRTree.getPointIntersectingValues(mousePos);
+		var exclusionIds:Array<Int> = this.exclusionRTree.requestValuesIntersectingPoint(mousePos);
 		var exclusionRegions:IntHash<Array<MouseExclusionRegion>> = new IntHash();
 		var regions:Array<MouseExclusionRegion>;
 		var maxDepth:Int = 0;

@@ -1,5 +1,7 @@
 package titanium_reindeer;
 
+import titanium_reindeer.components.IShape;
+
 class CollisionCircle extends CollisionComponent
 {
 	public var radius(default, setRadius):Float;
@@ -50,7 +52,7 @@ class CollisionCircle extends CollisionComponent
 		}
 	}
 
-	override public function getShape():Shape
+	override public function getShape():IShape
 	{
 		return new Circle(this.radius, this.getCenter());
 	}

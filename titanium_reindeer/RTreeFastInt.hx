@@ -1,5 +1,7 @@
 package titanium_reindeer;
 
+import titanium_reindeer.components.ISpatialPartition;
+
 class RTreeFastNode
 {
 	public var bounds:Rect;
@@ -57,7 +59,7 @@ class RTreeFastBranch extends RTreeFastNode
 	}
 }
 
-class RTreeFastInt implements SpacePartition
+class RTreeFastInt implements ISpatialPartition
 {
 	// Flags and values for optimizations
 	public var maxChildren(default, setMaxChildren):Int;
@@ -72,6 +74,11 @@ class RTreeFastInt implements SpacePartition
 
 	private var root:RTreeFastBranch;
 	private var intMap:IntHash<RTreeFastLeaf>;
+
+	public function getBoundingRect():Rect
+	{
+		return root.bounds;
+	}
 
 	public var debugCanvas:String;
 	public var debugOffset:Vector2;
@@ -510,7 +517,7 @@ class RTreeFastInt implements SpacePartition
 		}
 	}
 
-	public function getRectIntersectingValues(rect:Rect):Array<Int>
+	public function requestValuesIntersectingRect(rect:Rect):Array<Int>
 	{
 		if (root == null)
 			return [];
@@ -550,7 +557,7 @@ class RTreeFastInt implements SpacePartition
 		return results;
 	}
 
-	public function getPointIntersectingValues(point:Vector2):Array<Int>
+	public function requestValuesIntersectingPoint(point:Vector2):Array<Int>
 	{
 		if (root == null)
 			return [];

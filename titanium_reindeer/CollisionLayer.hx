@@ -1,5 +1,7 @@
 package titanium_reindeer;
 
+import titanium_reindeer.components.ISpatialPartition;
+
 // Each layer of collision components may collide with each other.
 // Groups of them are set and the developer chooses which group to make collide with which other
 class CollisionLayer
@@ -7,7 +9,7 @@ class CollisionLayer
 	public var manager(default, null):CollisionComponentManager;
 	public var name(default, null):String;
 
-	private var componentsPartition:SpacePartition;
+	private var componentsPartition:ISpatialPartition;
 	public var groups(default, null):Hash<CollisionGroup>;
 
 	private var debugView:Bool;
@@ -17,7 +19,7 @@ class CollisionLayer
 		this.manager = manager;
 		this.name = name;
 
-		this.componentsPartition = new BinPartition(10, new Vector2(-20, -20), 100, 100);
+		this.componentsPartition = new BinPartition(10, new Vector2(-20, -20), 1000, 1000);
 		this.groups = new Hash();
 
 		this.debugView = false;
@@ -39,7 +41,7 @@ class CollisionLayer
 	// Retrieves probable ids from the RTree and then does more accurate checks on the components themselves
 	public function getIdsIntersectingPoint(point:Vector2):Array<Int>
 	{
-		var ids:Array<Int> = componentsPartition.getPointIntersectingValues(point);
+		var ids:Array<Int> = componentsPartition.requestValuesIntersectingPoint(point);
 
 		var collidingIds:Array<Int> = new Array();
 		for (id in ids)
@@ -113,7 +115,7 @@ class CollisionLayer
 		{
 			for (component in group.members)
 			{
-				var collidingIds:Array<Int> = this.componentsPartition.getRectIntersectingValues(component.getMinBoundingRect());  
+				var collidingIds:Array<Int> = this.componentsPartition.requestValuesIntersectingRect(component.getMinBoundingRect());  
 				for (id in collidingIds)
 				{
 					// Only reguster a collision if it isn't colliding with itself

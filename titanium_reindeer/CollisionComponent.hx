@@ -1,5 +1,7 @@
 package titanium_reindeer;
 
+import titanium_reindeer.components.IShape;
+
 class CollisionComponent extends Component
 {
 	public var collisionManager(getCollisionManager, null):CollisionComponentManager;
@@ -117,7 +119,7 @@ class CollisionComponent extends Component
 		}
 	}
 
-	public function getShape():Shape
+	public function getShape():IShape
 	{
 		return this.getMinBoundingRect();
 	}

@@ -1,6 +1,8 @@
 package titanium_reindeer;
 
-class Rect extends Shape
+import titanium_reindeer.components.IShape;
+
+class Rect implements IShape
 {
 	// Static
 	public static function isIntersecting(a:Rect, b:Rect):Bool
@@ -97,12 +99,12 @@ class Rect extends Shape
 		this.height = height;
 	}
 
-	public override function getMinBoundingRect():Rect
+	public function getBoundingRect():Rect
 	{
 		return this.getCopy();
 	}
 
-	public override function isPointInside(p:Vector2):Bool
+	public function isPointInside(p:Vector2):Bool
 	{
 		return (p.x >= this.left) && (p.x < this.right) &&
 			   (p.y >= this.top)  && (p.y < this.bottom);

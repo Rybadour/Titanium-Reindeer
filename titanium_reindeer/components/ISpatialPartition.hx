@@ -1,6 +1,6 @@
-package titanium_reindeer;
+package titanium_reindeer.components;
 
-interface SpacePartition
+interface ISpatialPartition
 {
 	var debugCanvas:String;
 	var debugOffset:Vector2;
@@ -10,8 +10,10 @@ interface SpacePartition
 	function update(newBounds:Rect, value:Int):Void;
 	function remove(value:Int):Void;
 
-	function getRectIntersectingValues(rect:Rect):Array<Int>;
-	function getPointIntersectingValues(point:Vector2):Array<Int>;
+	function requestValuesIntersectingRect(rect:Rect):Array<Int>;
+	function requestValuesIntersectingPoint(point:Vector2):Array<Int>;
+
+	function getBoundingRect():Rect;
 
 	function drawDebug():Void;
 }

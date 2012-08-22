@@ -1,5 +1,7 @@
 package titanium_reindeer;
 
+import titanium_reindeer.components.ISpatialPartition;
+
 class BinCoord
 {
 	public var x:Int;
@@ -46,7 +48,7 @@ class Item
 	}
 }
 
-class BinPartition implements SpacePartition
+class BinPartition implements ISpatialPartition
 {
 	private var binSize:Int;
 	private var originOffset:Vector2;
@@ -55,6 +57,11 @@ class BinPartition implements SpacePartition
 
 	private var bins:Array<Array<Bin>>;
 	private var valueMap:IntHash<Item>;
+
+	public function getBoundingRect():Rect
+	{
+		return new Rect(originOffset.x, originOffset.y, binSize * width, binSize * height);
+	}
 
 	public var debugCanvas:String;
 	public var debugOffset:Vector2;
@@ -199,7 +206,7 @@ class BinPartition implements SpacePartition
 		this.valueMap.remove(value);
 	}
 
-	public function getRectIntersectingValues(rect:Rect):Array<Int>
+	public function requestValuesIntersectingRect(rect:Rect):Array<Int>
 	{
 		if (rect == null)
 			return new Array();
@@ -215,7 +222,7 @@ class BinPartition implements SpacePartition
 		return results;
 	}
 
-	public function getPointIntersectingValues(point:Vector2):Array<Int>
+	public function requestValuesIntersectingPoint(point:Vector2):Array<Int>
 	{
 		if (point == null)
 			return new Array();

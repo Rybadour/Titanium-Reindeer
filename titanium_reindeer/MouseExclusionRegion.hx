@@ -1,5 +1,7 @@
 package titanium_reindeer;
 
+import titanium_reindeer.components.IShape;
+
 class MouseExclusionRegion
 {
 	public var manager(default, null):MouseRegionManager;
@@ -8,8 +10,8 @@ class MouseExclusionRegion
 
 	public var depth:Int;
 
-	public var shape(default, setShape):Shape;
-	private function setShape(value:Shape):Shape
+	public var shape(default, setIShape):IShape;
+	private function setIShape(value:IShape):IShape
 	{
 		if (value != this.shape && value != null)
 		{
@@ -22,7 +24,7 @@ class MouseExclusionRegion
 		return this.shape;
 	}
 
-	public function new(manager:MouseRegionManager, id:Int, depth:Int, shape:Shape)
+	public function new(manager:MouseRegionManager, id:Int, depth:Int, shape:IShape)
 	{
 		this.manager = manager;
 		this.id = id;

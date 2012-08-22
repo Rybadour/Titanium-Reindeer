@@ -1,6 +1,9 @@
 package titanium_reindeer;
 
-class Scene extends ObjectManager
+import titanium_reindeer.core.IProvidesIds;
+import titanium_reindeer.core.IHasId;
+
+class Scene extends ObjectManager, implements IProvidesIds
 {
 	public var sceneManager(default, null):SceneManager;
 	public var game(getGame, null):Game;
@@ -25,6 +28,9 @@ class Scene extends ObjectManager
 		return this.game.bitmapCache;
 	}
 
+	private var lastId:Int;
+	private var oldAvailableIds:Array<Int>;
+
 	private var componentManagers:Hash<ComponentManager>;
 
 	public function new(game:Game, name:String, renderDepth:Int, layerCount:Int, ?backgroundColor:Color)
@@ -42,7 +48,26 @@ class Scene extends ObjectManager
 		this.sceneManager = game.sceneManager;
 		this.sceneManager.addScene(this);
 
+		this.nextId = 0;
+		this.oldAvailableIds = new Array();
+
 		this.componentManagers = new Hash();
+	}
+
+	public function requestId():Int
+	{
+		if (oldAvailableIds.length > 0)
+			return oldAvailableIds.pop();
+
+		return lastId++;
+	}
+
+	public function freeUpId(object:IHasId):Void
+	{
+		if (lastId == object.id + 1)
+			lastId -= 1;
+		else
+			oldAvailableIds.push(object.id);
 	}
 
 	public function addGameObject(gameObject:GameObject):Void
