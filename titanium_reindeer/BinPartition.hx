@@ -211,13 +211,19 @@ class BinPartition implements ISpatialPartition
 		if (rect == null)
 			return new Array();
 
+		var items:IntHash<Bool> = new IntHash();
 		var results:Array<Int> = new Array();
 		for (bin in this.getBinsIntersectingRect(rect))
+		{
 			for (item in bin.items)
 			{
-				if ( Rect.isIntersecting(item.bounds, rect) )
+				if ( !items.exists(item.value) && Rect.isIntersecting(item.bounds, rect) )
+				{
+					items.set(item.value, true);
 					results.push(item.value);
+				}
 			}
+		}
 
 		return results;
 	}
