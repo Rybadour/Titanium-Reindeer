@@ -1,0 +1,4 @@
+-cp ../ 
+
+-neko run.n
+-main Tests
