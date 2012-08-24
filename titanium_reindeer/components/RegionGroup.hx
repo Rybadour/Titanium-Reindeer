@@ -3,7 +3,7 @@ package titanium_reindeer.components;
 import titanium_reindeer.core.IGroup;
 import titanium_reindeer.core.IProvidesIds;
 
-class RegionGroup implements IGroup, implements IRegion
+class RegionGroup implements IGroup<IRegion>, implements IRegion
 {
 	public var idProvider(default, null):IProvidesIds;
 	public var id(default, null):Int;
@@ -19,6 +19,7 @@ class RegionGroup implements IGroup, implements IRegion
 	}
 
 	private var regions:IntHash<IRegion>;
+	private var groups:IntHash<RegionGroup>;
 
 	public function new(provider:IProvidesIds, name:String, spatialPartition:ISpatialPartition, shapeIntersecter:IShapeIntersecter)
 	{
@@ -30,14 +31,21 @@ class RegionGroup implements IGroup, implements IRegion
 		this.shapeIntersecter = shapeIntersecter;
 
 		this.regions = new IntHash();
+		this.groups = new IntHash();
+	}
+
+	// IRegion methods
+	public function get(id:Int):IRegion
+	{
+		if ( !this.regions.exists(id) )
+			return null;
+
+		return this.regions.get(id);
 	}
 
 	public function add(region:IRegion):Void
 	{
-		if (region.id == null)
-			return;
-
-		if ( Std.is(region, RegionGroup) && region == this )
+		if (region == null || region.id == null)
 			return;
 
 		this.regions.set(region.id, region);
@@ -46,8 +54,40 @@ class RegionGroup implements IGroup, implements IRegion
 
 	public function remove(region:IRegion):Void
 	{
+		if (region == null || !this.regions.exists(region.id))
+
 		this.partitioning.remove(region.id);
 		this.regions.remove(region.id);
+
+		if ( this.groups.exists(region.id) )
+			this.groups.remove(region.id);
+	}
+
+	// RegionGroup methods
+	public function getGroup(id:Int):RegionGroup
+	{
+		if ( !this.groups.exists(id) )
+			return null;
+
+		return this.groups.get(id);
+	}
+
+	public function addGroup(group:RegionGroup):Void
+	{
+		if (group == null || group == this)
+			return;
+
+		this.groups.set(group.id, group);
+		this.add(group);
+	}
+
+	public function removeGroup(group:RegionGroup):Void
+	{
+		if (group == null || !this.groups.exists(group.id))
+			return;
+
+		this.groups.remove(group.id);
+		this.remove(group);
 	}
 
 	public function requestRegionsIntersectingPoint(point:Vector2):Array<IRegion>

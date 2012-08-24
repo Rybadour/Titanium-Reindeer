@@ -32,7 +32,7 @@ class RegionsTests extends haxe.unit.TestCase
 		this.provider = new IdProvider();
 		this.si = new ShapeIntersecter();
 		this.binPartition = new BinPartition(10, new Vector2(-50, -50), 100, 100);
-		this.groupA = new RegionGroup(this.provider, "testRegion", binPartition, si);
+		this.groupA = new RegionGroup(this.provider, "testRegion", this.binPartition, this.si);
 
 		//this.rTree = new RTreeFastInt();
 
@@ -48,6 +48,37 @@ class RegionsTests extends haxe.unit.TestCase
 		this.circleC = new CircleRegion(this.provider, anchorA, 10);
 		this.circleC.offset = new Vector2(20, 20);
 		groupA.add(circleC);
+	}
+
+	public function testRegionGroup()
+	{
+		assertTrue(groupA.id >= 0);
+
+		// Regions
+		var r:CircleRegion = new CircleRegion(this.provider, anchorA, 10);
+
+		groupA.add(r);
+		assertEquals(groupA.get(r.id), r);
+
+		groupA.remove(r);
+		assertEquals(groupA.get(r.id), null);
+
+		// Other region groups
+		var bp:BinPartition = new BinPartition(10, new Vector2(0, 0), 10, 10);
+		var rg:RegionGroup = new RegionGroup(this.provider, "otherRegion", bp, this.si);
+
+		groupA.addGroup(rg);
+		assertEquals(groupA.get(rg.id), rg);
+		assertEquals(groupA.getGroup(rg.id), rg);
+
+		groupA.removeGroup(rg);
+		assertEquals(groupA.get(rg.id), null);
+		assertEquals(groupA.getGroup(rg.id), null);
+
+		groupA.addGroup(rg);
+		groupA.remove(rg);
+		assertEquals(groupA.get(rg.id), null);
+		assertEquals(groupA.getGroup(rg.id), null);
 	}
 
 	public function testCircleRegion()
