@@ -1,4 +1,4 @@
-import titanium_reindeer.core.IProvidesIds;
+import titanium_reindeer.core.IdProvider;
 import titanium_reindeer.components.IWatchedWorldPosition;
 import titanium_reindeer.components.RegionGroup;
 import titanium_reindeer.components.ShapeIntersecter;
@@ -14,7 +14,7 @@ import titanium_reindeer.Circle;
 
 class RegionsTests extends haxe.unit.TestCase
 {
-	private var provider:IProvidesIds;
+	private var provider:HasIdProvider;
 	private var groupA:RegionGroup;
 	private var binPartition:BinPartition;
 	//private var rTree:RTreeFastInt;
@@ -29,7 +29,7 @@ class RegionsTests extends haxe.unit.TestCase
 
 	public override function setup()
 	{
-		this.provider = new IdProvider();
+		this.provider = new HasIdProvider();
 		this.si = new ShapeIntersecter();
 		this.binPartition = new BinPartition(10, new Vector2(-50, -50), 100, 100);
 		this.groupA = new RegionGroup(this.provider, "testRegion", this.binPartition, this.si);

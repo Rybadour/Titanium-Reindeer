@@ -1,12 +1,15 @@
 package titanium_reindeer.components;
 
 import titanium_reindeer.core.IGroup;
-import titanium_reindeer.core.IProvidesIds;
+import titanium_reindeer.core.IHasIdProvider;
+import titanium_reindeer.core.IdProvider;
 
 class RegionGroup implements IGroup<IRegion>, implements IRegion
 {
-	public var idProvider(default, null):IProvidesIds;
+	private var hasProvider:IHasIdProvider;
+
 	public var id(default, null):Int;
+	public var idProvider(default, null):IdProvider;
 	public var name(default, null):String;
 
 	private var partitioning:ISpatialPartition;
@@ -21,10 +24,12 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 	private var regions:IntHash<IRegion>;
 	private var groups:IntHash<RegionGroup>;
 
-	public function new(provider:IProvidesIds, name:String, spatialPartition:ISpatialPartition, shapeIntersecter:IShapeIntersecter)
+	public function new(provider:IHasIdProvider, name:String, spatialPartition:ISpatialPartition, shapeIntersecter:IShapeIntersecter)
 	{
-		this.idProvider = provider;
-		this.id = this.idProvider.requestId();
+		this.hasProvider = provider;
+		this.id = this.hasProvider.idProvider.requestId();
+
+		this.idProvider = new IdProvider();
 		this.name = name;
 
 		this.partitioning = spatialPartition;
@@ -130,12 +135,8 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 		return regions;
 	}
 
-	public function update(msTimeStep:Int):Void
-	{
-	}
-
 	public function destroy():Void
 	{
-		this.idProvider.freeUpId(this);	
+		this.hasProvider.idProvider.freeUpId(this);	
 	}
 }

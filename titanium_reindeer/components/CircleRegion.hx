@@ -2,7 +2,7 @@ package titanium_reindeer.components;
 
 import titanium_reindeer.core.Watcher;
 import titanium_reindeer.core.Relation;
-import titanium_reindeer.core.IProvidesIds;
+import titanium_reindeer.core.IHasIdProvider;
 
 class CircleRegion implements IRegion
 {
@@ -45,9 +45,9 @@ class CircleRegion implements IRegion
 		return this.radius;
 	}
 
-	public function new(idProvider:IProvidesIds, anchor:IWatchedWorldPosition, radius:Float)
+	public function new(provider:IHasIdProvider, anchor:IWatchedWorldPosition, radius:Float)
 	{
-		this.id = idProvider.requestId();
+		this.id = provider.idProvider.requestId();
 
 		this.anchor = anchor;
 		this.radius = radius;
@@ -59,9 +59,5 @@ class CircleRegion implements IRegion
 	private function findWorldPosition(anchorPosition:Vector2, offset:Vector2):Vector2
 	{
 		return anchorPosition.add(offset);
-	}
-
-	public function update(msTimeStep:Int):Void
-	{
 	}
 }
