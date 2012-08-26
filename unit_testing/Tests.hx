@@ -4,6 +4,11 @@ class Tests
 	{
 		var tests = new haxe.unit.TestRunner();
 
+		// Core
+		tests.add( new IdProviderTests() );
+		tests.add( new UpdaterTests() );
+		tests.add( new SceneBaseTests() );
+
 		// Partitions
 		//tests.add( new RTreeTests() );
 		tests.add( new BinPartitionTests() );
