@@ -1,6 +1,6 @@
 package titanium_reindeer.core;
 
-class SceneBase 
+class Scene 
 	implements IGroup<IHasUpdaterAndId>,
 	implements IHasIdProvider,
 	implements IHasUpdaterAndId

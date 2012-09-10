@@ -7,7 +7,7 @@ class Tests
 		// Core
 		tests.add( new IdProviderTests() );
 		tests.add( new UpdaterTests() );
-		tests.add( new SceneBaseTests() );
+		tests.add( new SceneTests() );
 
 		// Partitions
 		//tests.add( new RTreeTests() );
