@@ -5,6 +5,7 @@ import titanium_reindeer.core.IHasIdProvider;
 class StandardScene extends Scene
 {
 	private var collisionReporters:Scene;
+	private var renderLayers:RendererGroup;
 
 	public function new(provider:IHasIdProvider, name:String)
 	{
