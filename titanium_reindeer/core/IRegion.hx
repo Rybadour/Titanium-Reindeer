@@ -1,7 +1,7 @@
 package titanium_reindeer.core;
 
-interface IRegion
+interface IRegion implements IShape
 {
-	public var shape(getShape, null):IShape;
-	public function getShape():IShape;
+	public function getBoundingRegion():RectRegion;
+	public var center(getCenter, null):Vector2;
 }

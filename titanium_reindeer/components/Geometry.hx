@@ -1,17 +1,30 @@
-package titanium_reindeer;
+package titanium_reindeer.components;
+
+import titanium_reindeer.core.RectRegion;
 
 // A series of static methods for common geometric calculations
 class Geometry
 {
-	public static function isCircleIntersectingRect(c:Circle, r:Rect):Bool
+	public static function isRectIntersectingRect(a:RectRegion, b:RectRegion):Bool
+	{
+		return (a.right >= b.left) && (a.left <= b.right) &&
+			   (a.bottom >= b.top) && (a.top <= b.bottom);
+	}
+
+	public static function isCircleIntersectingCircle(a:CircleRegion, b:CircleRegion):Bool
+	{
+		return a.radius + b.radius > Vector2.getDistance(a.center, b.center);
+	}
+
+	public static function isCircleIntersectingRect(c:CircleRegion, r:RectRegion):Bool
 	{
 		var rWidthHalf:Float = r.width/2;
 		var rHeightHalf:Float = r.height/2;
 
 		// Step A: calculate the absolute values of the x and y difference between the center of the circle and the center of the rectangle. 
 		// This collapses the four quadrants down into one, so that the calculations do not have to be done four times.
-		var circleDistX:Float = Math.abs(c.center.x - r.x - rWidthHalf);
-		var circleDistY:Float = Math.abs(c.center.y - r.y - rHeightHalf);
+		var circleDistX:Float = Math.abs(c.center.x - r.center.x);
+		var circleDistY:Float = Math.abs(c.center.y - r.center.y);
 
 		// Step B: eliminate the easy cases where the circle is far enough away from the rectangle (in either direction) that no intersection is possible.
 		if (circleDistX > rWidthHalf + c.radius || circleDistY > rHeightHalf + c.radius)

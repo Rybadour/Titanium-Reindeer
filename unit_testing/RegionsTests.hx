@@ -1,10 +1,12 @@
 import titanium_reindeer.core.IdProvider;
 import titanium_reindeer.components.IWatchedWorldPosition;
 import titanium_reindeer.components.RegionGroup;
-import titanium_reindeer.components.ShapeIntersecter;
+import titanium_reindeer.components.RegionIntersecter;
 import titanium_reindeer.components.CircleRegion;
-import titanium_reindeer.components.IRegion;
-import titanium_reindeer.components.IShape;
+import titanium_reindeer.components.CircleRegionWatched;
+import titanium_reindeer.components.RegionComponent;
+import titanium_reindeer.core.RectRegion;
+import titanium_reindeer.core.IRegion;
 
 import titanium_reindeer.BinPartition;
 //import titanium_reindeer.RTreeFastInt;
@@ -18,19 +20,19 @@ class RegionsTests extends haxe.unit.TestCase
 	private var groupA:RegionGroup;
 	private var binPartition:BinPartition;
 	//private var rTree:RTreeFastInt;
-	private var si:ShapeIntersecter;
+	private var si:RegionIntersecter;
 
 	private var anchorA:IWatchedWorldPosition;
 	private var anchorB:IWatchedWorldPosition;
 
-	private var circleA:CircleRegion;
-	private var circleB:CircleRegion;
-	private var circleC:CircleRegion;
+	private var circleA:RegionComponent<CircleRegionWatched>;
+	private var circleB:RegionComponent<CircleRegionWatched>;
+	private var circleC:RegionComponent<CircleRegionWatched>;
 
 	public override function setup()
 	{
 		this.provider = new HasIdProvider();
-		this.si = new ShapeIntersecter();
+		this.si = new RegionIntersecter();
 		this.binPartition = new BinPartition(10, new Vector2(-50, -50), 100, 100);
 		this.groupA = new RegionGroup(this.provider, "testRegion", this.binPartition, this.si);
 
@@ -38,16 +40,14 @@ class RegionsTests extends haxe.unit.TestCase
 
 		this.anchorA = new Thing();
 
-		this.circleA = new CircleRegion(this.provider, anchorA, 10);
-		groupA.add(circleA);
+		this.circleA = new RegionComponent(this.provider, anchorA, new CircleRegionWatched(10, new Vector2(0, 0)));
+		groupA.add(circleA.id, circleA.region);
 
-		this.circleB = new CircleRegion(this.provider, anchorA, 10);
-		this.circleB.offset = new Vector2(0, -12);
-		groupA.add(circleB);
+		this.circleB = new RegionComponent(this.provider, anchorA, new CircleRegionWatched(10, new Vector2(0, -12)));
+		groupA.add(circleB.id, circleB.region);
 
-		this.circleC = new CircleRegion(this.provider, anchorA, 10);
-		this.circleC.offset = new Vector2(20, 20);
-		groupA.add(circleC);
+		this.circleC = new RegionComponent(this.provider, anchorA, new CircleRegionWatched(10, new Vector2(20, 20)));
+		groupA.add(circleC.id, circleC.region);
 	}
 
 	public function testRegionGroup()
@@ -55,13 +55,14 @@ class RegionsTests extends haxe.unit.TestCase
 		assertTrue(groupA.id >= 0);
 
 		// Regions
-		var r:CircleRegion = new CircleRegion(this.provider, anchorA, 10);
+		var id:Int = this.provider.idProvider.requestId();
+		var r:CircleRegion = new CircleRegion(10, new Vector2(0, 0));
 
-		groupA.add(r);
-		assertEquals(groupA.get(r.id), r);
+		groupA.add(id, r);
+		assertEquals(groupA.get(id), r);
 
-		groupA.remove(r);
-		assertEquals(groupA.get(r.id), null);
+		groupA.remove(id);
+		assertEquals(groupA.get(id), null);
 
 		// Other region groups
 		var bp:BinPartition = new BinPartition(10, new Vector2(0, 0), 10, 10);
@@ -76,7 +77,7 @@ class RegionsTests extends haxe.unit.TestCase
 		assertEquals(groupA.getGroup(rg.id), null);
 
 		groupA.addGroup(rg);
-		groupA.remove(rg);
+		groupA.remove(rg.id);
 		assertEquals(groupA.get(rg.id), null);
 		assertEquals(groupA.getGroup(rg.id), null);
 	}
@@ -97,9 +98,9 @@ class RegionsTests extends haxe.unit.TestCase
 		var regions:Array<IRegion> = groupA.requestRegionsIntersectingPoint( new Vector2(13, 13) );
 		assertEquals(regions.length, 1);
 
-		// Shape intersections
-		var shape:IShape = new Rect(0, 0, 20, 20);
-		var regions:Array<IRegion> = groupA.requestRegionsIntersectingShape(shape);
+		// Region intersections
+		var region:IRegion = new RectRegion(20, 20, new Vector2(0, 0));
+		var regions:Array<IRegion> = groupA.requestRegionsIntersectingRegion(region);
 		assertEquals(regions.length, 2);
 	}
 

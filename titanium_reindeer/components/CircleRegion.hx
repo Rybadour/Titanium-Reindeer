@@ -1,31 +1,40 @@
 package titanium_reindeer.components;
 
-import titanium_reindeer.core.Watcher;
-import titanium_reindeer.core.Relation;
-import titanium_reindeer.core.IHasIdProvider;
+import titanium_reindeer.core.IRegion;
+import titanium_reindeer.core.RectRegion;
 
-class CircleRegion implements IRegion
+class CircleRegion extends Circle, implements IRegion
 {
-	public var shape(getShape, null):IShape;
-	public function getShape():IShape
+	public static function copy(cr:CircleRegion):CircleRegion
 	{
-		return new Circle(this.radius, worldPosition);
+		return new CircleRegion(cr.radius, cr.center);
 	}
 
-	public var radius(default, setRadius):Float;
-	public function setRadius(value:Float):Float
+	public var center(getCenter, setCenter):Vector2;
+	public function getCenter():Vector2 { return this.center; }
+	public function setCenter(value:Vector2):Vector2
 	{
-		if (this.radius != value)
-		{
-			this.radius = value;
-		}
-
-		return this.radius;
+		this.center = value;
+		return this.center;
 	}
 
-	public function new(radius:Float)
+	public function new(radius:Float, center:Vector2)
 	{
-		this.radius = radius;
-		this.watchedOffset = new Watcher(new Vector2(0, 0));
+		super(radius);
+
+		if (center == null)
+			this.center = new Vector2(0, 0);
+		else
+			this.center = center.getCopy();
+	}
+
+	public function getBoundingRegion():RectRegion
+	{
+		return new RectRegion(this.radius*2, this.radius*2, this.center);
+	}
+
+	public override function isPointInside(p:Vector2):Bool
+	{
+		return super.isPointInside(p.subtract(this.center));
 	}
 }

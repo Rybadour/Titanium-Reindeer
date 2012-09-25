@@ -4,5 +4,6 @@ import titanium_reindeer.core.Watcher;
 
 interface IWatchedWorldPosition
 {
-	public var worldPosition(default, null):Watcher<Vector2>;
+	public var worldPosition(getWorldPosition, null):Watcher<Vector2>;
+	public function getWorldPosition():Watcher<Vector2>;
 }

@@ -5,7 +5,8 @@ import titanium_reindeer.Vector2;
 
 class Thing implements IWatchedWorldPosition
 {
-	public var worldPosition(default, null):Watcher<Vector2>;
+	public var worldPosition(getWorldPosition, null):Watcher<Vector2>;
+	public function getWorldPosition():Watcher<Vector2> { return this.worldPosition; }
 
 	public var position(getPos, setPos):Vector2;
 	private function getPos():Vector2

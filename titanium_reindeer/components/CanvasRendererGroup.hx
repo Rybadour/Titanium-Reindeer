@@ -71,7 +71,7 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 		return this.renderers.get(id);
 	}
 
-	public function add(renderer:ICanvasRenderer):Void
+	public function add(id:Int, renderer:ICanvasRenderer):Void
 	{
 		if (renderer == null || renderer.id == null)
 			return;

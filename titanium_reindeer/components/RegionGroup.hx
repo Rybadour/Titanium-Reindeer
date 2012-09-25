@@ -1,10 +1,15 @@
 package titanium_reindeer.components;
 
 import titanium_reindeer.core.IGroup;
+import titanium_reindeer.core.IHasId;
+import titanium_reindeer.core.IRegion;
 import titanium_reindeer.core.IHasIdProvider;
 import titanium_reindeer.core.IdProvider;
+import titanium_reindeer.core.ISpatialPartition;
+import titanium_reindeer.core.IRegionIntersecter;
+import titanium_reindeer.core.RectRegion;
 
-class RegionGroup implements IGroup<IRegion>, implements IRegion
+class RegionGroup implements IGroup<IRegion>, implements IHasId, implements IRegion
 {
 	private var hasProvider:IHasIdProvider;
 
@@ -13,18 +18,32 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 	public var name(default, null):String;
 
 	private var partitioning:ISpatialPartition;
-	private var shapeIntersecter:IShapeIntersecter;
+	private var regionIntersecter:IRegionIntersecter;
 
-	public var shape(getShape, null):IShape;
-	public function getShape():IShape
+	// IRegion
+	public function getBoundingRect():Rect
 	{
-		return partitioning.getBoundingRect();
+		return this.getBoundingRegion();
 	}
+	public function isPointInside(p:Vector2):Bool
+	{
+		return this.partitioning.getBoundingRegion().isPointInside(p);
+	}
+	public function getArea():Float
+	{
+		return this.getBoundingRect().getArea();
+	}
+	public function getBoundingRegion():RectRegion
+	{
+		return this.partitioning.getBoundingRegion();
+	}
+	public var center(getCenter, null):Vector2;
+	public function getCenter():Vector2 { return this.partitioning.getBoundingRegion().center; }
 
 	private var regions:IntHash<IRegion>;
 	private var groups:IntHash<RegionGroup>;
 
-	public function new(provider:IHasIdProvider, name:String, spatialPartition:ISpatialPartition, shapeIntersecter:IShapeIntersecter)
+	public function new(provider:IHasIdProvider, name:String, spatialPartition:ISpatialPartition, regionIntersecter:IRegionIntersecter)
 	{
 		this.hasProvider = provider;
 		this.id = this.hasProvider.idProvider.requestId();
@@ -33,7 +52,7 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 		this.name = name;
 
 		this.partitioning = spatialPartition;
-		this.shapeIntersecter = shapeIntersecter;
+		this.regionIntersecter = regionIntersecter;
 
 		this.regions = new IntHash();
 		this.groups = new IntHash();
@@ -48,24 +67,25 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 		return this.regions.get(id);
 	}
 
-	public function add(region:IRegion):Void
+	public function add(id:Int, region:IRegion):Void
 	{
-		if (region == null || region.id == null)
+		if (region == null)
 			return;
 
-		this.regions.set(region.id, region);
-		this.partitioning.insert(region.shape.getBoundingRect(), region.id);
+		this.regions.set(id, region);
+		this.partitioning.insert(region.getBoundingRegion(), id);
 	}
 
-	public function remove(region:IRegion):Void
+	public function remove(id:Int):Void
 	{
-		if (region == null || !this.regions.exists(region.id))
+		if (!this.regions.exists(id))
+			return;
 
-		this.partitioning.remove(region.id);
-		this.regions.remove(region.id);
+		this.partitioning.remove(id);
+		this.regions.remove(id);
 
-		if ( this.groups.exists(region.id) )
-			this.groups.remove(region.id);
+		if ( this.groups.exists(id) )
+			this.groups.remove(id);
 	}
 
 	// RegionGroup methods
@@ -83,7 +103,7 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 			return;
 
 		this.groups.set(group.id, group);
-		this.add(group);
+		this.add(group.id, group);
 	}
 
 	public function removeGroup(group:RegionGroup):Void
@@ -92,7 +112,7 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 			return;
 
 		this.groups.remove(group.id);
-		this.remove(group);
+		this.remove(group.id);
 	}
 
 	public function requestRegionsIntersectingPoint(point:Vector2):Array<IRegion>
@@ -103,7 +123,7 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 		for (id in ids)
 		{
 			var region:IRegion = this.regions.get(id);
-			if (region != null && region.shape.isPointInside(point))
+			if (region != null && region.isPointInside(point))
 			{
 				if ( Std.is(region, RegionGroup) )
 					regions.concat( cast(region, RegionGroup).requestRegionsIntersectingPoint(point) );	
@@ -115,20 +135,20 @@ class RegionGroup implements IGroup<IRegion>, implements IRegion
 		return regions;
 	}
 
-	public function requestRegionsIntersectingShape(shape:IShape):Array<IRegion>
+	public function requestRegionsIntersectingRegion(region:IRegion):Array<IRegion>
 	{
-		var ids:Array<Int> = this.partitioning.requestValuesIntersectingRect(shape.getBoundingRect());
+		var ids:Array<Int> = this.partitioning.requestValuesIntersectingRect(region.getBoundingRegion());
 
 		var regions:Array<IRegion> = new Array();
 		for (id in ids)
 		{
-			var region:IRegion = this.regions.get(id);
-			if (region != null && this.shapeIntersecter.isIntersecting(region.shape, shape))
+			var r:IRegion = this.regions.get(id);
+			if (r != null && this.regionIntersecter.isIntersecting(r, region))
 			{
-				if ( Std.is(region, RegionGroup) )
-					regions.concat( cast(region, RegionGroup).requestRegionsIntersectingShape(shape) );	
+				if ( Std.is(r, RegionGroup) )
+					regions.concat( cast(r, RegionGroup).requestRegionsIntersectingRegion(region) );	
 				else
-					regions.push(region);
+					regions.push(r);
 			}
 		}
 

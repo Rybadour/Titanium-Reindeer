@@ -1,6 +1,6 @@
 package titanium_reindeer.components;
 
-interface IRenderer implements IHasId
+interface IRenderer
 {
 	public var boundingShape(getBoundingShape, null):IShape;
 	public function getBoundingShape():IShape;

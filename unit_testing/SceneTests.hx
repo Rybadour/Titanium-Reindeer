@@ -29,7 +29,7 @@ class SceneTests extends haxe.unit.TestCase
 	{
 		var a:Incrementor = new Incrementor(this.idProvider);
 		var b:Incrementor = new Incrementor(this.idProvider);
-		this.scene.add(a);
+		this.scene.add(a.id, a);
 
 		assertEquals(a.value, 0);
 
@@ -39,7 +39,7 @@ class SceneTests extends haxe.unit.TestCase
 		assertEquals(a.value, 1);
 
 		// pausing
-		this.scene.add(b);
+		this.scene.add(b.id, b);
 
 		this.scene.updater.pause();
 		this.scene.updater.preUpdate(1);
