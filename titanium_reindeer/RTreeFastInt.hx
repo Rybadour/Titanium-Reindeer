@@ -1,13 +1,14 @@
 package titanium_reindeer;
 
+import titanium_reindeer.core.FastRect;
 import titanium_reindeer.components.ISpatialPartition;
 
 class RTreeFastNode
 {
-	public var bounds:Rect;
+	public var bounds:FastRect;
 	public var parent:RTreeFastBranch;
 
-	public function new(bounds:Rect)
+	public function new(bounds:FastRect)
 	{
 		this.bounds = bounds;
 	}
@@ -18,7 +19,7 @@ class RTreeFastLeaf extends RTreeFastNode
 {
 	public var value:Int;
 
-	public function new(bounds:Rect, value:Int)
+	public function new(bounds:FastRect, value:Int)
 	{
 		super(bounds);
 
@@ -31,7 +32,7 @@ class RTreeFastBranch extends RTreeFastNode
 	public var children:Array<RTreeFastNode>;
 	public var isLeaf:Bool; // if true then this RTreeBranch only contains leafs as children
 
-	public function new(bounds:Rect)
+	public function new(bounds:FastRect)
 	{
 		super(bounds);
 
@@ -49,10 +50,10 @@ class RTreeFastBranch extends RTreeFastNode
 	{
 		if (this.children.length > 0)
 		{
-			var newBounds:Rect = this.children[0].bounds;
+			var newBounds:FastRect = this.children[0].bounds;
 			for (i in 1...this.children.length)
 			{
-				newBounds = Rect.expandToCover(newBounds, this.children[i].bounds);
+				newBounds = FastRect.expandToCover(newBounds, this.children[i].bounds);
 			}
 			this.bounds = newBounds;
 		}
@@ -75,7 +76,7 @@ class RTreeFastInt implements ISpatialPartition
 	private var root:RTreeFastBranch;
 	private var intMap:IntHash<RTreeFastLeaf>;
 
-	public function getBoundingRect():Rect
+	public function getBoundingRect():FastRect
 	{
 		return root.bounds;
 	}
@@ -91,7 +92,7 @@ class RTreeFastInt implements ISpatialPartition
 		intMap = new IntHash();
 	}
 
-	public function insert(rect:Rect, value:Int):Void
+	public function insert(rect:FastRect, value:Int):Void
 	{
 		if (intMap.exists(value))
 			return;
@@ -108,7 +109,7 @@ class RTreeFastInt implements ISpatialPartition
 		}
 
 		var currentNode:RTreeFastBranch = root;
-		var intersection:Rect;
+		var intersection:FastRect;
 
 		var continueSearching:Bool = true;
 		while (continueSearching)
@@ -130,7 +131,7 @@ class RTreeFastInt implements ISpatialPartition
 				for (node in currentNode.children)
 				{
 					var branch:RTreeFastBranch = cast(node, RTreeFastBranch);
-					intersection = Rect.getIntersection(branch.bounds, rect);
+					intersection = FastRect.getIntersection(branch.bounds, rect);
 					if (intersection != null)
 					{
 						var leastArea:Float = rect.getArea() - intersection.getArea();
@@ -158,7 +159,7 @@ class RTreeFastInt implements ISpatialPartition
 				// Recursive into the least node
 				else
 				{
-					currentNode.bounds = Rect.expandToCover(currentNode.bounds, rect);
+					currentNode.bounds = FastRect.expandToCover(currentNode.bounds, rect);
 
 					currentNode = leastBranch;
 				}
@@ -174,7 +175,7 @@ class RTreeFastInt implements ISpatialPartition
 	private function addChildToNode(parent:RTreeFastBranch, child:RTreeFastNode):Void
 	{
 		parent.addChild(child);
-		parent.bounds = Rect.expandToCover(parent.bounds, child.bounds);
+		parent.bounds = FastRect.expandToCover(parent.bounds, child.bounds);
 
 		// Not full
 		if (parent.children.length <= this.maxChildren)
@@ -290,7 +291,7 @@ class RTreeFastInt implements ISpatialPartition
 					branch = branchB;
 			}
 
-			branch.bounds = Rect.expandToCover(branch.bounds, node.bounds);
+			branch.bounds = FastRect.expandToCover(branch.bounds, node.bounds);
 			branch.addChild(node);
 		}
 
@@ -313,7 +314,7 @@ class RTreeFastInt implements ISpatialPartition
 			this.drawDebug();
 	}
 
-	public function update(newBounds:Rect, value:Int):Void
+	public function update(newBounds:FastRect, value:Int):Void
 	{
 		if (!this.intMap.exists(value))
 			return;
@@ -434,7 +435,7 @@ class RTreeFastInt implements ISpatialPartition
 		while (nextParent != null)
 		{
 			// If we are not intersecting and this parent is not root then attempt to move the node to a better parent
-			if ( !Rect.isIntersecting(nextParent.bounds, updatedNode.bounds) && nextParent.parent != null)
+			if ( !FastRect.isIntersecting(nextParent.bounds, updatedNode.bounds) && nextParent.parent != null)
 			{
 				var closestParent:RTreeFastBranch = null;
 				var closestDistance:Float = Math.POSITIVE_INFINITY;
@@ -474,7 +475,7 @@ class RTreeFastInt implements ISpatialPartition
 					var currentBranch:RTreeFastBranch = closestParent.parent;
 					while (currentBranch != null)
 					{
-						Rect.expandToCover(currentBranch.bounds, updatedNode.bounds);
+						FastRect.expandToCover(currentBranch.bounds, updatedNode.bounds);
 
 						currentBranch = currentBranch.parent;
 					}
@@ -517,7 +518,7 @@ class RTreeFastInt implements ISpatialPartition
 		}
 	}
 
-	public function requestValuesIntersectingRect(rect:Rect):Array<Int>
+	public function requestValuesIntersectingRect(rect:FastRect):Array<Int>
 	{
 		if (root == null)
 			return [];
@@ -542,7 +543,7 @@ class RTreeFastInt implements ISpatialPartition
 
 				for (child in node.children)
 				{
-					if (Rect.isIntersecting(rect, child.bounds))
+					if (FastRect.isIntersecting(rect, child.bounds))
 					{
 						if (Std.is(child, RTreeFastLeaf))
 							results.push(cast(child, RTreeFastLeaf).value);

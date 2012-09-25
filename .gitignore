@@ -5,3 +5,10 @@
 *.swp
 /examples\millions_of_entities\js/TestGame.js
 unit_testing/run.n
+playground/Anchoring.hx
+playground/compileTests.hxml
+playground/HasPosition.hx
+playground/Other.hx
+playground/Position.hx
+playground/Tests.hx
+playground/Thing.hx

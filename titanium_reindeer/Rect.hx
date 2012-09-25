@@ -1,122 +1,39 @@
 package titanium_reindeer;
 
-import titanium_reindeer.components.IShape;
+import titanium_reindeer.core.IShape;
 
 class Rect implements IShape
 {
-	// Static
-	public static function isIntersecting(a:Rect, b:Rect):Bool
+	public static function copy(r:Rect):Rect
 	{
-		return (a.x + a.width >= b.x) && (a.x <= b.x + b.width) &&
-			   (a.y + a.height >= b.y) && (a.y <= b.y + b.height);
+		return new Rect(r.width, r.height);
 	}
-
-	public static function getIntersection(a:Rect, b:Rect):Rect
-	{	
-		// True if the rectangle intersects
-		if ( (a.x + a.width >= b.x) && (a.x <= b.x + b.width) && (a.y + a.height >= b.y) && (a.y <= b.y + b.height) )
-		{
-			var left:Float = Math.max(a.x, b.x);
-			var top:Float = Math.max(a.y, b.y); 
-			return new Rect(
-				left, 
-				top, 
-				Math.min(a.x + a.width, b.x + b.width) - left, 
-				Math.min(a.y + a.height, b.y + b.height) - top
-			);
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	public static function isWithin(a:Rect, b:Rect):Bool
-	{
-		return (a.x <= b.x) && (a.x + a.width  >= b.x + b.width) &&
-			   (a.y <= b.y) && (a.y + a.height >= b.y + b.height);
-	}
-
-	public static function expandToCover(coverage:Rect, toFit:Rect):Rect
-	{
-		if (coverage == null)
-		{
-			if (toFit == null)
-				return null;
-			else
-				return toFit.getCopy();
-		}
-		else
-		{
-			if (toFit == null)
-				return coverage.getCopy();
-		}
-
-		// Actual stretch checking
-		var x:Float = Math.min(coverage.x, toFit.x);
-		var y:Float = Math.min(coverage.y, toFit.y);
-		return new Rect(
-			x, y,
-			Math.max(coverage.right, toFit.right) - x,
-			Math.max(coverage.bottom, toFit.bottom) - y
-		);
-	}
-
-	// Instance
-	public var x:Float;
-	public var y:Float;
 
 	public var width:Float;
 	public var height:Float;
 
-	public var top(getTop, never):Float;
-	private function getTop():Float
+	public function new(width:Float, height:Float)
 	{
-		return y;
-	}
-	public var bottom(getBottom, never):Float;
-	private function getBottom():Float
-	{
-		return y + height;
-	}
-	public var left(getLeft, never):Float;
-	private function getLeft():Float
-	{
-		return x;
-	}
-	public var right(getRight, never):Float;
-	private function getRight():Float
-	{
-		return x + width;
-	}
-
-	public function new(x:Float, y:Float, width:Float, height:Float)
-	{
-		this.x = x;
-		this.y = y;
-
 		this.width = width;
 		this.height = height;
 	}
 
 	public function getBoundingRect():Rect
 	{
-		return this.getCopy();
+		return Rect.copy(this);
 	}
 
 	public function isPointInside(p:Vector2):Bool
 	{
-		return (p.x >= this.left) && (p.x < this.right) &&
-			   (p.y >= this.top)  && (p.y < this.bottom);
-	}
+		var halfWidth:Float = this.width/2;
+		var halfHeight:Float = this.height/2;
 
-	public function getCopy():Rect
-	{
-		return new Rect(this.x, this.y, this.width, this.height);
+		return (p.x >= -halfWidth) && (p.x < halfWidth) &&
+			   (p.y >= -halfHeight)  && (p.y < halfHeight);
 	}
 
 	public function getArea():Float
 	{
-		return width * height;
+		return this.width * this.height;
 	}
 }

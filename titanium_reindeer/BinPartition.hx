@@ -1,6 +1,8 @@
 package titanium_reindeer;
 
-import titanium_reindeer.components.ISpatialPartition;
+import titanium_reindeer.core.FastRect;
+import titanium_reindeer.core.RectRegion;
+import titanium_reindeer.core.ISpatialPartition;
 
 class BinCoord
 {
@@ -37,10 +39,10 @@ class Bin
 class Item
 {
 	public var bins:Array<Bin>;
-	public var bounds:Rect;
+	public var bounds:FastRect;
 	public var value:Int;
 
-	public function new(bins:Array<Bin>, bounds:Rect, value:Int)
+	public function new(bins:Array<Bin>, bounds:FastRect, value:Int)
 	{
 		this.bins = bins;
 		this.bounds = bounds;
@@ -58,9 +60,12 @@ class BinPartition implements ISpatialPartition
 	private var bins:Array<Array<Bin>>;
 	private var valueMap:IntHash<Item>;
 
-	public function getBoundingRect():Rect
+	public function getBoundingRegion():RectRegion
 	{
-		return new Rect(originOffset.x, originOffset.y, binSize * width, binSize * height);
+		var width:Float = binSize * width;
+		var heigth:Float = binSize * height;
+
+		return new RectRegion(width, height, originOffset.subtract( new Vector2(width/2, height/2) ));
 	}
 
 	public var debugCanvas:String;
@@ -78,7 +83,7 @@ class BinPartition implements ISpatialPartition
 		this.valueMap = new IntHash();
 	}
 
-	private function getBinsIntersectingRect(rect:Rect):Array<Bin>
+	private function getBinsIntersectingRect(rect:FastRect):Array<Bin>
 	{
 		var collidingBins:IntHash<Int> = new IntHash();
 
@@ -171,21 +176,23 @@ class BinPartition implements ISpatialPartition
 		return this.bins[binCoord.y][binCoord.x];
 	}
 
-	public function insert(rect:Rect, value:Int):Void
+	public function insert(rect:RectRegion, value:Int):Void
 	{
 		if (rect == null)
 			return;
 
+		var fr:FastRect = FastRect.fromRectRegion(rect);
+
 		// Iterate over all the bins this rect collides with an insert it into them
-		var bins:Array<Bin> = this.getBinsIntersectingRect(rect);
-		var item:Item = new Item(bins, rect, value);
+		var bins:Array<Bin> = this.getBinsIntersectingRect(fr);
+		var item:Item = new Item(bins, fr, value);
 		for (bin in bins)
 			bin.addItem(item);
 
 		this.valueMap.set(value, item);
 	}
 
-	public function update(newBounds:Rect, value:Int):Void
+	public function update(newBounds:RectRegion, value:Int):Void
 	{
 		if (newBounds == null || !this.valueMap.exists(value))
 			return;
@@ -206,18 +213,20 @@ class BinPartition implements ISpatialPartition
 		this.valueMap.remove(value);
 	}
 
-	public function requestValuesIntersectingRect(rect:Rect):Array<Int>
+	public function requestValuesIntersectingRect(rect:RectRegion):Array<Int>
 	{
 		if (rect == null)
 			return new Array();
 
+		var fr:FastRect = FastRect.fromRectRegion(rect);
+
 		var items:IntHash<Bool> = new IntHash();
 		var results:Array<Int> = new Array();
-		for (bin in this.getBinsIntersectingRect(rect))
+		for (bin in this.getBinsIntersectingRect(fr))
 		{
 			for (item in bin.items)
 			{
-				if ( !items.exists(item.value) && Rect.isIntersecting(item.bounds, rect) )
+				if ( !items.exists(item.value) && FastRect.isIntersecting(item.bounds, fr) )
 				{
 					items.set(item.value, true);
 					results.push(item.value);
