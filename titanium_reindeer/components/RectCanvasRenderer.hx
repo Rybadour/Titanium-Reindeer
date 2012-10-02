@@ -4,6 +4,8 @@ import titanium_reindeer.core.Relation;
 import titanium_reindeer.core.Watcher;
 import titanium_reindeer.core.IHasIdProvider;
 import titanium_reindeer.core.IShape;
+import titanium_reindeer.core.IRegion;
+import titanium_reindeer.core.RectRegion;
 
 class RectCanvasRenderer implements ICanvasRenderer
 {
@@ -12,16 +14,15 @@ class RectCanvasRenderer implements ICanvasRenderer
 	public function getState():CanvasRenderState { return this.strokeFillState; }
 	public var strokeFillState(default, null):CanvasStrokeFillState;
 
-	public var boundingShape(getBoundingShape, null):IShape;
-	public function getBoundingShape():IShape
+	private var relatedRect:Relation3<Float, Float, Vector2, RectRegion>;
+	public var boundingRegion(getBoundingRegion, never):IRegion;
+	public function getBoundingRegion():IRegion
 	{
 		return this.relatedRect.value;
 	}
 
-	private var relatedRect:Relation2<Float, Float, Rect>;
-	
-	public var width:Watcher<Float>;
-	public var height:Watcher<Float>;
+	public var width(default, null):Watcher<Float>;
+	public var height(default, null):Watcher<Float>;
 
 	public function new(provider:IHasIdProvider, width:Float, height:Float)
 	{
@@ -30,12 +31,13 @@ class RectCanvasRenderer implements ICanvasRenderer
 
 		this.width = new Watcher(width);
 		this.height = new Watcher(height);
-		this.relatedRect = new Relation2(this.width, this.height, getBounds);
+
+		this.relatedRect = new Relation3(this.width, this.height, this.state.watchedPosition, getBounds);
 	}
 
-	private function getBounds(width:Float, height:Float):Rect
+	private function getBounds(width:Float, height:Float, position:Vector2):RectRegion
 	{
-		return new Rect(width, height);
+		return new RectRegion(width, height, position);
 	}
 
 	private function render(canvas:Canvas2D):Void

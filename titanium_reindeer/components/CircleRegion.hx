@@ -28,7 +28,7 @@ class CircleRegion extends Circle, implements IRegion
 			this.center = center.getCopy();
 	}
 
-	public function getBoundingRegion():RectRegion
+	public function getBoundingRectRegion():RectRegion
 	{
 		return new RectRegion(this.radius*2, this.radius*2, this.center);
 	}

@@ -2,6 +2,6 @@ package titanium_reindeer.core;
 
 interface IRenderer
 {
-	public var boundingShape(getBoundingShape, null):IShape;
-	public function getBoundingShape():IShape;
+	public var boundingRegion(getBoundingRegion, never):IRegion;
+	public function getBoundingRegion():IRegion;
 }

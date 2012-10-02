@@ -25,7 +25,8 @@ class RenderScene extends Scene
 	{
 		super.update(msTimeStep);
 
-		this.things.state.render(pageCanvas);
+		this.pageCanvas.clear();
+		this.things.state.render(this.pageCanvas);
 	}
 
 	public function addRenderer(id:Int, renderer:ICanvasRenderer, layerName:String)

@@ -7,6 +7,33 @@ class RectRegion extends Rect, implements IRegion
 		return new RectRegion(rr.width, rr.height, rr.center.getCopy());
 	}
 
+	public static function expandToCover(coverage:RectRegion, toFit:RectRegion):RectRegion
+	{
+		if (coverage == null)
+		{
+			if (toFit == null)
+				return null;
+			else
+				return RectRegion.copy(toFit);
+		}
+		else
+		{
+			if (toFit == null)
+				return RectRegion.copy(coverage);
+		}
+
+		// Actual stretch checking
+		var left:Float = Math.min(coverage.left, toFit.left);
+		var top:Float = Math.min(coverage.top, toFit.top);
+		var width:Float = Math.max(coverage.right, toFit.right) - left;
+		var height:Float = Math.max(coverage.bottom, toFit.bottom) - top;
+
+		return new RectRegion(
+			width, height,
+			new Vector2(left + width/2, top + height/2)
+		);
+	}
+
 	public var center(getCenter, setCenter):Vector2;
 	public function getCenter():Vector2 { return this.center; }
 	public function setCenter(value:Vector2):Vector2
@@ -37,7 +64,7 @@ class RectRegion extends Rect, implements IRegion
 			this.center = center.getCopy();
 	}
 
-	public function getBoundingRegion():RectRegion
+	public function getBoundingRectRegion():RectRegion
 	{
 		return RectRegion.copy(this);
 	}

@@ -5,6 +5,8 @@ import titanium_reindeer.core.IShape;
 import titanium_reindeer.core.Watcher;
 import titanium_reindeer.core.IHasIdProvider;
 import titanium_reindeer.core.IdProvider;
+import titanium_reindeer.core.IRegion;
+import titanium_reindeer.core.RectRegion;
 
 class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvasRenderer
 {
@@ -17,23 +19,12 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 	public var state(getState, null):CanvasRenderState;
 	public function getState():CanvasRenderState { return this.state; }
 
-	private var minBounds:Rect;
-	public var boundingShape(getBoundingShape, null):IShape;
-	public function getBoundingShape():IShape
-	{
-		return Rect.copy(this.minBounds);
-	}
+	private var minBounds:RectRegion;
 
-	private var watchedCenter:Watcher<Vector2>;
-	public var worldCenter(getWorldCenter, setWorldCenter):Vector2;
-	public function getWorldCenter():Vector2
+	public var boundingRegion(getBoundingRegion, never):IRegion;
+	public function getBoundingRegion():IRegion
 	{
-		return this.watchedCenter.value;
-	}
-	public function setWorldCenter(value:Vector2):Vector2
-	{
-		this.watchedCenter.value = value;
-		return this.worldCenter;
+		return new RectRegion(this.minBounds.width, this.minBounds.height, this.state.watchedPosition.value);
 	}
 
 	private var canvas(default, null):Canvas2D;
@@ -46,7 +37,7 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 		this.idProvider = new IdProvider();
 		this.name = name;
 
-		this.minBounds = new Rect(0, 0);
+		this.minBounds = new RectRegion(0, 0, new Vector2(0, 0));
 
 		this.state = new CanvasRenderState(this.render);
 		this.canvas = new Canvas2D(name+"_canvas", 0, 0);
@@ -54,17 +45,12 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 		this.renderers = new IntHash();
 	}
 	
-	private function expandBounds(newShape:IShape):Void
+	private function expandBounds(newBounds:RectRegion):Void
 	{
-		var newBounds:Rect = newShape.getBoundingRect();
 		if (this.minBounds.width == 0 && this.minBounds.height == 0)
-			this.minBounds = newBounds;
+			this.minBounds = RectRegion.copy(newBounds);
 		else
-		{
-			//this.minBounds = Rect.expandToCover(this.minBounds, newBounds);
-			this.minBounds.width = Math.max(this.minBounds.width, newBounds.width);
-			this.minBounds.height = Math.max(this.minBounds.height, newBounds.height);
-		}
+			this.minBounds = RectRegion.expandToCover(this.minBounds, newBounds);
 
 		this.canvas.width = this.minBounds.width;
 		this.canvas.height = this.minBounds.height;
@@ -85,7 +71,7 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 			return;
 
 		this.renderers.set(id, renderer);
-		this.expandBounds(renderer.boundingShape);
+		this.expandBounds(renderer.boundingRegion.getBoundingRectRegion());
 	}
 
 	public function remove(id:Int):Void
@@ -101,10 +87,16 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 	{
 		this.canvas.clear();
 
+		// Each renderer is drawn in the context of the render group
+		this.canvas.ctx.save();
+		this.canvas.ctx.translate(-this.minBounds.left, -this.minBounds.top);
+
 		for (renderer in this.renderers)
 			renderer.state.render(this.canvas);
 
-		//canvas.ctx.drawImage(this.canvas.canvas, -this.minBounds.width/2, -this.minBounds.height/2);
-		canvas.ctx.drawImage(this.canvas.canvas, 0, 0);
+		this.canvas.ctx.restore();
+
+		// The canvas is then drawn		
+		canvas.ctx.drawImage(this.canvas.canvas, -this.minBounds.width/2, -this.minBounds.height/2);
 	}
 }

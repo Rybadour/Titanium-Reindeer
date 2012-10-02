@@ -192,6 +192,8 @@ class CanvasStrokeFillState extends CanvasRenderState
 
 	private override function preRender(canvas:Canvas2D):Void
 	{
+		super.preRender(canvas);
+
 		this.lastRenderedCanvas = canvas;
 
 		if (this.isFillUnstyled)
@@ -203,6 +205,7 @@ class CanvasStrokeFillState extends CanvasRenderState
 
 			this.isFillUnstyled = false;
 		}
+		canvas.ctx.fillStyle = this.fillStyle;
 		
 		if (this.isStrokeUnstyled)
 		{
@@ -211,5 +214,6 @@ class CanvasStrokeFillState extends CanvasRenderState
 
 			this.isStrokeUnstyled = false;
 		}
+		canvas.ctx.strokeStyle = this.strokeStyle;
 	}
 }

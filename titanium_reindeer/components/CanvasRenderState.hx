@@ -50,13 +50,13 @@ class CanvasRenderState
 		return this.rotation;
 	}
 
-	private var position:Watcher<Vector2>;
+	public var watchedPosition(default, null):Watcher<Vector2>;
 	public var localPosition(getLocalPosition, setLocalPosition):Vector2;
-	private function getLocalPosition():Vector2 { return this.position.value; }
+	private function getLocalPosition():Vector2 { return this.watchedPosition.value; }
 	private function setLocalPosition(value:Vector2):Vector2
 	{
-		this.position.value = value;
-		return this.position.value;
+		this.watchedPosition.value = value;
+		return this.watchedPosition.value;
 	}
 
 	public function new(renderFunc:Canvas2D -> Void)
@@ -66,7 +66,7 @@ class CanvasRenderState
 		this.alpha = 1;
 		this.rotation = 0;
 
-		this.position = new Watcher(new Vector2(0, 0));
+		this.watchedPosition = new Watcher(new Vector2(0, 0));
 	}
 
 	private function preRender(canvas:Canvas2D):Void
@@ -74,13 +74,9 @@ class CanvasRenderState
 		canvas.ctx.save();
 		//canvas.ctx.globalCompositeOperation = RendererComponent.CompositionToString(this.renderComposition);
 
-		/* *
-		canvas.ctx.translate(this.screenPos.x, this.screenPos.y);
+		canvas.ctx.translate(this.localPosition.x, this.localPosition.y);
 		if (this.rotation != 0)
-		{
 			canvas.ctx.rotate(this.rotation);
-		}
-		/* */
 
 		canvas.ctx.globalAlpha = this.alpha;
 

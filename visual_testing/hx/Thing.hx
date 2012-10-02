@@ -7,12 +7,12 @@ class Thing
 	public var scene(default, null):RenderScene;
     public var body:RectCanvasRenderer;
 
-    public function new(scene:RenderScene)
+    public function new(scene:RenderScene, color:Color, width:Float)
     {
 		this.scene = scene;
 
-		this.body = new RectCanvasRenderer(scene, 40, 100);
-		this.body.strokeFillState.fillColor = Color.Red;
+		this.body = new RectCanvasRenderer(scene, width, 200);
+		this.body.strokeFillState.fillColor = color;
 		this.scene.addRenderer(this.body.id, this.body, "things");
     }
 }

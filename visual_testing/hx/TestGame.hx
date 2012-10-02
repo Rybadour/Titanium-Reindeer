@@ -16,6 +16,7 @@ class TestGame
 	public var scene:RenderScene;
 
 	private var a:Thing;
+	private var b:Thing;
 
 	public function new()
 	{
@@ -24,11 +25,27 @@ class TestGame
 		this.provider = new Provider();
 		this.scene = new RenderScene(this.provider, parentDom);
 
-        this.a = new Thing(this.scene);
+        this.a = new Thing(this.scene, Color.Red, 40);
+		this.a.body.state.localPosition.x = 30;
+
+        this.b = new Thing(this.scene, Color.Black, 10);
+		this.b.body.state.localPosition.y = 120;
 	}
 
 	public function play():Void
 	{
+		var parentDom:HtmlDom = js.Lib.document.getElementById("TestGame");
+		untyped
+		{
+			js.Lib.window.webkitRequestAnimationFrame(loop, parentDom);
+		}
+	}
+
+	public function loop():Void
+	{
+		this.b.body.state.localPosition.x += 0.1;
 		this.scene.updater.update(10);
+
+		this.play();
 	}
 }
