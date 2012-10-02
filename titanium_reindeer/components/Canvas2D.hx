@@ -2,13 +2,15 @@ package titanium_reindeer.components;
 
 import js.Dom;
 
+import titanium_reindeer.core.RectRegion;
+
 class Canvas2D
 {
 	public var canvas(default, null):Dynamic;
 	public var ctx(default, null):Dynamic;
 
 	public var width(default, setWidth):Float;
-	private var setWidth(value:Float):Float
+	private function setWidth(value:Float):Float
 	{
 		if (this.width != value)
 		{
@@ -20,15 +22,15 @@ class Canvas2D
 	}
 
 	public var height(default, setHeight):Float;
-	private var setWidth(value:Float):Float
+	private function setHeight(value:Float):Float
 	{
-		if (this.width != value)
+		if (this.height != value)
 		{
-			this.width = value;
+			this.height = value;
 			this.canvas.setAttribute("height", this.height+"px");
 		}
 
-		return this.width;
+		return this.height;
 	}
 
 	public function new(name:String, width:Float, height:Float)
@@ -47,11 +49,11 @@ class Canvas2D
 		element.appendChild(this.canvas);
 	}
 
-	public function clear(rect:Rect = null):Void
+	public function clear(rect:RectRegion = null):Void
 	{
 		if (rect == null)
-			rect = new Rect(0, 0, this.width, this.height);
+			rect = new RectRegion(this.width, this.height, new Vector2(this.width/2, this.height/2));
 
-		this.ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
+		this.ctx.clearRect(rect.left, rect.top, rect.width, rect.height);
 	}
 }

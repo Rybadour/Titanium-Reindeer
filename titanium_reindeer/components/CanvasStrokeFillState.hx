@@ -1,23 +1,29 @@
 package titanium_reindeer.components;
 
-import titanium_reindeer.Enums;
+import js.Dom;
 
-class CanvasStrokeFillRenderState extends CanvasRenderState
+import titanium_reindeer.Enums;
+import titanium_reindeer.LinearGradient;
+import titanium_reindeer.Pattern;
+
+class CanvasStrokeFillState extends CanvasRenderState
 {
+	private var lastRenderedCanvas:Canvas2D;
+
 	private var fillStyle:Dynamic;
 	private var currentFill:FillTypes;
+	private var isFillUnstyled:Bool;
 
 	public var fillColor(default, setFill):Color;
 	private function setFill(value:Color):Color
 	{
 		if (value != null)
 		{
-			currentFill = FillTypes.ColorFill;
-			if (fillStyle != value.rgba)
+			this.currentFill = FillTypes.ColorFill;
+			if (this.fillStyle != value.rgba)
 			{
-				fillColor = value;
-				fillStyle = value.rgba;
-				this.timeForRedraw = true;
+				this.fillColor = value;
+				this.fillStyle = value.rgba;
 			}
 		}
 
@@ -29,13 +35,19 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 	{
 		if (value != null)
 		{
-			fillGradient = value;
-			currentFill = FillTypes.Gradient; 
-			if (pen != null && fillStyle != value.getStyle(pen))
+			this.fillGradient = value;
+			this.currentFill = FillTypes.Gradient; 
+			
+			if (this.lastRenderedCanvas != null)
 			{
-				fillStyle = value.getStyle(pen);
-				this.timeForRedraw = true;
+				var style = value.getStyle(this.lastRenderedCanvas);
+				if (this.fillStyle != style)
+				{
+					this.fillStyle = style;
+				}
 			}
+			else
+				this.isFillUnstyled = true;
 		}
 
 		return value;
@@ -46,19 +58,25 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 	{
 		if (value != null)
 		{
-			fillPattern = value;
+			this.fillPattern = value;
+			this.currentFill = FillTypes.Pattern;
+
 			if (value.imageSource.isLoaded)
 			{
-				currentFill = FillTypes.Pattern;
-				if (pen != null && fillStyle != value.getStyle(pen))
+				if (this.lastRenderedCanvas != null)
 				{
-					fillStyle = value.getStyle(pen);
-					this.timeForRedraw = true;
+					var style = value.getStyle(this.lastRenderedCanvas);
+					if (this.fillStyle != style)
+					{
+						this.fillStyle = style;
+					}
 				}
+				else
+					this.isFillUnstyled = true;
 			}
 			else
 			{
-				value.imageSource.registerLoadEvent(fillPatternImageLoaded);
+				value.imageSource.registerLoadEvent(this.fillPatternImageLoaded);
 			}
 		}
 
@@ -67,18 +85,19 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 	
 	private var strokeStyle:Dynamic;
 	private var currentStroke:StrokeTypes;
+	private var isStrokeUnstyled:Bool;
 
 	public var strokeColor(default, setStrokeColor):Color;
 	private function setStrokeColor(value:Color):Color
 	{
 		if (value != null)
 		{
-			strokeColor = value;
-			currentStroke = StrokeTypes.StrokeColor;
+			this.strokeColor = value;
+			this.currentStroke = StrokeTypes.StrokeColor;
+
 			if (strokeStyle != value.rgba)
 			{
-				strokeStyle = strokeColor.rgba;
-				this.timeForRedraw = true;
+				this.strokeStyle = strokeColor.rgba;
 			}
 		}
 
@@ -90,12 +109,16 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 	{
 		if (value != null)
 		{
-			strokeGradient = value;
-			currentStroke = StrokeTypes.Gradient; 
-			if (pen != null && strokeStyle != value.getStyle(pen))
+			this.strokeGradient = value;
+			this.currentStroke = StrokeTypes.Gradient; 
+
+			if (this.lastRenderedCanvas != null)
 			{
-				strokeStyle = value.getStyle(pen);
-				this.timeForRedraw = true;
+				var style = value.getStyle(this.lastRenderedCanvas);
+				if (this.strokeStyle != style)
+				{
+					this.strokeStyle = style;
+				}
 			}
 		}
 
@@ -107,8 +130,7 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 	{
 		if (value != lineWidth)
 		{
-			lineWidth = value;
-			this.timeForRedraw = true;
+			this.lineWidth = value;
 		}
 
 		return value;
@@ -119,8 +141,7 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 	{
 		if (value != lineCap)
 		{
-			lineCap = value;
-			this.timeForRedraw = true;
+			this.lineCap = value;
 		}
 
 		return value;
@@ -131,8 +152,7 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 	{
 		if (value != lineJoin)
 		{
-			lineJoin = value;
-			this.timeForRedraw = true;
+			this.lineJoin = value;
 		}
 
 		return value;
@@ -143,8 +163,7 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 	{
 		if (value != miterLimit)
 		{
-			miterLimit = value;
-			this.timeForRedraw = true;
+			this.miterLimit = value;
 		}
 
 		return value;
@@ -152,17 +171,45 @@ class CanvasStrokeFillRenderState extends CanvasRenderState
 
 	public function new(renderFunc:Canvas2D -> Void)
 	{
-		this.renderFunc = renderFunc;
+		super(renderFunc);
+
+		this.isFillUnstyled = false;
+		this.isStrokeUnstyled = false;
+	}
+
+	private function fillPatternImageLoaded(event:Event):Void
+	{
+		if (this.lastRenderedCanvas != null)
+		{
+			if (this.fillStyle != this.fillPattern.getStyle(this.lastRenderedCanvas))
+			{
+				this.fillStyle = fillPattern.getStyle(this.lastRenderedCanvas);
+			}
+		}
+		else
+			this.isFillUnstyled = true;
 	}
 
 	private override function preRender(canvas:Canvas2D):Void
 	{
-	}
+		this.lastRenderedCanvas = canvas;
 
-	public function render(canvas:Canvas2D):Void
-	{
-		this.preRender(canvas);
-		this.renderFunc(canvas);
-		this.postRender(canvas);
+		if (this.isFillUnstyled)
+		{
+			if (this.currentFill == FillTypes.Gradient)
+				this.fillStyle = this.fillGradient.getStyle(this.lastRenderedCanvas);
+			else if (this.currentFill == FillTypes.Pattern)
+				this.fillStyle = this.fillPattern.getStyle(this.lastRenderedCanvas);
+
+			this.isFillUnstyled = false;
+		}
+		
+		if (this.isStrokeUnstyled)
+		{
+			if (this.currentStroke == StrokeTypes.Gradient)
+				this.strokeStyle = this.strokeGradient.getStyle(this.lastRenderedCanvas);
+
+			this.isStrokeUnstyled = false;
+		}
 	}
 }

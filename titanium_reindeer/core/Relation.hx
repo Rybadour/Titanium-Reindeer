@@ -34,11 +34,12 @@ class Relation<A, Result> extends BaseRelation<Result>
 	{
 		super();
 
-		this.changeBinds = new Array();
 		this.transformFunc = transformFunc;
 
 		this.a = a;
 		this.a.onChange = dependentChanged;
+
+		this.dependentChanged();
 	}
 
 	private function dependentChanged():Void
@@ -65,6 +66,8 @@ class Relation2<A, B, Result> extends BaseRelation<Result>
 
 		this.b = b;
 		this.b.onChange = dependentChanged;
+
+		this.dependentChanged();
 	}
 
 	private function dependentChanged():Void
@@ -95,6 +98,8 @@ class Relation3<A, B, C, Result> extends BaseRelation<Result>
 
 		this.c = c;
 		this.c.onChange = dependentChanged;
+
+		this.dependentChanged();
 	}
 
 	private function dependentChanged():Void
@@ -129,6 +134,8 @@ class Relation4<A, B, C, D, Result> extends BaseRelation<Result>
 
 		this.d = d;
 		this.d.onChange = dependentChanged;
+
+		this.dependentChanged();
 	}
 
 	private function dependentChanged():Void
