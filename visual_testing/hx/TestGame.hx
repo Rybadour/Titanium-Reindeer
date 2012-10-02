@@ -17,6 +17,7 @@ class TestGame
 
 	private var a:Thing;
 	private var b:Thing;
+	private var c:Thing;
 
 	public function new()
 	{
@@ -25,11 +26,14 @@ class TestGame
 		this.provider = new Provider();
 		this.scene = new RenderScene(this.provider, parentDom);
 
-        this.a = new Thing(this.scene, Color.Red, 40);
+        this.a = new Thing(this.scene, Color.Red, 40, "things");
 		this.a.body.state.localPosition.x = 30;
 
-        this.b = new Thing(this.scene, Color.Black, 10);
+        this.b = new Thing(this.scene, Color.Black, 10, "things");
 		this.b.body.state.localPosition.y = 120;
+
+		this.c = new Thing(this.scene, Color.Blue, 100, "others");
+		this.c.body.state.localPosition = new Vector2(70, 108);
 	}
 
 	public function play():Void
@@ -43,7 +47,8 @@ class TestGame
 
 	public function loop():Void
 	{
-		this.b.body.state.localPosition.x += 0.1;
+		this.c.body.state.localPosition.x += 0.1;
+		this.b.body.state.localPosition.x += 1;
 		this.scene.updater.update(10);
 
 		this.play();

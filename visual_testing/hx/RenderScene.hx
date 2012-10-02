@@ -9,6 +9,7 @@ import titanium_reindeer.components.CanvasRendererGroup;
 class RenderScene extends Scene
 {
 	public var things(default, null):CanvasRendererGroup;
+	public var others(default, null):CanvasRendererGroup;
 
 	public var pageCanvas(default, null):Canvas2D;
 
@@ -17,7 +18,9 @@ class RenderScene extends Scene
 		super(provider, "RenderScene");
 
 		this.things = new CanvasRendererGroup(this, "things");
-		this.pageCanvas = new Canvas2D("testCanvas", 1000, 1000);
+		this.others = new CanvasRendererGroup(this, "others");
+
+		this.pageCanvas = new Canvas2D("testCanvas", 400, 400);
 		this.pageCanvas.appendToDom(parentDom);
 	}
 
@@ -26,6 +29,7 @@ class RenderScene extends Scene
 		super.update(msTimeStep);
 
 		this.pageCanvas.clear();
+		this.others.state.render(this.pageCanvas);
 		this.things.state.render(this.pageCanvas);
 	}
 
@@ -33,5 +37,8 @@ class RenderScene extends Scene
 	{
 		if (this.things.name == layerName)
 			this.things.add(id, renderer);
+
+		if (this.others.name == layerName)
+			this.others.add(id, renderer);
 	}
 }

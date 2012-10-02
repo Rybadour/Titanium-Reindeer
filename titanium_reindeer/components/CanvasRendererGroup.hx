@@ -85,6 +85,11 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 	// As ICanvasRenderer
 	private function render(canvas:Canvas2D):Void
 	{
+		/* */
+		for (renderer in this.renderers)
+			renderer.state.render(canvas);
+
+		/* *
 		this.canvas.clear();
 
 		// Each renderer is drawn in the context of the render group
@@ -98,5 +103,6 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 
 		// The canvas is then drawn		
 		canvas.ctx.drawImage(this.canvas.canvas, -this.minBounds.width/2, -this.minBounds.height/2);
+		/* */
 	}
 }
