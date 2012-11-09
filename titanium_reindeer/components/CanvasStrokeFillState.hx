@@ -175,6 +175,13 @@ class CanvasStrokeFillState extends CanvasRenderState
 
 		this.isFillUnstyled = false;
 		this.isStrokeUnstyled = false;
+
+		this.fillColor = Color.White;
+		this.strokeColor = Color.Black;
+		this.lineWidth = 0;
+		this.lineCap = LineCapType.Butt;
+		this.lineJoin = LineJoinType.Miter;
+		this.miterLimit = 10.0;
 	}
 
 	private function fillPatternImageLoaded():Void
@@ -195,6 +202,37 @@ class CanvasStrokeFillState extends CanvasRenderState
 		super.preRender(canvas);
 
 		this.lastRenderedCanvas = canvas;
+
+		canvas.ctx.lineWidth = this.lineWidth;
+		canvas.ctx.miterLimit = this.miterLimit;
+
+		var cap:String;
+		switch (this.lineCap)
+		{
+			case LineCapType.Butt:
+				cap = "butt";
+
+			case LineCapType.Round:
+				cap = "round";
+
+			case LineCapType.Square:
+				cap = "square";
+		}
+		canvas.ctx.lineCap = cap;
+
+		var join:String;
+		switch (this.lineJoin)
+		{
+			case LineJoinType.Round:
+				join = "round";
+
+			case LineJoinType.Bevel:
+				join = "bevel";
+
+			case LineJoinType.Miter:
+				join = "miter";
+		}
+		canvas.ctx.lineJoin = join;
 
 		if (this.isFillUnstyled)
 		{
