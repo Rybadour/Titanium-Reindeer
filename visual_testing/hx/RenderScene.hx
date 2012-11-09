@@ -10,6 +10,7 @@ class RenderScene extends Scene
 {
 	public var things(default, null):CanvasRendererGroup;
 	public var others(default, null):CanvasRendererGroup;
+	public var lowest(default, null):CanvasRendererGroup;
 
 	public var pageCanvas(default, null):Canvas2D;
 
@@ -19,6 +20,7 @@ class RenderScene extends Scene
 
 		this.things = new CanvasRendererGroup(this, "things");
 		this.others = new CanvasRendererGroup(this, "others");
+		this.lowest = new CanvasRendererGroup(this, "lowest");
 
 		this.pageCanvas = new Canvas2D("testCanvas", 400, 400);
 		this.pageCanvas.appendToDom(parentDom);
@@ -29,6 +31,7 @@ class RenderScene extends Scene
 		super.update(msTimeStep);
 
 		this.pageCanvas.clear();
+		this.lowest.state.render(this.pageCanvas);
 		this.others.state.render(this.pageCanvas);
 		this.things.state.render(this.pageCanvas);
 	}
@@ -40,5 +43,8 @@ class RenderScene extends Scene
 
 		if (this.others.name == layerName)
 			this.others.add(id, renderer);
+
+		if (this.lowest.name == layerName)
+			this.lowest.add(id, renderer);
 	}
 }
