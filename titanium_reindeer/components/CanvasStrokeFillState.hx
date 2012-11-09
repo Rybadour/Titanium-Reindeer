@@ -177,7 +177,7 @@ class CanvasStrokeFillState extends CanvasRenderState
 		this.isStrokeUnstyled = false;
 	}
 
-	private function fillPatternImageLoaded(event:Event):Void
+	private function fillPatternImageLoaded():Void
 	{
 		if (this.lastRenderedCanvas != null)
 		{

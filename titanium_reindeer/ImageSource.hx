@@ -10,7 +10,7 @@ class ImageSource
 
 	public var isLoaded(default, null):Bool;
 
-	private var loadedFunctions:List<Event -> Void>;
+	private var loadedFunctions:List<Void -> Void>;
 
 	public function new(path:String)
 	{
@@ -35,14 +35,14 @@ class ImageSource
 		if (loadedFunctions != null)
 		{
 			for (func in loadedFunctions)
-				func(event);
+				func();
 
 			loadedFunctions.clear();
 			loadedFunctions = null;
 		}
 	}
 
-	public function registerLoadEvent(cb:Event -> Void):Void
+	public function registerLoadEvent(cb:Void -> Void):Void
 	{
 		if (this.isLoaded)
 			return;
