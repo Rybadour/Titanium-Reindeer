@@ -19,6 +19,11 @@ class Vector2
 		return outgoing;
 	}
 
+	public static function equals(a:Vector2, b:Vector2):Bool
+	{
+		return a.equal(b);
+	}
+
 	private var mX:Float;
 	public var x(getX, setX):Float;
 	private function getX():Float { return mX; }

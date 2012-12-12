@@ -16,7 +16,7 @@ class CircleRegionWatched extends CircleRegion, implements IWatchedRegion
 
 	public function new(radius:Float, center:Vector2)
 	{
-		this.watchedCenter = new Watcher(center);
+		this.watchedCenter = new Watcher(center, Vector2.equals);
 
 		super(radius, center);
 	}

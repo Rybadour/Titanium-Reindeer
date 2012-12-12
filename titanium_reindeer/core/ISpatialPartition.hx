@@ -13,7 +13,7 @@ interface ISpatialPartition
 	function requestValuesIntersectingRect(rect:RectRegion):Array<Int>;
 	function requestValuesIntersectingPoint(point:Vector2):Array<Int>;
 
-	function getBoundingRegion():RectRegion;
+	function getBoundingRectRegion():RectRegion;
 
 	function drawDebug():Void;
 }

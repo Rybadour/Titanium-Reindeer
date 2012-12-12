@@ -1,4 +1,4 @@
-package titanium_reindeer;
+package titanium_reindeer.components;
 
 import titanium_reindeer.core.FastRect;
 import titanium_reindeer.core.RectRegion;
@@ -60,7 +60,7 @@ class BinPartition implements ISpatialPartition
 	private var bins:Array<Array<Bin>>;
 	private var valueMap:IntHash<Item>;
 
-	public function getBoundingRegion():RectRegion
+	public function getBoundingRectRegion():RectRegion
 	{
 		var width:Float = binSize * width;
 		var heigth:Float = binSize * height;
