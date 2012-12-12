@@ -21,6 +21,6 @@ class Thing implements IWatchedWorldPosition
 
 	public function new()
 	{
-		this.worldPosition = new Watcher(new Vector2(0, 0));
+		this.worldPosition = new Watcher(new Vector2(0, 0), Vector2.equals);
 	}
 }

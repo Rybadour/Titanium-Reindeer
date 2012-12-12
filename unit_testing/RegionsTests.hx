@@ -8,7 +8,7 @@ import titanium_reindeer.components.RegionComponent;
 import titanium_reindeer.core.RectRegion;
 import titanium_reindeer.core.IRegion;
 
-import titanium_reindeer.BinPartition;
+import titanium_reindeer.components.BinPartition;
 //import titanium_reindeer.RTreeFastInt;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.Rect;
