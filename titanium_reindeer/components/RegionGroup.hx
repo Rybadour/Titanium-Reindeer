@@ -23,22 +23,22 @@ class RegionGroup implements IGroup<IRegion>, implements IHasId, implements IReg
 	// IRegion
 	public function getBoundingRect():Rect
 	{
-		return this.getBoundingRegion();
+		return this.getBoundingRectRegion();
 	}
 	public function isPointInside(p:Vector2):Bool
 	{
-		return this.partitioning.getBoundingRegion().isPointInside(p);
+		return this.partitioning.getBoundingRectRegion().isPointInside(p);
 	}
 	public function getArea():Float
 	{
 		return this.getBoundingRect().getArea();
 	}
-	public function getBoundingRegion():RectRegion
+	public function getBoundingRectRegion():RectRegion
 	{
-		return this.partitioning.getBoundingRegion();
+		return this.partitioning.getBoundingRectRegion();
 	}
 	public var center(getCenter, null):Vector2;
-	public function getCenter():Vector2 { return this.partitioning.getBoundingRegion().center; }
+	public function getCenter():Vector2 { return this.partitioning.getBoundingRectRegion().center; }
 
 	private var regions:IntHash<IRegion>;
 	private var groups:IntHash<RegionGroup>;
@@ -73,7 +73,7 @@ class RegionGroup implements IGroup<IRegion>, implements IHasId, implements IReg
 			return;
 
 		this.regions.set(id, region);
-		this.partitioning.insert(region.getBoundingRegion(), id);
+		this.partitioning.insert(region.getBoundingRectRegion(), id);
 	}
 
 	public function remove(id:Int):Void
@@ -137,7 +137,7 @@ class RegionGroup implements IGroup<IRegion>, implements IHasId, implements IReg
 
 	public function requestRegionsIntersectingRegion(region:IRegion):Array<IRegion>
 	{
-		var ids:Array<Int> = this.partitioning.requestValuesIntersectingRect(region.getBoundingRegion());
+		var ids:Array<Int> = this.partitioning.requestValuesIntersectingRect(region.getBoundingRectRegion());
 
 		var regions:Array<IRegion> = new Array();
 		for (id in ids)

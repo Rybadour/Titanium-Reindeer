@@ -9,9 +9,9 @@ class RegionIntersecter implements IRegionIntersecter
 	public function isIntersecting(a:IRegion, b:IRegion):Bool
 	{
 		if ( !Std.is(a, RectRegion) && !Std.is(a, CircleRegion) )
-			a = a.getBoundingRegion();
+			a = a.getBoundingRectRegion();
 		if ( !Std.is(b, RectRegion) && !Std.is(b, CircleRegion) )
-			b = b.getBoundingRegion();
+			b = b.getBoundingRectRegion();
 
 		if ( Std.is(a, RectRegion) )
 		{

@@ -1,4 +1,4 @@
-import titanium_reindeer.BinPartition;
+import titanium_reindeer.components.BinPartition;
 import titanium_reindeer.Vector2;
 import titanium_reindeer.core.RectRegion;
 import titanium_reindeer.core.Circle;
