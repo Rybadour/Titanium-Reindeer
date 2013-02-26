@@ -4,7 +4,6 @@
 /examples/random/js/TestGame.js
 *.swp
 /examples\millions_of_entities\js/TestGame.js
-unit_testing/run.n
 playground/Anchoring.hx
 playground/compileTests.hxml
 playground/HasPosition.hx
