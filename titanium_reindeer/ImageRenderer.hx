@@ -41,7 +41,6 @@ class ImageRenderer extends RendererComponent
 
 		if (this.image.isLoaded)
 		{
-			var x:Int = 2;
 			pen.drawImage(this.image.image, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height, -this.destWidth/2, -this.destHeight/2, this.destWidth, this.destHeight);
 		}
 		else
@@ -74,7 +73,7 @@ class ImageRenderer extends RendererComponent
 
 		if (this.sourceRect == null)
 		{
-			this.sourceRect = new Rect(0, 0, this.destWidth, this.destHeight);
+			this.sourceRect = new Rect(0, 0, this.image.width, this.image.height);
 		}
 
 		this.setRedraw(true);
