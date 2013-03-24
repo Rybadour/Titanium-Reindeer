@@ -48,6 +48,15 @@ class LineRenderer extends StrokeFillRenderer
 		}
 	}
 
+	override private function setLineWidth(value:Int):Int
+	{
+		var result = super.setLineWidth(value);
+		
+		this.recalculateDrawnSize();
+
+		return result;
+	}
+
 	public function new(endPoint:Vector2, layer:Int)
 	{
 		super(0, 0, layer);
@@ -78,11 +87,16 @@ class LineRenderer extends StrokeFillRenderer
 
 	private function recalculateDrawnSize():Void
 	{
-		if (this.endPoint == null)
-			return;
+		var width:Float = 0;
+		var height:Float = 0;
+		if (this.endPoint != null)
+		{
+			width = Math.abs(this.endPoint.x);
+			height = Math.abs(this.endPoint.y);
+		}
 
-		this.initialDrawnWidth = Math.abs(this.endPoint.x + 2);
-		this.initialDrawnHeight = Math.abs(this.endPoint.y + 2);
+		this.initialDrawnWidth = width + this.lineWidth + 2;
+		this.initialDrawnHeight = height + this.lineWidth + 2;
 	}
 
 	override public function render():Void
