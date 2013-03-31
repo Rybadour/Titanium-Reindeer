@@ -61,17 +61,17 @@ class GameInputManager extends InputManager
 
 	private function recordEvent(type:InputEvent, event:Dynamic):Void
 	{
+		event.preventDefault();
+
+		var key:Int = event.keyCode; 
 		if (type == InputEvent.KeyDown)
 		{
-			var key:Int = event.keyCode; 
 			if (this.keyDowns.exists(key) && this.keyDowns.get(key))
 				return;
-
 			this.keyDowns.set(key, true);
 		}
 		else if (type == InputEvent.KeyUp)
 		{
-			var key:Int = event.keyCode; 
 			this.keyDowns.set(key, false);
 		}
 

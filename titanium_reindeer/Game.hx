@@ -137,14 +137,14 @@ class Game
 
 	private function update(msTimeStep:Int):Void
 	{
-		sceneManager.update(msTimeStep);
 		inputManager.update(msTimeStep);
+		sceneManager.update(msTimeStep);
 	}
 
 	private function postUpdate(msTimeStep:Int):Void
 	{
-		sceneManager.postUpdate(msTimeStep);
 		inputManager.postUpdate(msTimeStep);
+		sceneManager.postUpdate(msTimeStep);
 	}
 
 	public function destroy():Void
