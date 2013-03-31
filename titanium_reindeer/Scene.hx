@@ -158,7 +158,9 @@ class Scene extends ObjectManager
 		// Update game objects
 		for (obj in objects)
 		{
-			cast(obj, GameObject).update(msTimeStep);
+			var go:GameObject = cast(obj, GameObject);
+			if (!go.toBeDestroyed)
+				go.update(msTimeStep);
 		}
 		// Update on component managers
 		for (manager in this.componentManagers)
