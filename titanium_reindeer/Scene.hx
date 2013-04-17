@@ -60,11 +60,6 @@ class Scene extends ObjectManager
 
 	public function removeGameObject(obj:GameObject):Void
 	{
-		if (super.objectIdExists(obj.id))
-		{
-			obj.remove();
-		}
-
 		super.removeObject(obj);
 	}
 
@@ -179,8 +174,6 @@ class Scene extends ObjectManager
 		}
 		this.inputManager.postUpdate(msTimeStep);
 
-		// Remove Objects which were flagged to be removed
-		super.removeObjects();
 		// Let GameObjects remove Components they wanted to remove now (and only now)
 		for (obj in objects)
 		{
@@ -190,6 +183,9 @@ class Scene extends ObjectManager
 		{
 			manager.removeComponents();
 		}
+
+		// Remove Objects which were flagged to be removed
+		super.removeObjects();
 		
 		if (this.toBeDestroyed)
 			this.finalDestroy();

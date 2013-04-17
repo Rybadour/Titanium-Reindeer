@@ -128,8 +128,10 @@ class GameObject extends ManagedObject
 	}
 
 	// Internal Only
-	public function remove():Void
+	override public function remove():Void
 	{
+		super.remove();
+
 		if (componentsToRemove == null)
 			componentsToRemove = new Array();
 		
@@ -165,17 +167,21 @@ class GameObject extends ManagedObject
 				components.remove(i);
 		}
 	}
-	
-	override public function finalDestroy():Void
+
+	override public function destroy():Void
 	{
+		super.destroy();
 		if (this.scene != null)
 		{
 			this.scene.removeGameObject(this);
-			this.scene = null;
 		}
-
+	}
+	
+	override public function finalDestroy():Void
+	{
 		super.finalDestroy();
 
+		this.scene = null;
 		if (componentsToRemove != null)
 		{
 			while (componentsToRemove.length != 0)
@@ -189,6 +195,8 @@ class GameObject extends ManagedObject
 		{
 			for (i in components.keys())
 			{
+				if (components.get(i).owner == this)
+					components.get(i).destroy();
 				components.remove(i);
 			}
 			components = null;

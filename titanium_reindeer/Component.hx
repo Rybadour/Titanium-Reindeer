@@ -48,8 +48,12 @@ class Component extends ManagedObject
 	public function notifyPositionChange():Void { }
 
 	// Internal Only
-	public function remove():Void
+	override public function remove():Void
 	{
+		super.remove();
+
+		this.owner = null;
+
 		if (this.componentManager != null)
 			this.componentManager.removeComponent(this);
 	}

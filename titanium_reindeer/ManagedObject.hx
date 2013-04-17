@@ -51,6 +51,10 @@ class ManagedObject
 		this.registeredManagerSetEvents = new Array();
 	}
 
+	public function remove():Void
+	{
+	}
+
 	public function destroy():Void
 	{
 		this.toBeDestroyed = true;

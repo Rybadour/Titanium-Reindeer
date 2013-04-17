@@ -6,7 +6,7 @@ class MovementComponentManager extends ComponentManager
 	{
 		for (component in components)
 		{
-			if (cast(component, MovementComponent) != null && component.enabled)
+			if (Std.is(component, MovementComponent) && component.enabled && component.owner != null)
 				cast(component, MovementComponent).move(msTimeStep);
 		}
 	}

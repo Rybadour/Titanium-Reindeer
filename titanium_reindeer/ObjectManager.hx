@@ -53,6 +53,7 @@ class ObjectManager
 			for (objId in objectsToRemove)
 			{
 				var obj:ManagedObject = objects.get(objId);
+				obj.remove();
 				if (obj.toBeDestroyed)
 				{
 					obj.finalDestroy();
