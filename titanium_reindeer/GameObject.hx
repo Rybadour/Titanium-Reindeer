@@ -152,6 +152,7 @@ class GameObject extends ManagedObject
 				components.get(compName).detachOwner();
 				components.remove(compName);
 			}
+			componentsToRemove = new Array();
 		}
 	}
 
