@@ -47,12 +47,15 @@ class Component extends ManagedObject
 	// Called when the owner changes position
 	public function notifyPositionChange():Void { }
 
+	public function detachOwner():Void
+	{
+		this.owner = null;
+	}	
+
 	// Internal Only
 	override public function remove():Void
 	{
 		super.remove();
-
-		this.owner = null;
 
 		if (this.componentManager != null)
 			this.componentManager.removeComponent(this);
@@ -61,6 +64,7 @@ class Component extends ManagedObject
 	override public function destroy():Void
 	{
 		this.remove();
+		this.detachOwner();
 		this.enabled = false;
 
 		super.destroy();

@@ -149,6 +149,7 @@ class GameObject extends ManagedObject
 		{
 			for (compName in componentsToRemove)
 			{
+				components.get(compName).detachOwner();
 				components.remove(compName);
 			}
 		}
