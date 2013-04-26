@@ -12,7 +12,7 @@ class GameObject extends ManagedObject
 	}
 
 	private var components:Hash<Component>;
-	private var componentsToRemove:Array<String>;
+	private var componentsToRemove:Array<Component>;
 
 	private var watchedPosition:WatchedVector2;
 
@@ -78,8 +78,9 @@ class GameObject extends ManagedObject
 			if (componentsToRemove == null)
 				componentsToRemove = new Array();
 
-			componentsToRemove.push(name);
+			componentsToRemove.push(components.get(name));
 			components.get(name).remove();
+			components.remove(name);
 		}
 	}
 
@@ -137,7 +138,7 @@ class GameObject extends ManagedObject
 		
 		for (compName in components.keys())
 		{
-			componentsToRemove.push(compName);
+			componentsToRemove.push(components.get(compName));
 			components.get(compName).remove();
 		}
 	}
@@ -147,10 +148,9 @@ class GameObject extends ManagedObject
 	{
 		if (componentsToRemove != null)
 		{
-			for (compName in componentsToRemove)
+			for (comp in componentsToRemove)
 			{
-				components.get(compName).detachOwner();
-				components.remove(compName);
+				comp.detachOwner();
 			}
 			componentsToRemove = new Array();
 		}
