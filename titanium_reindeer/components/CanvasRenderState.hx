@@ -1,7 +1,6 @@
 package titanium_reindeer.components;
 
 import titanium_reindeer.Shadow;
-import titanium_reindeer.core.Watcher;
 
 class CanvasRenderState
 {
@@ -50,14 +49,7 @@ class CanvasRenderState
 		return this.rotation;
 	}
 
-	public var watchedPosition(default, null):Watcher<Vector2>;
-	public var localPosition(getLocalPosition, setLocalPosition):Vector2;
-	private function getLocalPosition():Vector2 { return this.watchedPosition.value; }
-	private function setLocalPosition(value:Vector2):Vector2
-	{
-		this.watchedPosition.value = value;
-		return this.watchedPosition.value;
-	}
+	public var localPosition(default, null):WVector2;
 
 	public function new(renderFunc:Canvas2D -> Void)
 	{
@@ -66,7 +58,7 @@ class CanvasRenderState
 		this.alpha = 1;
 		this.rotation = 0;
 
-		this.watchedPosition = new Watcher(new Vector2(0, 0));
+		this.watchedPosition = new WVector2(0, 0);
 	}
 
 	private function preRender(canvas:Canvas2D):Void

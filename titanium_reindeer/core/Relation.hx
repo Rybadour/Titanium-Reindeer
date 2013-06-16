@@ -1,6 +1,6 @@
 package titanium_reindeer.core;
 
-class BaseRelation<Result> implements IWatchable<Result>
+class BaseRelation<Result> implements IWatchable
 {
 	public var value(default, null):Result;
 	private function setValue(value:Result):Void
@@ -25,12 +25,12 @@ class BaseRelation<Result> implements IWatchable<Result>
 	}
 }
 
-class Relation<A, Result> extends BaseRelation<Result>
+class Relation<A:IWatchable, Result> extends BaseRelation<Result>
 {
 	private var transformFunc:A -> Result;
-	private var a:IWatchable<A>;
+	private var a:A;
 
-	public function new(a:IWatchable<A>, transformFunc:A -> Result)
+	public function new(a:A, transformFunc:A -> Result)
 	{
 		super();
 
@@ -48,13 +48,13 @@ class Relation<A, Result> extends BaseRelation<Result>
 	}
 }
 
-class Relation2<A, B, Result> extends BaseRelation<Result>
+class Relation2<A:IWatchable, B:IWatchable, Result> extends BaseRelation<Result>
 {
 	private var transformFunc:A -> B -> Result;
-	private var a:IWatchable<A>;
-	private var b:IWatchable<B>;
+	private var a:A;
+	private var b:B;
 
-	public function new(a:IWatchable<A>, b:IWatchable<B>, transformFunc:A -> B -> Result)
+	public function new(a:A, b:B, transformFunc:A -> B -> Result)
 	{
 		super();
 
@@ -76,14 +76,14 @@ class Relation2<A, B, Result> extends BaseRelation<Result>
 	}
 }
 
-class Relation3<A, B, C, Result> extends BaseRelation<Result>
+class Relation3<A:IWatchable, B:IWatchable, C:IWatchable, Result> extends BaseRelation<Result>
 {
 	private var transformFunc:A -> B -> C -> Result;
-	private var a:IWatchable<A>;
-	private var b:IWatchable<B>;
-	private var c:IWatchable<C>;
+	private var a:A;
+	private var b:B;
+	private var c:C;
 
-	public function new(a:IWatchable<A>, b:IWatchable<B>, c:IWatchable<C>, transformFunc:A -> B -> C -> Result)
+	public function new(a:A, b:B, c:C, transformFunc:A -> B -> C -> Result)
 	{
 		super();
 
@@ -108,15 +108,15 @@ class Relation3<A, B, C, Result> extends BaseRelation<Result>
 	}
 }
 
-class Relation4<A, B, C, D, Result> extends BaseRelation<Result>
+class Relation4<A:IWatchable, B:IWatchable, C:IWatchable, D:IWatchable, Result> extends BaseRelation<Result>
 {
 	private var transformFunc:A -> B -> C -> D -> Result;
-	private var a:IWatchable<A>;
-	private var b:IWatchable<B>;
-	private var c:IWatchable<C>;
-	private var d:IWatchable<D>;
+	private var a:A;
+	private var b:B;
+	private var c:C;
+	private var d:D;
 
-	public function new(a:IWatchable<A>, b:IWatchable<B>, c:IWatchable<C>, d:IWatchable<D>, transformFunc:A -> B -> C -> D -> Result)
+	public function new(a:A, b:B, c:C, d:D, transformFunc:A -> B -> C -> D -> Result)
 	{
 		super();
 

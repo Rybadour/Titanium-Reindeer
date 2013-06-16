@@ -19,11 +19,6 @@ class Vector2
 		return outgoing;
 	}
 
-	public static function equals(a:Vector2, b:Vector2):Bool
-	{
-		return a.equal(b);
-	}
-
 	private var mX:Float;
 	public var x(getX, setX):Float;
 	private function getX():Float { return mX; }
@@ -152,14 +147,6 @@ class Vector2
 		this.y -= b.y;
 
 		return this;
-	}
-	
-	public function equal(b:Vector2)
-	{
-		if (b == null)
-			return false;
-
-		return this.x == b.x && this.y == b.y;
 	}
 
 	public function identify():String

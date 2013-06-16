@@ -2,7 +2,6 @@ package titanium_reindeer.components;
 
 import titanium_reindeer.core.IGroup;
 import titanium_reindeer.core.IShape;
-import titanium_reindeer.core.Watcher;
 import titanium_reindeer.core.IHasIdProvider;
 import titanium_reindeer.core.IdProvider;
 import titanium_reindeer.core.IRegion;
@@ -24,7 +23,7 @@ class CanvasRendererGroup implements IGroup<ICanvasRenderer>, implements ICanvas
 	public var boundingRegion(getBoundingRegion, never):IRegion;
 	public function getBoundingRegion():IRegion
 	{
-		return new RectRegion(this.minBounds.width, this.minBounds.height, this.state.watchedPosition.value);
+		return new RectRegion(this.minBounds.width, this.minBounds.height, this.state.watchedPosition);
 	}
 
 	private var canvas(default, null):Canvas2D;

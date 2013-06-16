@@ -12,3 +12,4 @@ playground/Position.hx
 playground/Tests.hx
 playground/Thing.hx
 visual_testing/js/TestGame.js
+logical_testing/js/TestGame.js

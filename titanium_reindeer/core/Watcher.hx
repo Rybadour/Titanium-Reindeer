@@ -1,11 +1,11 @@
 package titanium_reindeer.core;
 
-class Watcher<T> implements IWatchable<T>
+class Watcher<T> implements IWatchable
 {
 	public var value(default, setValue):T;
 	private function setValue(value:T):T
 	{
-		if ( this.value == null || !this.equalsFunc(this.value, value) )
+		if (this.value != value)
 		{
 			this.value = value;
 
@@ -16,8 +16,6 @@ class Watcher<T> implements IWatchable<T>
 		return this.value;
 	}
 
-	private var equalsFunc:T -> T -> Bool;
-
 	private var changeBinds:Array<Void -> Void>;
 	public var onChange(never, bindOnChange):Void -> Void;
 	public function bindOnChange(func:Void -> Void):Void -> Void
@@ -26,15 +24,9 @@ class Watcher<T> implements IWatchable<T>
 		return func;
 	}
 
-	public function new(value:T, equalsFunc:T -> T -> Bool)
+	public function new(value:T)
 	{
 		this.changeBinds = new Array();
-		this.equalsFunc = equalsFunc;
 		this.value = value;
-		if (this.equalsFunc == null)
-			this.equalsFunc = function (a:T, b:T):Bool
-			{
-				return a == b;
-			}
 	}
 }

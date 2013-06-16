@@ -9,8 +9,18 @@ class Rect implements IShape
 		return new Rect(r.width, r.height);
 	}
 
-	public var width:Float;
-	public var height:Float;
+	public var width(default, setWidth):Float;
+	private function setWidth(value:Float):Float
+	{
+		this.width = value;
+		return this.width;
+	}
+	public var height(default, setHeight):Float;
+	private function setHeight(value:Float):Float
+	{
+		this.height = value;
+		return this.height;
+	}
 
 	public function new(width:Float, height:Float)
 	{

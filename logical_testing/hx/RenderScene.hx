@@ -8,9 +8,9 @@ import titanium_reindeer.components.CanvasRendererGroup;
 
 class RenderScene extends Scene
 {
-	public var things(default, null):CanvasRendererGroup;
-	public var others(default, null):CanvasRendererGroup;
-	public var lowest(default, null):CanvasRendererGroup;
+	public var paddles(default, null):CanvasRendererGroup;
+	public var balls(default, null):CanvasRendererGroup;
+	public var bg(default, null):CanvasRendererGroup;
 
 	public var pageCanvas(default, null):Canvas2D;
 
@@ -18,9 +18,9 @@ class RenderScene extends Scene
 	{
 		super(provider, "RenderScene");
 
-		this.things = new CanvasRendererGroup(this, "things");
-		this.others = new CanvasRendererGroup(this, "others");
-		this.lowest = new CanvasRendererGroup(this, "lowest");
+		this.paddles = new CanvasRendererGroup(this, "paddles");
+		this.balls = new CanvasRendererGroup(this, "balls");
+		this.bg = new CanvasRendererGroup(this, "bg");
 
 		this.pageCanvas = new Canvas2D("testCanvas", 400, 400);
 		this.pageCanvas.appendToDom(parentDom);
@@ -31,20 +31,20 @@ class RenderScene extends Scene
 		super.update(msTimeStep);
 
 		this.pageCanvas.clear();
-		this.lowest.state.render(this.pageCanvas);
-		this.others.state.render(this.pageCanvas);
-		this.things.state.render(this.pageCanvas);
+		this.bg.state.render(this.pageCanvas);
+		this.balls.state.render(this.pageCanvas);
+		this.paddles.state.render(this.pageCanvas);
 	}
 
 	public function addRenderer(id:Int, renderer:ICanvasRenderer, layerName:String)
 	{
-		if (this.things.name == layerName)
-			this.things.add(id, renderer);
+		if (this.paddles.name == layerName)
+			this.paddles.add(id, renderer);
 
-		if (this.others.name == layerName)
-			this.others.add(id, renderer);
+		if (this.balls.name == layerName)
+			this.balls.add(id, renderer);
 
-		if (this.lowest.name == layerName)
-			this.lowest.add(id, renderer);
+		if (this.bg.name == layerName)
+			this.bg.add(id, renderer);
 	}
 }
