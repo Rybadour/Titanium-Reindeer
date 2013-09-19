@@ -1,7 +1,9 @@
-package titanium_reindeer;
+package titanium_reindeer.core;
 
 import haxe.Timer;
 import js.Dom;
+
+import titanium_reindeer.rendering.Color;
 
 class Game
 {

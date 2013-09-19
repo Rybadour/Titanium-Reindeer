@@ -1,0 +1,24 @@
+package titanium_reindeer.rendering;
+
+import titanium_reindeer.spatial.Rect;
+import titanium_reindeer.spatial.RectRegion;
+
+class RectRenderer extends CanvasRenderer
+{
+	public var rect(default, null):Rect;
+
+	public function new(rect:Rect)
+	{
+		super(new StrokeFillState());
+
+		this.rect = rect;
+	}
+
+	public override function _render(canvas:Canvas2D):Void
+	{
+		canvas.ctx.fillRect(
+			0, 0,
+			this.rect.width, this.rect.height
+		);
+	}
+}

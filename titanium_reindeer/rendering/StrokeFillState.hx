@@ -1,18 +1,10 @@
-package titanium_reindeer.components;
-
-import js.Dom;
+package titanium_reindeer.rendering;
 
 import titanium_reindeer.Enums;
-import titanium_reindeer.LinearGradient;
-import titanium_reindeer.Pattern;
 
-class CanvasStrokeFillState extends CanvasRenderState
+class StrokeFillState extends CanvasRenderState
 {
-	private var lastRenderedCanvas:Canvas2D;
-
-	private var fillStyle:Dynamic;
 	private var currentFill:FillTypes;
-	private var isFillUnstyled:Bool;
 
 	public var fillColor(default, setFill):Color;
 	private function setFill(value:Color):Color
@@ -20,11 +12,7 @@ class CanvasStrokeFillState extends CanvasRenderState
 		if (value != null)
 		{
 			this.currentFill = FillTypes.ColorFill;
-			if (this.fillStyle != value.rgba)
-			{
-				this.fillColor = value;
-				this.fillStyle = value.rgba;
-			}
+			this.fillColor = value;
 		}
 
 		return value;
@@ -37,17 +25,6 @@ class CanvasStrokeFillState extends CanvasRenderState
 		{
 			this.fillGradient = value;
 			this.currentFill = FillTypes.Gradient; 
-			
-			if (this.lastRenderedCanvas != null)
-			{
-				var style = value.getStyle(this.lastRenderedCanvas);
-				if (this.fillStyle != style)
-				{
-					this.fillStyle = style;
-				}
-			}
-			else
-				this.isFillUnstyled = true;
 		}
 
 		return value;
@@ -61,31 +38,18 @@ class CanvasStrokeFillState extends CanvasRenderState
 			this.fillPattern = value;
 			this.currentFill = FillTypes.Pattern;
 
-			if (value.imageSource.isLoaded)
-			{
-				if (this.lastRenderedCanvas != null)
-				{
-					var style = value.getStyle(this.lastRenderedCanvas);
-					if (this.fillStyle != style)
-					{
-						this.fillStyle = style;
-					}
-				}
-				else
-					this.isFillUnstyled = true;
-			}
-			else
+			/* *
+			if (!value.imageSource.isLoaded)
 			{
 				value.imageSource.registerLoadEvent(this.fillPatternImageLoaded);
 			}
+			/* */
 		}
 
 		return value;
 	}
-	
-	private var strokeStyle:Dynamic;
+
 	private var currentStroke:StrokeTypes;
-	private var isStrokeUnstyled:Bool;
 
 	public var strokeColor(default, setStrokeColor):Color;
 	private function setStrokeColor(value:Color):Color
@@ -94,11 +58,6 @@ class CanvasStrokeFillState extends CanvasRenderState
 		{
 			this.strokeColor = value;
 			this.currentStroke = StrokeTypes.StrokeColor;
-
-			if (strokeStyle != value.rgba)
-			{
-				this.strokeStyle = strokeColor.rgba;
-			}
 		}
 
 		return value;
@@ -111,15 +70,6 @@ class CanvasStrokeFillState extends CanvasRenderState
 		{
 			this.strokeGradient = value;
 			this.currentStroke = StrokeTypes.Gradient; 
-
-			if (this.lastRenderedCanvas != null)
-			{
-				var style = value.getStyle(this.lastRenderedCanvas);
-				if (this.strokeStyle != style)
-				{
-					this.strokeStyle = style;
-				}
-			}
 		}
 
 		return value;
@@ -169,12 +119,9 @@ class CanvasStrokeFillState extends CanvasRenderState
 		return value;
 	}
 
-	public function new(renderFunc:Canvas2D -> Void)
+	public function new()
 	{
-		super(renderFunc);
-
-		this.isFillUnstyled = false;
-		this.isStrokeUnstyled = false;
+		super();
 
 		this.fillColor = Color.White;
 		this.strokeColor = Color.Black;
@@ -184,24 +131,9 @@ class CanvasStrokeFillState extends CanvasRenderState
 		this.miterLimit = 10.0;
 	}
 
-	private function fillPatternImageLoaded():Void
+	public override function apply(canvas:Canvas2D):Void
 	{
-		if (this.lastRenderedCanvas != null)
-		{
-			if (this.fillStyle != this.fillPattern.getStyle(this.lastRenderedCanvas))
-			{
-				this.fillStyle = fillPattern.getStyle(this.lastRenderedCanvas);
-			}
-		}
-		else
-			this.isFillUnstyled = true;
-	}
-
-	private override function preRender(canvas:Canvas2D):Void
-	{
-		super.preRender(canvas);
-
-		this.lastRenderedCanvas = canvas;
+		super.apply(canvas);
 
 		canvas.ctx.lineWidth = this.lineWidth;
 		canvas.ctx.miterLimit = this.miterLimit;
@@ -234,24 +166,14 @@ class CanvasStrokeFillState extends CanvasRenderState
 		}
 		canvas.ctx.lineJoin = join;
 
-		if (this.isFillUnstyled)
-		{
-			if (this.currentFill == FillTypes.Gradient)
-				this.fillStyle = this.fillGradient.getStyle(this.lastRenderedCanvas);
-			else if (this.currentFill == FillTypes.Pattern)
-				this.fillStyle = this.fillPattern.getStyle(this.lastRenderedCanvas);
-
-			this.isFillUnstyled = false;
-		}
-		canvas.ctx.fillStyle = this.fillStyle;
+		var style:Dynamic = null;
+		if (this.currentFill == FillTypes.Gradient)
+			style = this.fillGradient.getStyle(canvas);
+		else if (this.currentFill == FillTypes.Pattern)
+			style = this.fillPattern.getStyle(canvas);
+		canvas.ctx.fillStyle = style;
 		
-		if (this.isStrokeUnstyled)
-		{
-			if (this.currentStroke == StrokeTypes.Gradient)
-				this.strokeStyle = this.strokeGradient.getStyle(this.lastRenderedCanvas);
-
-			this.isStrokeUnstyled = false;
-		}
-		canvas.ctx.strokeStyle = this.strokeStyle;
+		if (this.currentStroke == StrokeTypes.Gradient)
+			canvas.ctx.strokeStyle = this.strokeGradient.getStyle(canvas);
 	}
 }

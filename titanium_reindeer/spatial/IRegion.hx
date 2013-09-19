@@ -1,4 +1,4 @@
-package titanium_reindeer.core;
+package titanium_reindeer.spatial;
 
 interface IRegion implements IShape
 {

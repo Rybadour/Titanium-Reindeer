@@ -1,11 +1,7 @@
-package titanium_reindeer.components;
+package titanium_reindeer.rendering;
 
-import titanium_reindeer.Shadow;
-
-class CanvasRenderState
+class CanvasRenderState implements IRenderState
 {
-	private var renderFunc:Canvas2D -> Void;
-
 	public var alpha(default, setAlpha):Float;
 	private function setAlpha(value:Float):Float
 	{
@@ -49,24 +45,16 @@ class CanvasRenderState
 		return this.rotation;
 	}
 
-	public var localPosition(default, null):WVector2;
-
-	public function new(renderFunc:Canvas2D -> Void)
+	public function new()
 	{
-		this.renderFunc = renderFunc;
-
 		this.alpha = 1;
 		this.rotation = 0;
-
-		this.watchedPosition = new WVector2(0, 0);
 	}
 
-	private function preRender(canvas:Canvas2D):Void
+	public function apply(canvas:Canvas2D):Void
 	{
-		canvas.ctx.save();
 		//canvas.ctx.globalCompositeOperation = RendererComponent.CompositionToString(this.renderComposition);
 
-		canvas.ctx.translate(this.localPosition.x, this.localPosition.y);
 		if (this.rotation != 0)
 			canvas.ctx.rotate(this.rotation);
 
@@ -79,17 +67,5 @@ class CanvasRenderState
 			canvas.ctx.shadowOffsetY = this.shadow.offset.y;
 			canvas.ctx.shadowBlur = this.shadow.blur;
 		}
-	}
-
-	public function render(canvas:Canvas2D):Void
-	{
-		this.preRender(canvas);
-		this.renderFunc(canvas);
-		this.postRender(canvas);
-	}
-
-	private function postRender(canvas:Canvas2D):Void
-	{
-		canvas.ctx.restore();
 	}
 }

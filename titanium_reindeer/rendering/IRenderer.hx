@@ -1,4 +1,6 @@
-package titanium_reindeer.core;
+package titanium_reindeer.rendering;
+
+import titanium_reindeer.spatial.IRegion;
 
 interface IRenderer
 {

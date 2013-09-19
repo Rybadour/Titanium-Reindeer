@@ -149,6 +149,11 @@ class Vector2
 		return this;
 	}
 
+	public function equal(other:Vector2)
+	{
+		return this.x == other.x && this.y == other.y;
+	}
+
 	public function identify():String
 	{
 		return "Vector2("+x+","+y+")";

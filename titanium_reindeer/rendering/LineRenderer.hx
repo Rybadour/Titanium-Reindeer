@@ -1,13 +1,11 @@
-package titanium_reindeer.components;
+package titanium_reindeer.rendering;
 
-import titanium_reindeer.core.Relation;
-import titanium_reindeer.core.Watcher;
 import titanium_reindeer.core.IHasIdProvider;
-import titanium_reindeer.core.IShape;
-import titanium_reindeer.core.IRegion;
-import titanium_reindeer.core.RectRegion;
+import titanium_reindeer.spatial.IShape;
+import titanium_reindeer.spatial.IRegion;
+import titanium_reindeer.spatial.RectRegion;
 
-class LineCanvasRenderer implements ICanvasRenderer
+class LineRenderer implements ICanvasRenderer
 {
 	public var id(default, null):Int;
 	public var state(getState, null):CanvasRenderState;

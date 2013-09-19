@@ -1,4 +1,4 @@
-package titanium_reindeer.core;
+package titanium_reindeer.spatial;
 
 class RectRegion extends Rect, implements IRegion
 {

@@ -1,8 +1,8 @@
-package titanium_reindeer.components;
+package titanium_reindeer.rendering;
 
 import js.Dom;
 
-import titanium_reindeer.core.RectRegion;
+import titanium_reindeer.spatial.RectRegion;
 
 class Canvas2D
 {
