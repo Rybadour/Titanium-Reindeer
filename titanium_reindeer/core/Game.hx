@@ -29,7 +29,7 @@ class Game
 
 	private var msLastTimeStep:Int;
 
-	private var exitGame:Bool = true;
+	private var exitGame:Bool;
 
 	public var pageCanvas(default, null):Canvas2D;
 

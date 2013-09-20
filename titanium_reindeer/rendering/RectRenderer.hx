@@ -14,7 +14,7 @@ class RectRenderer extends CanvasRenderer
 		this.rect = rect;
 	}
 
-	public override function _render(canvas:Canvas2D):Void
+	private override function _render(canvas:Canvas2D):Void
 	{
 		canvas.renderRect(this.rect);
 	}

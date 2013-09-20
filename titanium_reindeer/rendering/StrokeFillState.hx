@@ -11,7 +11,7 @@ class StrokeFillState extends CanvasRenderState
 	{
 		if (value != null)
 		{
-			this.currentFill = FillTypes.ColorFill;
+			this.currentFill = FillTypes.FillColor;
 			this.fillColor = value;
 		}
 
@@ -167,13 +167,24 @@ class StrokeFillState extends CanvasRenderState
 		canvas.ctx.lineJoin = join;
 
 		var style:Dynamic = null;
-		if (this.currentFill == FillTypes.Gradient)
-			style = this.fillGradient.getStyle(canvas);
-		else if (this.currentFill == FillTypes.Pattern)
-			style = this.fillPattern.getStyle(canvas);
+		switch (this.currentFill)
+		{
+			case Gradient:
+				style = this.fillGradient.getStyle(canvas);
+			case Pattern:
+				style = this.fillGradient.getStyle(canvas);
+			case FillColor:
+				style = this.fillColor.getRgba();
+		}
 		canvas.ctx.fillStyle = style;
 		
-		if (this.currentStroke == StrokeTypes.Gradient)
-			canvas.ctx.strokeStyle = this.strokeGradient.getStyle(canvas);
+		switch (this.currentStroke)
+		{
+			case Gradient:
+				style = this.strokeGradient.getStyle(canvas);
+			case StrokeColor:
+				style = this.strokeColor.getRgba();
+		}
+		canvas.ctx.strokeStyle = style;
 	}
 }

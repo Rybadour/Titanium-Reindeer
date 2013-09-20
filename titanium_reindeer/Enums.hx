@@ -76,7 +76,7 @@ enum LineJoinType
 
 enum FillTypes
 {
-	Gradient; Pattern; ColorFill;
+	Gradient; Pattern; FillColor;
 }
 
 enum StrokeTypes

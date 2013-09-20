@@ -62,6 +62,10 @@ class Canvas2D
 			0, 0,
 			rect.width, rect.height
 		);
+		this.ctx.strokeRect(
+			0, 0,
+			rect.width, rect.height
+		);
 	}
 
 	public function renderCircle(circle:Circle)
@@ -69,6 +73,7 @@ class Canvas2D
 		this.ctx.beginPath();
 		this.ctx.arc(0, 0, circle.radius, 0, 2*Math.PI, false);
 		this.ctx.fill();
+		this.ctx.stroke();
 		this.ctx.closePath();
 	}
 
