@@ -1,6 +1,4 @@
-package titanium_reindeer;
-
-import titanium_reindeer.core.IShape;
+package titanium_reindeer.spatial;
 
 class Circle implements IShape
 {

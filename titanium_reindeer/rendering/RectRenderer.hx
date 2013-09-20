@@ -16,9 +16,6 @@ class RectRenderer extends CanvasRenderer
 
 	public override function _render(canvas:Canvas2D):Void
 	{
-		canvas.ctx.fillRect(
-			0, 0,
-			this.rect.width, this.rect.height
-		);
+		canvas.renderRect(this.rect);
 	}
 }

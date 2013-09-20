@@ -3,6 +3,8 @@ package titanium_reindeer.rendering;
 import js.Dom;
 
 import titanium_reindeer.spatial.RectRegion;
+import titanium_reindeer.spatial.Rect;
+import titanium_reindeer.spatial.Circle;
 
 class Canvas2D
 {
@@ -47,6 +49,27 @@ class Canvas2D
 	public function appendToDom(element:HtmlDom)
 	{
 		element.appendChild(this.canvas);
+	}
+
+	public function translate(vector:Vector2)
+	{
+		this.ctx.translate(vector.x, vector.y);
+	}
+	
+	public function renderRect(rect:Rect)
+	{
+		this.ctx.fillRect(
+			0, 0,
+			rect.width, rect.height
+		);
+	}
+
+	public function renderCircle(circle:Circle)
+	{
+		this.ctx.beginPath();
+		this.ctx.arc(0, 0, circle.radius, 0, 2*Math.PI, false);
+		this.ctx.fill();
+		this.ctx.closePath();
 	}
 
 	public function clear(rect:RectRegion = null):Void

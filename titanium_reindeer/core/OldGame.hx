@@ -3,7 +3,6 @@ package titanium_reindeer.core;
 import haxe.Timer;
 import js.Dom;
 
-import titanium_reindeer.rendering.Canvas2D;
 import titanium_reindeer.rendering.Color;
 
 class Game
@@ -14,6 +13,8 @@ class Game
 	public var targetElement(default, null):HtmlDom;
 	public var width:Int;
 	public var height:Int;
+
+	public var backgroundColor:Color;
 
 	public var debugMode:Bool;
 	public var maxAllowedUpdateLengthMs(default, setMaxAllowedUpdateLengthMs):Int;
@@ -27,26 +28,34 @@ class Game
 		return this.maxAllowedUpdateLengthMs;
 	}
 
+	private var exitGame:Bool;
 	private var msLastTimeStep:Int;
 
-	private var exitGame:Bool = true;
-
-	public var pageCanvas(default, null):Canvas2D;
+	// Managers
+	public var sceneManager(default, null):SceneManager;
+	public var inputManager(default, null):GameInputManager;
+	public var soundManager(default, null):GameSoundManager;
+	public var bitmapCache(default, null):BitmapCache;
+	public var cursor(default, null):Cursor;
 
 	public function new(targetHtmlId:String, ?width:Int, ?height:Int, ?debugMode:Bool)
 	{
 		this.targetElement = js.Lib.document.getElementById(targetHtmlId);
 		this.targetElement.style.position = "relative";
-		this.pageCanvas = new Canvas2D("main", width, height);
-		this.pageCanvas.appendToDom(this.targetElement);
 
 		this.width = width == null ? 400 : width;
 		this.height = height == null ? 300 : height;
 
-		this.exitGame = false;
-
 		this.debugMode = debugMode == null ? false : debugMode;
 		this.maxAllowedUpdateLengthMs = 1000; // 1 fps
+
+		this.exitGame = false;
+
+		this.sceneManager = new SceneManager(this);
+		this.inputManager = new GameInputManager(this, this.targetElement);
+		this.soundManager = new GameSoundManager(this);
+		this.bitmapCache = new BitmapCache();
+		this.cursor = new Cursor(this.targetElement);
 
 		if (debugMode)
 		{
@@ -124,19 +133,29 @@ class Game
 
 	private function preUpdate(msTimeStep:Int):Void
 	{
+		inputManager.preUpdate(msTimeStep);
+		sceneManager.preUpdate(msTimeStep);
 	}
 
 	private function update(msTimeStep:Int):Void
 	{
+		sceneManager.update(msTimeStep);
+		inputManager.update(msTimeStep);
 	}
 
 	private function postUpdate(msTimeStep:Int):Void
 	{
+		sceneManager.postUpdate(msTimeStep);
+		inputManager.postUpdate(msTimeStep);
 	}
 
 	public function destroy():Void
 	{
 		this.targetElement = null;
+		this.backgroundColor = null;
+
+		this.sceneManager.destroy();
+		this.inputManager.destroy();
 	}
 
 	public function stopGame():Void

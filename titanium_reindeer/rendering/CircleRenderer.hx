@@ -4,46 +4,23 @@ import titanium_reindeer.core.Relation;
 import titanium_reindeer.core.IHasIdProvider;
 import titanium_reindeer.core.IShape;
 import titanium_reindeer.core.IRegion;
-import titanium_reindeer.core.WFloat;
 
-class CircleCanvasRenderer implements ICanvasRenderer
+class CircleRenderer extends CanvasRenderer
 {
-	public var id(default, null):Int;
-	public var state(getState, null):CanvasRenderState;
-	public function getState():CanvasRenderState { return this.strokeFillState; }
-	public var strokeFillState(default, null):CanvasStrokeFillState;
+	public var circle(default, null):Circle;
 
-	private var relatedCircle:Relation2<WFloat, WVector2, CircleRegion>;
-	public var boundingRegion(getBoundingRegion, never):IRegion;
-	public function getBoundingRegion():IRegion
+	public function new(circle:Circle)
 	{
-		return this.relatedCircle.value;
+		super(new CanvasStrokeFillState());
+
+		this.circle = circle;
 	}
 
-	public var radius(default, null):WFloat;
-
-	public function new(provider:IHasIdProvider, radius:Float)
+	private override function _render(canvas:Canvas2D):Void
 	{
-		this.id = provider.idProvider.requestId();
-		this.strokeFillState = new CanvasStrokeFillState(this.render);
+		canvas.renderCircle(this.circle);
 
-		this.radius = new WFloat(radius);
-
-		this.relatedCircle = new Relation2(this.radius, this.state.localPosition, getBounds);
-	}
-
-	private function getBounds(radius:Float, position:Vector2):CircleRegion
-	{
-		return new CircleRegion(radius, position);
-	}
-
-	private function render(canvas:Canvas2D):Void
-	{
-		canvas.ctx.beginPath();
-		canvas.ctx.arc(0, 0, this.radius.value, 0, 2*Math.PI, false);
-		canvas.ctx.fill();
-		canvas.ctx.closePath();
-
+		/* *
 		var lineWidth:Float = this.strokeFillState.lineWidth;
 		if (lineWidth > 0)
 		{
@@ -52,5 +29,6 @@ class CircleCanvasRenderer implements ICanvasRenderer
 			canvas.ctx.stroke();
 			canvas.ctx.closePath();
 		}
+		/* */
 	}
 }
