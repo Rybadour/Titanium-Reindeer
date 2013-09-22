@@ -1,57 +1,100 @@
 package titanium_reindeer.ai.pathing;
 
+class WeightedNode
+{
+	public var node:PathNode;
+	public var opened:Bool;
+	public var closed:Bool;
+
+	public var f:Float;
+	public var g:Float;
+	public var h:Float;
+
+	public function new(node:PathNode)
+	{
+		this.opened = false;
+		this.closed = false;
+		this.node = node;
+
+		this.f = 0;
+		this.g = 0;
+		this.h = 0;
+	}
+
+	public function open()
+	{
+		this.opened = true;
+	}
+
+	public function close()
+	{
+		this.opened = false;
+		this.closed = true;
+	}
+
+	public static function sort(a:WeightedNode, b:WeightedNode):Int
+	{
+		return a.f - b.f;
+	}
+}
+
 class RoutingAlgorithms
 {
 	public static function aStar(start:PathNode, end:PathNode, graph:IPathNodeGraph):Array<PathNode>
 	{
-		var openList = new Heap(function(nodeA, nodeB) {
-				return nodeA.f - nodeB.f;
-			}),
-			heuristic = this.heuristic,
-			weight = this.weight,
-			abs = Math.abs, SQRT2 = Math.SQRT2,
-			node, neighbors, neighbor, i, l, x, y, ng;
+		var openList:Array<WeightedNode> = new Array();
+		var heuristic = this.heuristic;
+		var weight = this.weight;
+		var pathSoFar:Array<WeightedNode> = new Array();
+		var SQRT2:Float = Math.sqrt(2);
 
-		// set the `g` and `f` value of the start node to be 0
-		startNode.g = 0;
-		startNode.f = 0;
+		var nodeMap:Map<String, WeightedNode> = new Map();
+		var getWeighted:PathNode -> WeightedNode = function (node:PathNode) {
+			var key:String = node.x+","+node.y;
+			if (!nodeMap.exists(key))
+				nodeMap.set(key, new WeightedNode(node));
+			return nodeMap.get(key);
+		};
 
 		// push the start node into the open list
+		var startNode:WeightedNode = getWeighted(start);
 		openList.push(startNode);
-		startNode.opened = true;
+		startNode.open();
 
 		// while the open list is not empty
-		while (!openList.empty()) {
+		while (openList.length > 0)
+		{
 			// pop the position of node which has the minimum `f` value.
-			node = openList.pop();
-			node.closed = true;
+			var wNode = openList.pop();
+			wNode.close();
 
 			// if reached the end position, construct the path and return it
-			if (node === endNode) {
-				return Util.backtrace(endNode);
+			if (wNode.node == end) {
+				pathSoFar.push(wNode.node);
+				return pathSoFar;
 			}
 
 			// get neigbours of the current node
-			neighbors = grid.getNeighbors(node, allowDiagonal, dontCrossCorners);
-			for (i = 0, l = neighbors.length; i < l; ++i) {
-				neighbor = neighbors[i];
-
+			var neighbors:Array<PathNode> = graph.getAdjacentNodes(wNode.node);
+			for (var pNode:PathNode in neighbors)
+			{
+				var neighbor = getWeighted(pNode);
 				if (neighbor.closed) {
 					continue;
 				}
 
-				x = neighbor.x;
-				y = neighbor.y;
+				var x = pNode.x;
+				var y = pNode.y;
 
 				// get the distance between current node and the neighbor
 				// and calculate the next g score
-				ng = node.g + ((x - node.x === 0 || y - node.y === 0) ? 1 : SQRT2);
+				var ng = node.g + ((x - pNode.x === 0 || y - pNode.y === 0) ? 1 : SQRT2);
 
 				// check if the neighbor has not been inspected yet, or
 				// can be reached with smaller cost from the current node
 				if (!neighbor.opened || ng < neighbor.g) {
 					neighbor.g = ng;
-					neighbor.h = neighbor.h || weight * heuristic(abs(x - endX), abs(y - endY));
+					neighbor.h = neighbor.h || weight * heuristic(Math.abs(x - endX), Math.abs(y - endY));
 					neighbor.f = neighbor.g + neighbor.h;
 					neighbor.parent = node;
 
