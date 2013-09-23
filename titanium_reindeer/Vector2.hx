@@ -19,6 +19,11 @@ class Vector2
 		return outgoing;
 	}
 
+	public static function fromAngle(rad:Float):Vector2
+	{
+		return (new Vector2(1, 0)).rotate(rad);
+	}
+
 	private var mX:Float;
 	public var x(getX, setX):Float;
 	private function getX():Float { return mX; }

@@ -31,15 +31,6 @@ class Rect implements IShape
 		return Rect.copy(this);
 	}
 
-	public function isPointInside(p:Vector2):Bool
-	{
-		var halfWidth:Float = this.width/2;
-		var halfHeight:Float = this.height/2;
-
-		return (p.x >= -halfWidth) && (p.x < halfWidth) &&
-			   (p.y >= -halfHeight)  && (p.y < halfHeight);
-	}
-
 	public function getArea():Float
 	{
 		return this.width * this.height;

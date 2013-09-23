@@ -1,6 +1,4 @@
-package titanium_reindeer.components;
-
-import titanium_reindeer.core.RectRegion;
+package titanium_reindeer.spatial;
 
 // A series of static methods for common geometric calculations
 class Geometry

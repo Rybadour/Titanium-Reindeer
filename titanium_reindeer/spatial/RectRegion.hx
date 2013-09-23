@@ -4,7 +4,7 @@ class RectRegion extends Rect, implements IRegion
 {
 	public static function copy(rr:RectRegion):RectRegion
 	{
-		return new RectRegion(rr.width, rr.height, rr.center.getCopy());
+		return new RectRegion(rr.width, rr.height, rr.position.getCopy());
 	}
 
 	public static function expandToCover(coverage:RectRegion, toFit:RectRegion):RectRegion
@@ -34,34 +34,34 @@ class RectRegion extends Rect, implements IRegion
 		);
 	}
 
-	public var center(getCenter, setCenter):Vector2;
-	public function getCenter():Vector2 { return this.center; }
-	public function setCenter(value:Vector2):Vector2
+	public var position(default, null):Vector2;
+
+	public var top(getTop, never):Float;
+	private function getTop():Float { return this.position.y; }
+
+	public var bottom(getBottom, never):Float;
+	private function getBottom():Float { return this.position.y + this.height; }
+
+	public var left(getLeft, never):Float;
+	private function getLeft():Float { return this.position.x; }
+
+	public var right(getRight, never):Float;
+	private function getRight():Float { return this.position.x + this.width; }
+
+	public var center(getCenter, never):Vector2;
+	private function getCenter():Vector2
 	{
-		this.center = value;
-		return this.center;
+		return this.position.add(new Vector2(this.width/2, this.height/2));
 	}
 
-	public var top(getTop, null):Float;
-	private function getTop():Float { return this.center.y - this.height/2; }
-
-	public var bottom(getBottom, null):Float;
-	private function getBottom():Float { return this.center.y + this.height/2; }
-
-	public var left(getLeft, null):Float;
-	private function getLeft():Float { return this.center.x - this.width/2; }
-
-	public var right(getRight, null):Float;
-	private function getRight():Float { return this.center.x + this.width/2; }
-
-	public function new(width:Float, height:Float, center:Vector2)
+	public function new(width:Float, height:Float, position:Vector2)
 	{
 		super(width, height);
 
-		if (center == null)
-			this.center = new Vector2(0, 0);
+		if (position == null)
+			this.position = new Vector2(0, 0);
 		else
-			this.center = center.getCopy();
+			this.position = position.getCopy();
 	}
 
 	public function getBoundingRectRegion():RectRegion
@@ -69,8 +69,9 @@ class RectRegion extends Rect, implements IRegion
 		return RectRegion.copy(this);
 	}
 
-	public override function isPointInside(p:Vector2):Bool
+	public function isPointInside(p:Vector2):Bool
 	{
-		return super.isPointInside(p.subtract(this.center));
+		return (p.x >= this.left) && (p.x < this.right) &&
+			   (p.y >= this.top)  && (p.y < this.bottom);
 	}
 }
