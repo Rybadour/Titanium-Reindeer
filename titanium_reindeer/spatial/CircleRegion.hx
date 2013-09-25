@@ -1,7 +1,4 @@
-package titanium_reindeer.components;
-
-import titanium_reindeer.core.IRegion;
-import titanium_reindeer.core.RectRegion;
+package titanium_reindeer.spatial;
 
 class CircleRegion extends Circle, implements IRegion
 {
