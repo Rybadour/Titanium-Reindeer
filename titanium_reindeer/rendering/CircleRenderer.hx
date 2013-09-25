@@ -1,17 +1,15 @@
-package titanium_reindeer.components;
+package titanium_reindeer.rendering;
 
-import titanium_reindeer.core.Relation;
-import titanium_reindeer.core.IHasIdProvider;
-import titanium_reindeer.core.IShape;
-import titanium_reindeer.core.IRegion;
+import titanium_reindeer.spatial.Circle;
+import titanium_reindeer.spatial.CircleRegion;
 
-class CircleRenderer extends CanvasRenderer
+class CircleRenderer extends CanvasRenderer<StrokeFillState>
 {
 	public var circle(default, null):Circle;
 
 	public function new(circle:Circle)
 	{
-		super(new CanvasStrokeFillState());
+		super(new StrokeFillState());
 
 		this.circle = circle;
 	}

@@ -74,4 +74,19 @@ class RectRegion extends Rect, implements IRegion
 		return (p.x >= this.left) && (p.x < this.right) &&
 			   (p.y >= this.top)  && (p.y < this.bottom);
 	}
+
+	public function expand(margin:Int):Void
+	{
+		this.position.x -= margin;
+		this.position.y -= margin;
+		this.width += margin*2;
+		this.height += margin*2;
+	}
+
+	public function getExpanded(margin:Int):RectRegion
+	{
+		var region:RectRegion = RectRegion.copy(this);
+		region.expand(margin);
+		return region;
+	}
 }
