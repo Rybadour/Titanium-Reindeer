@@ -1,6 +1,8 @@
 package titanium_reindeer.rendering;
 
-import js.Dom;
+import js.html.Element;
+import js.html.CanvasElement;
+import js.html.CanvasRenderingContext2D;
 
 import titanium_reindeer.spatial.RectRegion;
 import titanium_reindeer.spatial.Rect;
@@ -8,11 +10,11 @@ import titanium_reindeer.spatial.Circle;
 
 class Canvas2D
 {
-	public var canvas(default, null):Dynamic;
-	public var ctx(default, null):Dynamic;
+	public var canvas(default, null):CanvasElement;
+	public var ctx(default, null):CanvasRenderingContext2D;
 
-	public var width(default, setWidth):Float;
-	private function setWidth(value:Float):Float
+	public var width(default, set):Float;
+	private function set_width(value:Float):Float
 	{
 		if (this.width != value)
 		{
@@ -23,8 +25,8 @@ class Canvas2D
 		return this.width;
 	}
 
-	public var height(default, setHeight):Float;
-	private function setHeight(value:Float):Float
+	public var height(default, set):Float;
+	private function set_height(value:Float):Float
 	{
 		if (this.height != value)
 		{
@@ -37,16 +39,16 @@ class Canvas2D
 
 	public function new(name:String, width:Float, height:Float)
 	{
-		this.canvas = js.Lib.document.createElement("canvas"); 
+		this.canvas = js.Browser.document.createCanvasElement(); 
 		this.canvas.id = name;
 
 		this.width = width;
 		this.height = height;
 
-		this.ctx = this.canvas.getContext("2d");
+		this.ctx = this.canvas.getContext2d();
 	}
 
-	public function appendToDom(element:HtmlDom)
+	public function appendToDom(element:Element)
 	{
 		element.appendChild(this.canvas);
 	}

@@ -1,6 +1,6 @@
 package titanium_reindeer.spatial;
 
-class RectRegion extends Rect, implements IRegion
+class RectRegion extends Rect implements IRegion
 {
 	public static function copy(rr:RectRegion):RectRegion
 	{
@@ -36,20 +36,20 @@ class RectRegion extends Rect, implements IRegion
 
 	public var position(default, null):Vector2;
 
-	public var top(getTop, never):Float;
-	private function getTop():Float { return this.position.y; }
+	public var top(get, never):Float;
+	private function get_top():Float { return this.position.y; }
 
-	public var bottom(getBottom, never):Float;
-	private function getBottom():Float { return this.position.y + this.height; }
+	public var bottom(get, never):Float;
+	private function get_bottom():Float { return this.position.y + this.height; }
 
-	public var left(getLeft, never):Float;
-	private function getLeft():Float { return this.position.x; }
+	public var left(get, never):Float;
+	private function get_left():Float { return this.position.x; }
 
-	public var right(getRight, never):Float;
-	private function getRight():Float { return this.position.x + this.width; }
+	public var right(get, never):Float;
+	private function get_right():Float { return this.position.x + this.width; }
 
-	public var center(getCenter, never):Vector2;
-	private function getCenter():Vector2
+	public var center(get, never):Vector2;
+	private function get_center():Vector2
 	{
 		return this.position.add(new Vector2(this.width/2, this.height/2));
 	}

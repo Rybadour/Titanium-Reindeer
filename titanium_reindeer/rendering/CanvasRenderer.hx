@@ -2,11 +2,11 @@ package titanium_reindeer.rendering;
 
 class CanvasRenderer<S:IRenderState> implements ICanvasRenderer<S>
 {
-	public var state(getState, null):S;
-	public function getState():S { return this.state; }
+	public var state(get, null):S;
+	public function get_state():S { return this.state; }
 
-	public var position(getPosition, null):Vector2;
-	public function getPosition():Vector2 { return this.position; }
+	public var position(get, null):Vector2;
+	public function get_position():Vector2 { return this.position; }
 
 
 	public function new(state:S)

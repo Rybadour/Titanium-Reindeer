@@ -1,7 +1,7 @@
 package titanium_reindeer.spatial;
 
-interface IRegion implements IShape
+interface IRegion extends IShape
 {
 	public function getBoundingRectRegion():RectRegion;
-	public var center(getCenter, null):Vector2;
+	public var center(get, null):Vector2;
 }

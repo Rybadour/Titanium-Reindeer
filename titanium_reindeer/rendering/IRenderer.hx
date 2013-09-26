@@ -4,6 +4,6 @@ import titanium_reindeer.spatial.IRegion;
 
 interface IRenderer
 {
-	public var boundingRegion(getBoundingRegion, never):IRegion;
-	public function getBoundingRegion():IRegion;
+	public var boundingRegion(get, never):IRegion;
+	public function get_boundingRegion():IRegion;
 }

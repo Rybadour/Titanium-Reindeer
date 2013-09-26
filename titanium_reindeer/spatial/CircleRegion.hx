@@ -1,15 +1,15 @@
 package titanium_reindeer.spatial;
 
-class CircleRegion extends Circle, implements IRegion
+class CircleRegion extends Circle implements IRegion
 {
 	public static function copy(cr:CircleRegion):CircleRegion
 	{
 		return new CircleRegion(cr.radius, cr.center);
 	}
 
-	public var center(getCenter, setCenter):Vector2;
-	public function getCenter():Vector2 { return this.center; }
-	public function setCenter(value:Vector2):Vector2
+	@:isVar public var center(get, set):Vector2;
+	public function get_center():Vector2 { return this.center; }
+	public function set_center(value:Vector2):Vector2
 	{
 		this.center = value;
 		return this.center;

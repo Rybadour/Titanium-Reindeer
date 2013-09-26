@@ -6,8 +6,8 @@ class StrokeFillState extends CanvasRenderState
 {
 	private var currentFill:FillTypes;
 
-	public var fillColor(default, setFill):Color;
-	private function setFill(value:Color):Color
+	public var fillColor(default, set):Color;
+	private function set_fillColor(value:Color):Color
 	{
 		if (value != null)
 		{
@@ -18,8 +18,8 @@ class StrokeFillState extends CanvasRenderState
 		return value;
 	}
 
-	public var fillGradient(default, setFillGradient):LinearGradient;
-	private function setFillGradient(value:LinearGradient):LinearGradient
+	public var fillGradient(default, set):LinearGradient;
+	private function set_fillGradient(value:LinearGradient):LinearGradient
 	{
 		if (value != null)
 		{
@@ -30,8 +30,8 @@ class StrokeFillState extends CanvasRenderState
 		return value;
 	}
 
-	public var fillPattern(default, setFillPattern):Pattern;
-	private function setFillPattern(value:Pattern):Pattern
+	public var fillPattern(default, set):Pattern;
+	private function set_fillPattern(value:Pattern):Pattern
 	{
 		if (value != null)
 		{
@@ -51,8 +51,8 @@ class StrokeFillState extends CanvasRenderState
 
 	private var currentStroke:StrokeTypes;
 
-	public var strokeColor(default, setStrokeColor):Color;
-	private function setStrokeColor(value:Color):Color
+	public var strokeColor(default, set):Color;
+	private function set_strokeColor(value:Color):Color
 	{
 		if (value != null)
 		{
@@ -63,8 +63,8 @@ class StrokeFillState extends CanvasRenderState
 		return value;
 	}
 
-	public var strokeGradient(default, setStrokeGradient):LinearGradient;
-	private function setStrokeGradient(value:LinearGradient):LinearGradient
+	public var strokeGradient(default, set):LinearGradient;
+	private function set_strokeGradient(value:LinearGradient):LinearGradient
 	{
 		if (value != null)
 		{
@@ -75,8 +75,8 @@ class StrokeFillState extends CanvasRenderState
 		return value;
 	}
 
-	public var lineWidth(default, setLineWidth):Int;
-	private function setLineWidth(value:Int):Int
+	public var lineWidth(default, set):Int;
+	private function set_lineWidth(value:Int):Int
 	{
 		if (value != lineWidth)
 		{
@@ -86,8 +86,8 @@ class StrokeFillState extends CanvasRenderState
 		return value;
 	}
 
-	public var lineCap(default, setLineCap):LineCapType;
-	private function setLineCap(value:LineCapType):LineCapType
+	public var lineCap(default, set):LineCapType;
+	private function set_lineCap(value:LineCapType):LineCapType
 	{
 		if (value != lineCap)
 		{
@@ -97,8 +97,8 @@ class StrokeFillState extends CanvasRenderState
 		return value;
 	}
 
-	public var lineJoin(default, setLineJoin):LineJoinType;
-	private function setLineJoin(value:LineJoinType):LineJoinType
+	public var lineJoin(default, set):LineJoinType;
+	private function set_lineJoin(value:LineJoinType):LineJoinType
 	{
 		if (value != lineJoin)
 		{
@@ -108,8 +108,8 @@ class StrokeFillState extends CanvasRenderState
 		return value;
 	}
 
-	public var miterLimit(default, setMiterLimit):Float;
-	private function setMiterLimit(value:Float):Float
+	public var miterLimit(default, set):Float;
+	private function set_miterLimit(value:Float):Float
 	{
 		if (value != miterLimit)
 		{
@@ -174,7 +174,7 @@ class StrokeFillState extends CanvasRenderState
 			case Pattern:
 				style = this.fillGradient.getStyle(canvas);
 			case FillColor:
-				style = this.fillColor.getRgba();
+				style = this.fillColor.rgba;
 		}
 		canvas.ctx.fillStyle = style;
 		
@@ -183,7 +183,7 @@ class StrokeFillState extends CanvasRenderState
 			case Gradient:
 				style = this.strokeGradient.getStyle(canvas);
 			case StrokeColor:
-				style = this.strokeColor.getRgba();
+				style = this.strokeColor.rgba;
 		}
 		canvas.ctx.strokeStyle = style;
 	}

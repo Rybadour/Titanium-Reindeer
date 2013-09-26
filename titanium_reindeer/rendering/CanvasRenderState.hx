@@ -2,8 +2,8 @@ package titanium_reindeer.rendering;
 
 class CanvasRenderState implements IRenderState
 {
-	public var alpha(default, setAlpha):Float;
-	private function setAlpha(value:Float):Float
+	public var alpha(default, set):Float;
+	private function set_alpha(value:Float):Float
 	{
 		if (value < 0)
 			value = 0;
@@ -18,8 +18,8 @@ class CanvasRenderState implements IRenderState
 		return this.alpha;
 	}
 
-	public var shadow(default, setShadow):Shadow;
-	private function setShadow(value:Shadow):Shadow
+	public var shadow(default, set):Shadow;
+	private function set_shadow(value:Shadow):Shadow
 	{
 		if (value != null)
 		{
@@ -32,8 +32,8 @@ class CanvasRenderState implements IRenderState
 		return this.shadow;
 	}
 
-	public var rotation(default, setRotation):Float;
-	private function setRotation(value:Float):Float
+	public var rotation(default, set):Float;
+	private function set_rotation(value:Float):Float
 	{
 		 value %= Math.PI*2;
 

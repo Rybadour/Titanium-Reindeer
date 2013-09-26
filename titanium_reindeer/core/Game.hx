@@ -1,23 +1,23 @@
 package titanium_reindeer.core;
 
 import haxe.Timer;
-import js.Dom;
+import js.html.Element;
 
 import titanium_reindeer.rendering.Canvas2D;
 import titanium_reindeer.rendering.Color;
 
 class Game
 {
-	public static inline var DEFAULT_UPDATES_TIME_MS:Int 	= Math.round(1000/60); // 60 fps
+	public static inline var DEFAULT_UPDATES_TIME_MS:Int 	= 17; // 60 fps
 
 
-	public var targetElement(default, null):HtmlDom;
+	public var targetElement(default, null):Element;
 	public var width:Int;
 	public var height:Int;
 
 	public var debugMode:Bool;
-	public var maxAllowedUpdateLengthMs(default, setMaxAllowedUpdateLengthMs):Int;
-	private function setMaxAllowedUpdateLengthMs(value:Int):Int
+	public var maxAllowedUpdateLengthMs(default, set):Int;
+	private function set_maxAllowedUpdateLengthMs(value:Int):Int
 	{
 		if (value != this.maxAllowedUpdateLengthMs)
 		{
@@ -35,7 +35,7 @@ class Game
 
 	public function new(targetHtmlId:String, ?width:Int, ?height:Int, ?debugMode:Bool)
 	{
-		this.targetElement = js.Lib.document.getElementById(targetHtmlId);
+		this.targetElement = js.Browser.document.getElementById(targetHtmlId);
 		this.targetElement.style.position = "relative";
 		this.pageCanvas = new Canvas2D("main", width, height);
 		this.pageCanvas.appendToDom(this.targetElement);
@@ -50,12 +50,15 @@ class Game
 
 		if (debugMode)
 		{
-			js.Lib.setErrorHandler(function (msg:String, stack:Array<String>)
+			/* *
+			// TODO: Wtf happened to setErrorHandler
+			js.Browser.setErrorHandler(function (msg:String, stack:Array<String>)
 			{
-				js.Lib.alert("ERROR[ "+msg+" ]");
+				js.Browser.alert("ERROR[ "+msg+" ]");
 				trace(stack);
 				return true;
 			});
+			/* */
 		}
 	}
 
@@ -65,7 +68,7 @@ class Game
 		requestAnimFrame();
 	}
 
-	private function gameLoop(now:Int):Void
+	private function gameLoop(now:Float):Bool
 	{
 		if (exitGame)
 		{
@@ -74,14 +77,14 @@ class Game
 		else
 		{
 			if (this.msLastTimeStep == null)
-				this.msLastTimeStep = now;
+				this.msLastTimeStep = 0;
 
 			var msTimeStep:Int;
 			if (now == null)
 				msTimeStep = Game.DEFAULT_UPDATES_TIME_MS;
 			else
 				msTimeStep = Std.int(Math.min(now - this.msLastTimeStep, this.maxAllowedUpdateLengthMs));
-			this.msLastTimeStep = now;
+			this.msLastTimeStep = Math.round(now);
 
 			// Game Logic
 			this.preUpdate(msTimeStep);
@@ -93,32 +96,34 @@ class Game
 			// Request a game loop tick from the browser
 			requestAnimFrame();
 		}
+
+		return true;
 	}
 
 	// Setup the request animation frame wrapper for browser compatibility
 	private function requestAnimFrame()
 	{
-		// This terrible code seems to be the only way I could get Haxe to allow me to call browser specific functions
-		// Assigning the functions to a variable was causing the javascript code to crash
 		untyped
 		{
-			if (js.Lib.window.requestAnimationFrame)
-				js.Lib.window.requestAnimationFrame(gameLoop, this.targetElement);
-			
-			else if (js.Lib.window.webkitRequestAnimationFrame)
-				js.Lib.window.webkitRequestAnimationFrame(gameLoop, this.targetElement);
+			if (js.Browser.window.requestAnimationFrame)
+				js.Browser.window.requestAnimationFrame(gameLoop);
 
-			else if (js.Lib.window.mozRequestAnimationFrame)
-				js.Lib.window.mozRequestAnimationFrame(gameLoop, this.targetElement);
+			else if (js.Browser.window.webkitRequestAnimationFrame)
+				js.Browser.window.webkitRequestAnimationFrame(gameLoop);
 
-			else if (js.Lib.window.oRequestAnimationFrame)
-				js.Lib.window.oRequestAnimationFrame(gameLoop, this.targetElement);
+			else if (js.Browser.window.mozRequestAnimationFrame)
+				js.Browser.window.mozRequestAnimationFrame(gameLoop);
 
-			else if (js.Lib.window.msRequestAnimationFrame)
-				js.Lib.window.msRequestAnimationFrame(gameLoop, this.targetElement);
+			else if (js.Browser.window.oRequestAnimationFrame)
+				js.Browser.window.oRequestAnimationFrame(gameLoop);
+
+			else if (js.Browser.window.msRequestAnimationFrame)
+				js.Browser.window.msRequestAnimationFrame(gameLoop);
 
 			else
-				js.Lib.window.setTimeout(gameLoop, Game.DEFAULT_UPDATES_TIME_MS);
+				js.Browser.window.setTimeout(function () {
+						this.gameLoop(Game.DEFAULT_UPDATES_TIME_MS);
+						}, Game.DEFAULT_UPDATES_TIME_MS);
 		}
 	}
 

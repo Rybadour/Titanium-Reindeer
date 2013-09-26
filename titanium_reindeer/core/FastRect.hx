@@ -77,26 +77,17 @@ class FastRect
 	public var width:Float;
 	public var height:Float;
 
-	public var top(getTop, never):Float;
-	private function getTop():Float
-	{
-		return y;
-	}
-	public var bottom(getBottom, never):Float;
-	private function getBottom():Float
-	{
-		return y + height;
-	}
-	public var left(getLeft, never):Float;
-	private function getLeft():Float
-	{
-		return x;
-	}
-	public var right(getRight, never):Float;
-	private function getRight():Float
-	{
-		return x + width;
-	}
+	public var top(get, never):Float;
+	private function get_top():Float { return y; }
+
+	public var bottom(get, never):Float;
+	private function get_bottom():Float { return y + height; }
+
+	public var left(get, never):Float;
+	private function get_left():Float { return x; }
+
+	public var right(get, never):Float;
+	private function get_right():Float { return x + width; }
 
 	public function new(x:Float, y:Float, width:Float, height:Float)
 	{

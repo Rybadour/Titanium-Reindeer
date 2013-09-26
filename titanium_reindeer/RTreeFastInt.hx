@@ -603,8 +603,8 @@ class RTreeFastInt implements ISpatialPartition
 		if (this.root == null)
 			return;
 
-		var canvas:Dynamic = js.Lib.document.getElementById(this.debugCanvas);
-		var pen:Dynamic = canvas.getContext("2d");
+		var canvas:Dynamic = js.Browser.document.getElementById(this.debugCanvas);
+		var pen:Dynamic = canvas.getContext2d();
 
 		/* *
 		var colors:Array<String> = new Array();

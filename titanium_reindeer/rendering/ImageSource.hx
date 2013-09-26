@@ -1,10 +1,10 @@
 package titanium_reindeer.rendering;
 
-import js.Dom;
+import js.html.ImageElement;
 
 class ImageSource
 {
-	public var image(default, null):js.Image;
+	public var image(default, null):ImageElement;
 	public var width(default, null):Int;
 	public var height(default, null):Int;
 
@@ -16,13 +16,12 @@ class ImageSource
 	{
 		untyped
 		{
-			__js__("this.image = new Image();");
 			this.image.onload = this.imageLoaded;
 			this.image.src = path;
 		}
 	}
 
-	private function imageLoaded(event:Event):Void
+	private function imageLoaded(event:Dynamic):Void
 	{
 		if (this.image == null)
 			return;

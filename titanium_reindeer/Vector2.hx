@@ -26,28 +26,13 @@ class Vector2
 		return v;
 	}
 
-	private var mX:Float;
-	public var x(getX, setX):Float;
-	private function getX():Float { return mX; }
-	private function setX(value:Float):Float
-	{
-		mX = value;
-		return mX;
-	}
-
-	private var mY:Float;
-	public var y(getY, setY):Float;
-	private function getY():Float { return mY; }
-	private function setY(value:Float):Float
-	{
-		mY = value;
-		return mY;
-	}
+	public var x:Float;
+	public var y:Float;
 
 	public function new(x:Float, y:Float)
 	{
-		this.mX = x;
-		this.mY = y;
+		this.x = x;
+		this.y = y;
 	}
 	
 	public function getCopy()
