@@ -1,6 +1,6 @@
 package titanium_reindeer.ai.pathing;
 
-interface IPathNodeGraph
+interface IPathNodeGraph<T:PathNode>
 {
-	public function getAdjacentNodes(node:PathNode):Array<PathNode>;
+	public function getAdjacentNodes(node:PathNode):Array<T>;
 }

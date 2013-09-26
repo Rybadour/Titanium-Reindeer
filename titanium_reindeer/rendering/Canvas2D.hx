@@ -57,6 +57,16 @@ class Canvas2D
 	{
 		this.ctx.translate(vector.x, vector.y);
 	}
+
+	public function moveTo(vector:Vector2)
+	{
+		this.ctx.moveTo(vector.x, vector.y);
+	}
+
+	public function lineTo(vector:Vector2)
+	{
+		this.ctx.lineTo(vector.x, vector.y);
+	}
 	
 	public function renderRect(rect:Rect)
 	{
