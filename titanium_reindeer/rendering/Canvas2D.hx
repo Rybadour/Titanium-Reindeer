@@ -67,6 +67,11 @@ class Canvas2D
 	{
 		this.ctx.lineTo(vector.x, vector.y);
 	}
+
+	public function renderCanvas(canvas:Canvas2D)
+	{
+		untyped { this.ctx.drawImage(canvas.canvas, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height); }
+	}
 	
 	public function renderRect(rect:Rect)
 	{
