@@ -50,16 +50,16 @@ class PathNodeGraphRenderer<T:PathNode, S:IRenderState> extends CanvasRenderer<C
 		this.visit(node);
 		for (newNode in graph.getAdjacentNodes(node))
 		{
+			canvas.ctx.save();
+			edgeState.apply(canvas);
+			canvas.ctx.beginPath();
+			canvas.moveTo(node);
+			canvas.lineTo(newNode);
+			canvas.ctx.stroke();
+			canvas.ctx.restore();
+
 			if (!this.isVisited(newNode))
 			{
-				canvas.ctx.save();
-				edgeState.apply(canvas);
-				canvas.ctx.beginPath();
-				canvas.moveTo(node);
-				canvas.lineTo(newNode);
-				canvas.ctx.stroke();
-				canvas.ctx.restore();
-
 				this.renderGraphNode(canvas, graph, newNode);
 			}
 		}

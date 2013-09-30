@@ -32,7 +32,7 @@ class WeightedNode<N:PathNode>
 		this.closed = true;
 	}
 
-	public static function sort(a:WeightedNode, b:WeightedNode):Int
+	public static function sort<N>(a:WeightedNode<N>, b:WeightedNode<N>):Float
 	{
 		return a.f - b.f;
 	}
@@ -40,24 +40,28 @@ class WeightedNode<N:PathNode>
 
 class RoutingAlgorithms
 {
-	public static function aStar<N:PathNode>(start:N, end:N, graph:IPathNodeGraph<N>):Array<N>
+	public static function aStar<N:PathNode>(start:N, end:N, graph:IPathNodeGraph<N>, ?heuristic:Float -> Float -> Float):Array<N>
 	{
-		var openList:Array<WeightedNode> = new Array();
-		//var heuristic = this.heuristic;
-		//var weight = this.weight;
-		var pathSoFar:Array<WeightedNode> = new Array();
+		var weight = 1;
+
+		var openList:Array<WeightedNode<N>> = new Array();
+		if (heuristic == null)
+		{
+			heuristic = function (dx, dy) { return dx + dy; };
+		}
+		var pathSoFar:Array<N> = new Array();
 		var SQRT2:Float = Math.sqrt(2);
 
-		var nodeMap:Map<String, WeightedNode> = new Map();
-		var getWeighted:N -> WeightedNode = function (node:N) {
+		var nodeMap:Map<String, WeightedNode<N>> = new Map();
+		var getWeighted:N -> WeightedNode<N> = function (node:N) {
 			var key:String = node.x+","+node.y;
 			if (!nodeMap.exists(key))
-				nodeMap.set(key, new WeightedNode(node));
+				nodeMap.set(key, new WeightedNode<N>(node));
 			return nodeMap.get(key);
 		};
 
 		// push the start node into the open list
-		var startNode:WeightedNode = getWeighted(start);
+		var startNode:WeightedNode<N> = getWeighted(start);
 		openList.push(startNode);
 		startNode.open();
 
