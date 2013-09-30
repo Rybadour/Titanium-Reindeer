@@ -1,8 +1,8 @@
 package titanium_reindeer.ai.pathing;
 
-class WeightedNode
+class WeightedNode<N:PathNode>
 {
-	public var node:PathNode;
+	public var node:N;
 	public var opened:Bool;
 	public var closed:Bool;
 
@@ -10,7 +10,7 @@ class WeightedNode
 	public var g:Float;
 	public var h:Float;
 
-	public function new(node:PathNode)
+	public function new(node:N)
 	{
 		this.opened = false;
 		this.closed = false;
@@ -40,16 +40,16 @@ class WeightedNode
 
 class RoutingAlgorithms
 {
-	public static function aStar(start:PathNode, end:PathNode, graph:IPathNodeGraph):Array<PathNode>
+	public static function aStar<N:PathNode>(start:N, end:N, graph:IPathNodeGraph<N>):Array<N>
 	{
 		var openList:Array<WeightedNode> = new Array();
-		var heuristic = this.heuristic;
-		var weight = this.weight;
+		//var heuristic = this.heuristic;
+		//var weight = this.weight;
 		var pathSoFar:Array<WeightedNode> = new Array();
 		var SQRT2:Float = Math.sqrt(2);
 
 		var nodeMap:Map<String, WeightedNode> = new Map();
-		var getWeighted:PathNode -> WeightedNode = function (node:PathNode) {
+		var getWeighted:N -> WeightedNode = function (node:N) {
 			var key:String = node.x+","+node.y;
 			if (!nodeMap.exists(key))
 				nodeMap.set(key, new WeightedNode(node));
@@ -75,8 +75,8 @@ class RoutingAlgorithms
 			}
 
 			// get neigbours of the current node
-			var neighbors:Array<PathNode> = graph.getAdjacentNodes(wNode.node);
-			for (var pNode:PathNode in neighbors)
+			var neighbors:Array<N> = graph.getAdjacentNodes(wNode.node);
+			for (pNode in neighbors)
 			{
 				var neighbor = getWeighted(pNode);
 				if (neighbor.closed) {
@@ -88,7 +88,7 @@ class RoutingAlgorithms
 
 				// get the distance between current node and the neighbor
 				// and calculate the next g score
-				var ng = node.g + ((x - pNode.x === 0 || y - pNode.y === 0) ? 1 : SQRT2);
+				var ng = node.g + ((x - pNode.x == 0 || y - pNode.y == 0) ? 1 : SQRT2);
 
 				// check if the neighbor has not been inspected yet, or
 				// can be reached with smaller cost from the current node
