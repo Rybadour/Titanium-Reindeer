@@ -10,6 +10,8 @@ class WeightedNode<N:PathNode>
 	public var g:Float;
 	public var h:Float;
 
+	//public var parent:WeightedNode<N>
+
 	public function new(node:N)
 	{
 		this.opened = false;
@@ -18,7 +20,7 @@ class WeightedNode<N:PathNode>
 
 		this.f = 0;
 		this.g = 0;
-		this.h = 0;
+		this.h = null;
 	}
 
 	public function open()
@@ -32,9 +34,11 @@ class WeightedNode<N:PathNode>
 		this.closed = true;
 	}
 
-	public static function sort<N>(a:WeightedNode<N>, b:WeightedNode<N>):Float
+	public static function sort<N:PathNode>(a:WeightedNode<N>, b:WeightedNode<N>):Int
 	{
-		return a.f - b.f;
+		var f:Float = a.f - b.f;
+		if (f == 0) return 0;
+		return (f < 0) ? -1 : 1;
 	}
 }
 
@@ -42,6 +46,7 @@ class RoutingAlgorithms
 {
 	public static function aStar<N:PathNode>(start:N, end:N, graph:IPathNodeGraph<N>, ?heuristic:Float -> Float -> Float):Array<N>
 	{
+		// TODO: Parameter or class member or something sometime
 		var weight = 1;
 
 		var openList:Array<WeightedNode<N>> = new Array();
@@ -49,6 +54,7 @@ class RoutingAlgorithms
 		{
 			heuristic = function (dx, dy) { return dx + dy; };
 		}
+
 		var pathSoFar:Array<N> = new Array();
 		var SQRT2:Float = Math.sqrt(2);
 
@@ -83,33 +89,36 @@ class RoutingAlgorithms
 			for (pNode in neighbors)
 			{
 				var neighbor = getWeighted(pNode);
-				if (neighbor.closed) {
+				if (neighbor.closed)
 					continue;
-				}
 
-				var x = pNode.x;
-				var y = pNode.y;
+				var x = neighbor.node.x;
+				var y = neighbor.node.y;
 
 				// get the distance between current node and the neighbor
 				// and calculate the next g score
-				var ng = node.g + ((x - pNode.x == 0 || y - pNode.y == 0) ? 1 : SQRT2);
+				var ng = wNode.g + ((x - wNode.node.x == 0 || y - wNode.node.y == 0) ? 1 : SQRT2);
 
 				// check if the neighbor has not been inspected yet, or
 				// can be reached with smaller cost from the current node
 				if (!neighbor.opened || ng < neighbor.g) {
 					neighbor.g = ng;
-					neighbor.h = neighbor.h || weight * heuristic(Math.abs(x - endX), Math.abs(y - endY));
+					if (neighbor.h == null)
+						neighbor.h = weight * heuristic(Math.abs(x - end.x), Math.abs(y - end.y));
 					neighbor.f = neighbor.g + neighbor.h;
-					neighbor.parent = node;
+					//neighbor.parent = pNode;
 
-					if (!neighbor.opened) {
+					if (!neighbor.opened)
+					{
 						openList.push(neighbor);
-						neighbor.opened = true;
-					} else {
+						neighbor.open();
+					}
+					else
+					{
 						// the neighbor can be reached with smaller cost.
 						// Since its f value has been updated, we have to
 						// update its position in the open list
-						openList.updateItem(neighbor);
+						openList.sort(WeightedNode.sort);
 					}
 				}
 			} // end for each neighbor
