@@ -30,7 +30,6 @@ class WeightedNode<N:PathNode>
 
 	public function close()
 	{
-		this.opened = false;
 		this.closed = true;
 	}
 
@@ -121,13 +120,7 @@ class RoutingAlgorithms
 						openList.push(neighbor);
 						neighbor.open();
 					}
-					else
-					{
-						// the neighbor can be reached with smaller cost.
-						// Since its f value has been updated, we have to
-						// update its position in the open list
-						openList.sort(WeightedNode.sort);
-					}
+					openList.sort(WeightedNode.sort);
 				}
 			} // end for each neighbor
 		} // end while not open list empty
