@@ -10,7 +10,7 @@ class WeightedNode<N:PathNode>
 	public var g:Float;
 	public var h:Float;
 
-	//public var parent:WeightedNode<N>
+	public var parent:WeightedNode<N>;
 
 	public function new(node:N)
 	{
@@ -55,7 +55,6 @@ class RoutingAlgorithms
 			heuristic = function (dx, dy) { return dx + dy; };
 		}
 
-		var pathSoFar:Array<N> = new Array();
 		var SQRT2:Float = Math.sqrt(2);
 
 		var nodeMap:Map<String, WeightedNode<N>> = new Map();
@@ -79,9 +78,18 @@ class RoutingAlgorithms
 			wNode.close();
 
 			// if reached the end position, construct the path and return it
-			if (wNode.node == end) {
-				pathSoFar.push(wNode.node);
-				return pathSoFar;
+			if (wNode.node == end)
+			{
+				var path:Array<N> = new Array();
+				var n = wNode;
+				while (n.parent != null)
+				{
+					path.push(n.node);
+					n = n.parent;
+				}
+				path.push(n.node);
+				path.reverse();
+				return path;
 			}
 
 			// get neigbours of the current node
@@ -106,7 +114,7 @@ class RoutingAlgorithms
 					if (neighbor.h == null)
 						neighbor.h = weight * heuristic(Math.abs(x - end.x), Math.abs(y - end.y));
 					neighbor.f = neighbor.g + neighbor.h;
-					//neighbor.parent = pNode;
+					neighbor.parent = wNode;
 
 					if (!neighbor.opened)
 					{

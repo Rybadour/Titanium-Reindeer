@@ -26,6 +26,14 @@ class Vector2
 		return v;
 	}
 
+	public static function normalizedDiff(a:Vector2, b:Vector2):Vector2
+	{
+		var diff:Vector2 = b.subtract(a);
+		diff.normalize();
+		return diff;
+	}
+
+
 	public var x:Float;
 	public var y:Float;
 
