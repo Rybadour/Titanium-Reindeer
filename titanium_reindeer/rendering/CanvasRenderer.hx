@@ -1,28 +1,18 @@
 package titanium_reindeer.rendering;
 
-class CanvasRenderer<S:IRenderState> implements ICanvasRenderer<S>
+class CanvasRenderer extends Renderer<RenderState>
 {
-	public var state(get, null):S;
-	public function get_state():S { return this.state; }
+	public var canvas(default, null):Canvas2D;
 
-	public var position(get, null):Vector2;
-	public function get_position():Vector2 { return this.position; }
-
-
-	public function new(state:S)
+	public function new(canvas:Canvas2D)
 	{
-		this.position = new Vector2(0, 0);
-		this.state = state;
+		super(new RenderState());
+
+		this.canvas = canvas;
 	}
 
-	public function render(canvas:Canvas2D):Void
+	private function _render(canvas:Canvas2D):Void
 	{
-		canvas.ctx.save();
-		canvas.ctx.translate(this.position.x, this.position.y);
-		this.state.apply(canvas);
-		this._render(canvas);
-		canvas.ctx.restore();
+		canvas.renderCanvas(this.canvas);
 	}
-
-	private function _render(canvas:Canvas2D):Void { }
 }
