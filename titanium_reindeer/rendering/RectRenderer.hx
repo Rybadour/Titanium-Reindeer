@@ -3,7 +3,7 @@ package titanium_reindeer.rendering;
 import titanium_reindeer.spatial.Rect;
 import titanium_reindeer.spatial.RectRegion;
 
-class RectRenderer extends CanvasRenderer<StrokeFillState>
+class RectRenderer extends Renderer<StrokeFillState>
 {
 	public var rect(default, null):Rect;
 

@@ -1,9 +1,9 @@
 package titanium_reindeer.rendering;
 
-import titanium_reindeer.spatial.IRegion;
-
-interface IRenderer
+interface IRenderer<S:IRenderState>
 {
-	public var boundingRegion(get, never):IRegion;
-	public function get_boundingRegion():IRegion;
+	public var state(get, null):S;
+	public var position(get, null):Vector2;
+
+	public function render(canvas:Canvas2D):Void;
 }

@@ -3,7 +3,7 @@ package titanium_reindeer.rendering;
 import titanium_reindeer.spatial.Circle;
 import titanium_reindeer.spatial.CircleRegion;
 
-class CircleRenderer extends CanvasRenderer<StrokeFillState>
+class CircleRenderer extends Renderer<StrokeFillState>
 {
 	public var circle(default, null):Circle;
 
