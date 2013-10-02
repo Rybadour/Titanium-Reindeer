@@ -68,6 +68,57 @@ class Game
 		requestAnimFrame();
 	}
 
+	public function requestFullScreen():Void
+	{
+		var isRequestMade:Bool = false;
+
+		// Make fullscreen
+		untyped
+		{
+			var requestFuncs:Array<String> = [
+				"requestFullscreen",
+				"webkitRequestFullscreen",
+				"webkitRequestFullScreen",
+				"mozRequestFullScreen",
+				"msRequestFullscreen"
+			];
+			var changeFuncs:Array<String> = [
+				"fullscreenchange",
+				"webkitfullscreenchange",
+				"webkitfullscreenchange",
+				"mozfullScreenchange",
+				"MSFullscreenchange"
+			];
+			var errorFuncs:Array<String> = [
+				"fullscreenerror",
+				"webkitfullscreenerror",
+				"webkitfullscreenerror",
+				"mozfullScreenerror",
+				"MSFullscreenerror"
+			];
+			for (r in 0...requestFuncs.length)
+			{
+				var req = requestFuncs[r];
+				if (this.targetElement[req])
+				{
+					isRequestMade = true;
+					this.targetElement.addEventListener(changeFuncs[r], function (event) {
+						var size = js.Browser.window.getComputedStyle(this.targetElement);
+						this.width = size.width;
+						this.height = size.height;
+						this.pageCanvas.width = this.width;
+						this.pageCanvas.height = this.height;
+					});
+					this.targetElement.addEventListener(errorFuncs[r], function (event) {
+						js.Browser.window.alert("Either the target element can not be made fullscreen or you didn't request from a user interaction");
+					});
+					this.targetElement[req]();
+					break;
+				}
+			}
+		}
+	}
+
 	private function gameLoop(now:Float):Bool
 	{
 		if (exitGame)
