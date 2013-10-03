@@ -3,17 +3,17 @@ package titanium_reindeer.rendering;
 import titanium_reindeer.ai.pathing.PathNode;
 import titanium_reindeer.ai.pathing.IPathNodeGraph;
 
-class PathNodeGraphRenderer<T:PathNode, S:IRenderState> extends CanvasRenderer<CanvasRenderState>
+class PathNodeGraphRenderer<T:PathNode, S:IRenderState> extends Renderer<RenderState>
 {
 	public var startNode:T;
 	public var graph(default, null):IPathNodeGraph<T>;
-	public var nodeRenderer(default, null):CanvasRenderer<S>;
+	public var nodeRenderer(default, null):Renderer<S>;
 	public var edgeState(default, null):StrokeFillState;
 	private var visitedMap:Map<String, T>;
 
-	public function new(startNode:T, graph:IPathNodeGraph<T>, nodeRenderer:CanvasRenderer<S>, edgeState:StrokeFillState)
+	public function new(startNode:T, graph:IPathNodeGraph<T>, nodeRenderer:Renderer<S>, edgeState:StrokeFillState)
 	{
-		super(new CanvasRenderState());
+		super(new RenderState());
 
 		this.startNode = startNode;
 		this.graph = graph;

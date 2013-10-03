@@ -2,7 +2,7 @@ package titanium_reindeer.rendering;
 
 import titanium_reindeer.Enums;
 
-class StrokeFillState extends CanvasRenderState
+class StrokeFillState extends RenderState
 {
 	private var currentFill:FillTypes;
 

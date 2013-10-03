@@ -1,31 +1,32 @@
 package titanium_reindeer.rendering;
 
-typedef ReadOnlyState = {
-	public function apply(canvas:Canvas2D):Void;
-};
-
 class RendererList<S:IRenderState> extends Renderer<S>
 {
-	private var renderers:Array<ICanvasRenderer<ReadOnlyState>>;
+	private var renderers:Array<IRenderer<ReadOnlyState>>;
 
-	public function new(?renderers:Array<ICanvasRenderer<ReadOnlyState>>)
+	public function new(s:S)
 	{
-		super(new S());
+		super(s);
 
-		this.renderers = (renderers == null) ? new Array() : renderers.copy();
+		this.renderers = new Array();
 	}
 	
-	public function get(i:Int):ICanvasRenderer<ReadOnlyState>
+	public function get(i:Int):IRenderer<IRenderState>
 	{
 		return this.renderers[i];
 	}
 
-	public function insert(i:Int, renderer:ICanvasRenderer<ReadOnlyState>):Void
+	public function insert(i:Int, renderer:IRenderer<ReadOnlyState>):Void
 	{
 		if (renderer == null)
 			return;
 
 		this.renderers.insert(i, renderer);
+	}
+
+	public function push(renderer:IRenderer<ReadOnlyState>):Void
+	{
+		this.renderers.push(renderer);
 	}
 
 	public function remove(i:Int):Void

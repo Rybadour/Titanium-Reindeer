@@ -1,6 +1,6 @@
 package titanium_reindeer.rendering;
 
-class Renderer<S:IRenderState> implements ICanvasRenderer<S>
+class Renderer<S:IRenderState> implements IRenderer<S>
 {
 	public var state(get, null):S;
 	public function get_state():S { return this.state; }

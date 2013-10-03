@@ -1,6 +1,6 @@
 package titanium_reindeer.rendering;
 
-class CanvasRenderState implements IRenderState
+class RenderState implements IRenderState
 {
 	public var alpha(default, set):Float;
 	private function set_alpha(value:Float):Float

@@ -4,7 +4,7 @@ import titanium_reindeer.core.IHasIdProvider;
 import titanium_reindeer.core.IRegion;
 import titanium_reindeer.core.RectRegion;
 
-class ImageRenderer extends CanvasRenderer
+class ImageRenderer extends Renderer
 {
 	public var image(default, setImage):ImageSource;
 	private function setImage(value:ImageSource):ImageSource
@@ -21,7 +21,7 @@ class ImageRenderer extends CanvasRenderer
 
 	public function new(image:ImageSource)
 	{
-		super(new CanvasRenderState());
+		super(new RenderState());
 
 		this.image = image;
 		if (!this.image.isLoaded)
