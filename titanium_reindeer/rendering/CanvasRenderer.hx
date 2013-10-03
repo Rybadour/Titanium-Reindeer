@@ -11,7 +11,7 @@ class CanvasRenderer extends Renderer<RenderState>
 		this.canvas = canvas;
 	}
 
-	private function _render(canvas:Canvas2D):Void
+	private override function _render(canvas:Canvas2D):Void
 	{
 		canvas.renderCanvas(this.canvas);
 	}

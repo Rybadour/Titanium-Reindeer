@@ -1,12 +1,9 @@
 package titanium_reindeer.rendering;
 
-class Renderer<S:IRenderState> implements IRenderer<S>
+class Renderer<S:IRenderState> implements IRenderer
 {
-	public var state(get, null):S;
-	public function get_state():S { return this.state; }
-
-	public var position(get, null):Vector2;
-	public function get_position():Vector2 { return this.position; }
+	public var state:S;
+	public var position:Vector2;
 
 	public function new(state:S)
 	{

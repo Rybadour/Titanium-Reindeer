@@ -70,7 +70,7 @@ class Canvas2D
 
 	public function renderCanvas(canvas:Canvas2D)
 	{
-		untyped { this.ctx.drawImage(canvas.canvas, 0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height); }
+		untyped { this.ctx.drawImage(canvas.canvas, 0, 0); }
 	}
 	
 	public function renderRect(rect:Rect)
