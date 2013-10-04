@@ -1,5 +1,6 @@
 package titanium_reindeer.rendering;
 
+import js.html.CanvasPattern;
 import titanium_reindeer.Enums;
 
 class StrokeFillState extends RenderState
@@ -30,8 +31,8 @@ class StrokeFillState extends RenderState
 		return value;
 	}
 
-	public var fillPattern(default, set):Pattern;
-	private function set_fillPattern(value:Pattern):Pattern
+	public var fillPattern(default, set):CanvasPattern;
+	private function set_fillPattern(value:CanvasPattern):CanvasPattern
 	{
 		if (value != null)
 		{
@@ -172,7 +173,7 @@ class StrokeFillState extends RenderState
 			case Gradient:
 				style = this.fillGradient.getStyle(canvas);
 			case Pattern:
-				style = this.fillGradient.getStyle(canvas);
+				style = this.fillPattern;
 			case FillColor:
 				style = this.fillColor.rgba;
 		}
