@@ -32,6 +32,7 @@ class Game
 	private var exitGame:Bool;
 
 	public var pageCanvas(default, null):Canvas2D;
+	public var input(default, null):InputState;
 
 	public function new(targetHtmlId:String, ?width:Int, ?height:Int, ?debugMode:Bool)
 	{
@@ -39,6 +40,8 @@ class Game
 		this.targetElement.style.position = "relative";
 		this.pageCanvas = new Canvas2D("main", width, height);
 		this.pageCanvas.appendToDom(this.targetElement);
+
+		this.input = new InputState(targetElement);
 
 		this.width = width == null ? 400 : width;
 		this.height = height == null ? 300 : height;
