@@ -40,15 +40,10 @@ class RendererList<S:IRenderState> extends Renderer<S>
 		for (renderer in this.renderers)
 		{
 			canvas.ctx.save();
-			this.beforeRender(r, renderer, canvas);
 			renderer.render(canvas);
 			canvas.ctx.restore();
 
 			r++;
 		}
-	}
-
-	private function beforeRender(i:Int, renderer:IRenderer, canvas:Canvas2D)
-	{
 	}
 }

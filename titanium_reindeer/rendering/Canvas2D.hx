@@ -8,8 +8,9 @@ import titanium_reindeer.spatial.RectRegion;
 import titanium_reindeer.spatial.Rect;
 import titanium_reindeer.spatial.Circle;
 
-class Canvas2D
+class Canvas2D implements IRenderer
 {
+	public var offset(default, null):Vector2;
 	public var canvas(default, null):CanvasElement;
 	public var ctx(default, null):CanvasRenderingContext2D;
 
@@ -51,6 +52,16 @@ class Canvas2D
 	public function appendToDom(element:Element)
 	{
 		element.appendChild(this.canvas);
+	}
+
+	public function save()
+	{
+		this.ctx.save();
+	}
+
+	public function restore()
+	{
+		this.ctx.restore();
 	}
 
 	public function translate(vector:Vector2)
@@ -100,5 +111,10 @@ class Canvas2D
 			rect = new RectRegion(this.width, this.height, new Vector2(this.width/2, this.height/2));
 
 		this.ctx.clearRect(rect.left, rect.top, rect.width, rect.height);
+	}
+
+	public function render(canvas:Canvas2D)
+	{
+		canvas.renderCanvas(this);
 	}
 }
