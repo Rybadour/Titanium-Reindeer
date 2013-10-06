@@ -4,6 +4,8 @@ class ParallaxRendererList<S:IRenderState, R:IRenderer> extends Renderer<S>
 {
 	private var parallaxRatios:Map<Int, Float>;
 	private var layers:Array<R>;
+	public var numLayers(get, never):Int;
+	function get_numLayers():Int { return this.layers.length; }
 
 	public var offset:Vector2;
 	public var rule:Int -> R -> Vector2 -> Canvas2D -> Void;
@@ -50,8 +52,11 @@ class ParallaxRendererList<S:IRenderState, R:IRenderer> extends Renderer<S>
 			{
 				ratio = this.parallaxRatios.get(i);
 			}
-			this.rule(i, layer, offset.getExtend(ratio), canvas);
+
+			this.rule(i, layer, this.offset.getExtend(ratio), canvas);
 			layer.render(canvas);
+
+			++i;
 		}
 	}
 }
