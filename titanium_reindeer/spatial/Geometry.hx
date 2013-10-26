@@ -40,6 +40,7 @@ class Geometry
 
 	public static function getMidPoint(a:Vector2, b:Vector2):Vector2
 	{
+		// Could be replaced with a.add(b).getExtend(0.5);
 		return b.add( a.subtract(b).getExtend(0.5) );
 	}
 
