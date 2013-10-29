@@ -64,36 +64,40 @@ class Canvas2D implements IRenderer
 		this.ctx.restore();
 	}
 
-	public function translate(vector:Vector2)
+	public function translatef(x:Float, y:Float)
+	{
+		this.ctx.translate(x, y);
+	}
+
+	public inline function translate(vector:Vector2)
 	{
 		this.ctx.translate(vector.x, vector.y);
 	}
 
-	public function moveTo(vector:Vector2)
+	public inline function moveTo(vector:Vector2)
 	{
 		this.ctx.moveTo(vector.x, vector.y);
 	}
 
-	public function lineTo(vector:Vector2)
+	public inline function lineTo(vector:Vector2)
 	{
 		this.ctx.lineTo(vector.x, vector.y);
 	}
 
-	public function renderCanvas(canvas:Canvas2D)
+	public inline function renderCanvas(canvas:Canvas2D)
 	{
 		untyped { this.ctx.drawImage(canvas.canvas, 0, 0); }
 	}
-	
-	public function renderRect(rect:Rect)
+
+	public inline function renderRectf(width:Float, height:Float)
 	{
-		this.ctx.fillRect(
-			0, 0,
-			rect.width, rect.height
-		);
-		this.ctx.strokeRect(
-			0, 0,
-			rect.width, rect.height
-		);
+		this.ctx.fillRect(0, 0, width, height);
+		this.ctx.strokeRect(0, 0, width, height);
+	}
+	
+	public inline function renderRect(rect:Rect)
+	{
+		this.renderRectf(rect.width, rect.height);
 	}
 
 	public function renderCircle(circle:Circle)
