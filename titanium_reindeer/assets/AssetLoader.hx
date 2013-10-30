@@ -1,6 +1,6 @@
 package titanium_reindeer.assets;
 
-class AssetLoader implements Asset
+class AssetLoader implements ILoadable
 {
 	private var isLoaded:Bool;
 	public var assets(default, null):Array<Asset>;
@@ -28,5 +28,10 @@ class AssetLoader implements Asset
 
 	public function getProgress()
 	{
+	}
+
+	public function isLoaded()
+	{
+		return this.isLoaded;
 	}
 }
