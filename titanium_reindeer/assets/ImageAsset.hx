@@ -13,8 +13,7 @@ class ImageAsset implements IAsset
 		this.path = path;
 		this.isLoaded = false;
 		this.progress = 0;
-		this.total = 1;
-
+		this.size = 1;
 
 		this.image = new Image();
 	}
@@ -38,8 +37,8 @@ class ImageAsset implements IAsset
 		return this.progress;
 	}
 
-	public function getTotal():Int
+	public function getSize():Int
 	{
-		return this.total;
+		return this.size;
 	}
 }
