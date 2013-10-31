@@ -5,24 +5,27 @@ import js.html.Image;
 class ImageAsset implements IAsset
 {
 	public var path(default, null):String;
+	private var _isLoaded:Bool;
 
-	public var image(default, null):
+	public var image(default, null):Image;
 
 	public function new(path:String)
 	{
 		this.path = path;
-		this.isLoaded = false;
-		this.progress = 0;
-		this.size = 1;
+		this._isLoaded = false;
 
 		this.image = new Image();
 	}
 
-	public function load()
+	public function isLoaded():Bool
 	{
-		this.image.onload = function () {
-			this.isLoaded = true;
-			this.progress = 1;
+		return this._isLoaded;
+	}
+
+	public function load():Void
+	{
+		this.image.onload = function (e) {
+			this._isLoaded = true;
 		};
 
 		/* *
@@ -34,11 +37,11 @@ class ImageAsset implements IAsset
 
 	public function getProgress():Float
 	{
-		return this.progress;
+		return (this._isLoaded ? 1 : 0);
 	}
 
 	public function getSize():Int
 	{
-		return this.size;
+		return 1;
 	}
 }

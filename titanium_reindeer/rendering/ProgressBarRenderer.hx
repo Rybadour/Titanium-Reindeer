@@ -1,10 +1,10 @@
 package titanium_reindeer.rendering;
 
-import titanium_reindeer.assets.IAsset;
+import titanium_reindeer.assets.ILoadable;
 
 class ProgressBarRenderer extends Renderer<RenderState>
 {
-	public var asset(default, null):IAsset;
+	public var asset(default, null):ILoadable;
 
 	public var bgState(default, null):StrokeFillState;
 	public var fgState(default, null):StrokeFillState;
@@ -12,7 +12,7 @@ class ProgressBarRenderer extends Renderer<RenderState>
 	public var height(default, null):Int;
 	public var fgMargin(default, null):Int;
 
-	public function new(asset:IAsset, width:Int, height:Int)
+	public function new(asset:ILoadable, width:Int, height:Int)
 	{
 		super(new StrokeFillState());
 

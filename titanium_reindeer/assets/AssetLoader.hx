@@ -2,10 +2,10 @@ package titanium_reindeer.assets;
 
 class AssetLoader implements ILoadable
 {
-	public var assets(default, null):Array<Asset>;
-	private var unloadedAssets:Array<Asset>;
+	public var assets(default, null):Array<ILoadable>;
+	private var unloadedAssets:Array<ILoadable>;
 
-	public function new(assets:Array<Asset>)
+	public function new(assets:Array<ILoadable>)
 	{
 		this.unloadedAssets = assets.copy();
 		this.assets = new Array();
@@ -19,7 +19,7 @@ class AssetLoader implements ILoadable
 			asset.load();
 	}
 
-	public function getProgress()
+	public function getProgress():Float
 	{
 		if (this._isLoaded())
 		{
@@ -27,41 +27,63 @@ class AssetLoader implements ILoadable
 		}
 		else
 		{
-			// For now we assume that every asset has a total of 1
-			var total = this.assets.length + this.unloadedAssets.length;
-		
 			this.updateProgress();
 
-			// this.assets.length may have changed but total stays the same
-			var progress = this.assets.length;
-
-			return progress/total;
+			return this.getLoadedSize() / this.getSize();
 		}
 	}
 
-	public function isLoaded()
+	public function getLoadedSize():Int
+	{
+		var total = 0;
+		for (asset in this.assets)
+			total += asset.getSize();
+		return total;
+	}
+
+	public function getUnloadedSize():Int
+	{
+		var total = 0;
+		for (asset in this.unloadedAssets)
+			total += asset.getSize();
+		return total;
+	}
+
+	public function getSize():Int
+	{
+		return this.getLoadedSize() + this.getUnloadedSize();
+	}
+
+	public function isLoaded():Bool
 	{
 		this.updateProgress();
 
 		return this._isLoaded();
 	}
 
-	private function _isLoaded()
+	private function _isLoaded():Bool
 	{
 		return this.unloadedAssets.length == 0;
 	}
 
-	private function updateProgress()
+	private function updateProgress():Void
 	{
 		if (!this._isLoaded())
 		{
-			var assets = this.unloadedAssets.copy();
-			for (asset in assets)
+			var i = 0;
+			while (i < this.unloadedAssets.length)
 			{
+				var asset = this.unloadedAssets[i];
 				if (asset.isLoaded())
+				{
 					this.assets.push(asset);
+
+					this.unloadedAssets.splice(i, 1);
+				}
 				else
-					this.unloadedAssets.push(asset);
+				{
+					i++;
+				}
 			}
 		}
 	}
