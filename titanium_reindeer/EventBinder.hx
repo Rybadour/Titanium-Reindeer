@@ -2,11 +2,11 @@ package titanium_reindeer;
 
 class EventBinder
 {
-	private var eventBinds:Hash<Array<Dynamic>>;
+	private var eventBinds:Map<String, Array<Dynamic>>;
 
 	public function new(eventNames:Array<String>)
 	{
-		this.eventBinds = new Hash();
+		this.eventBinds = new Map();
 		for (name in eventNames)
 		{
 			this.eventBinds.set(name, []);
