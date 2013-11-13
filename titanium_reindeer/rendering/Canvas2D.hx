@@ -109,6 +109,12 @@ class Canvas2D implements IRenderer
 		this.ctx.closePath();
 	}
 
+	public function renderText(text:String)
+	{
+		this.ctx.fillText(this.text, 0, 0);
+		this.ctx.strokeText(this.text, 0, 0);
+	}
+
 	public function clear(rect:RectRegion = null):Void
 	{
 		if (rect == null)
