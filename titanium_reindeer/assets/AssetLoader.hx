@@ -10,6 +10,11 @@ class AssetLoader implements ILoadable
 		this.unloadedAssets = assets.copy();
 		this.assets = new Array();
 	}
+	
+	public function addAssets(assets:Array<ILoadable>)
+	{
+		this.unloadedAssets = this.unloadedAssets.concat(assets);
+	}
 
 	public function load():Void
 	{
