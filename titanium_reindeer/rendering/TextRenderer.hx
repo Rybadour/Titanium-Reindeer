@@ -30,7 +30,7 @@ class TextRenderer extends Renderer<TextState>
 
 	private override function _render(canvas:Canvas2D):Void
 	{
-		super._render();
+		super._render(canvas);
 
 		canvas.renderText(this.text);
 	}

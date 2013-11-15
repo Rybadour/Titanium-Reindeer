@@ -38,7 +38,7 @@ class TextState extends StrokeFillState
 	{
 		super.apply(canvas);
 
-		var fontParts:Array = new Array();
+		var fontParts:Array<String> = new Array();
 		switch (fontStyle)
 		{
 			case Normal: fontParts.push("normal");
@@ -56,7 +56,7 @@ class TextState extends StrokeFillState
 		{
 			case Normal: fontParts.push("normal");
 			case Bold: fontParts.push("bold");
-			case Size(s): fontParts.push(Math.max(100, Math.min(s, 900)));
+			case Size(s): fontParts.push(""+Math.max(100, Math.min(s, 900)));
 		}
 
 		fontParts.push(fontSize+"px");

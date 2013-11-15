@@ -11,13 +11,13 @@ class RepeatFillRenderer extends Renderer<RenderState>
 {
 	public var offset:Vector2;
 	public var renderer:IRenderer;
-	public var fillWidth:Float;
-	public var fillHeight:Float;
+	public var fillWidth:Int;
+	public var fillHeight:Int;
 	public var method:RepeatFillMethod;
-	public var sourceWidth:Float;
-	public var sourceHeight:Float;
+	public var sourceWidth:Int;
+	public var sourceHeight:Int;
 
-	public function new(r:IRenderer, width:Float, height:Float, method:RepeatFillMethod, ?sWidth:Float, ?sHeight:Float)
+	public function new(r:IRenderer, width:Int, height:Int, method:RepeatFillMethod, ?sWidth:Int, ?sHeight:Int)
 	{
 		super(new RenderState());
 

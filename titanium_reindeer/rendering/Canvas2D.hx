@@ -14,8 +14,8 @@ class Canvas2D implements IRenderer
 	public var canvas(default, null):CanvasElement;
 	public var ctx(default, null):CanvasRenderingContext2D;
 
-	public var width(default, set):Float;
-	private function set_width(value:Float):Float
+	public var width(default, set):Int;
+	private function set_width(value:Int):Int
 	{
 		if (this.width != value)
 		{
@@ -26,8 +26,8 @@ class Canvas2D implements IRenderer
 		return this.width;
 	}
 
-	public var height(default, set):Float;
-	private function set_height(value:Float):Float
+	public var height(default, set):Int;
+	private function set_height(value:Int):Int
 	{
 		if (this.height != value)
 		{
@@ -38,7 +38,7 @@ class Canvas2D implements IRenderer
 		return this.height;
 	}
 
-	public function new(name:String, width:Float, height:Float)
+	public function new(name:String, width:Int, height:Int)
 	{
 		this.canvas = js.Browser.document.createCanvasElement(); 
 		this.canvas.id = name;
@@ -111,8 +111,8 @@ class Canvas2D implements IRenderer
 
 	public function renderText(text:String)
 	{
-		this.ctx.fillText(this.text, 0, 0);
-		this.ctx.strokeText(this.text, 0, 0);
+		this.ctx.fillText(text, 0, 0);
+		this.ctx.strokeText(text, 0, 0);
 	}
 
 	public function clear(rect:RectRegion = null):Void
