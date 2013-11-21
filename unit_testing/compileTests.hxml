@@ -1,4 +1,4 @@
 -cp ../ 
 
--neko run.n
+-php run.php
 -main Tests

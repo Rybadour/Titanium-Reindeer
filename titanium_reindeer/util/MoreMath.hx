@@ -10,7 +10,6 @@ class MoreMath
 		return a + Math.round((b - a)/2);
 	}
 
-
 	// Float
 	public static function between(a:Float, b:Float)
 	{
