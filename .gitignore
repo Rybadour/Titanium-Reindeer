@@ -1,15 +1,3 @@
-
-/examples/star_control_clone/js/Game.js
-/examples/composition/js/TestGame.js
-/examples/random/js/TestGame.js
 *.swp
-/examples\millions_of_entities\js/TestGame.js
-playground/Anchoring.hx
-playground/compileTests.hxml
-playground/HasPosition.hx
-playground/Other.hx
-playground/Position.hx
-playground/Tests.hx
-playground/Thing.hx
-visual_testing/js/TestGame.js
-logical_testing/js/TestGame.js
+unit_testing/run.php/index.php
+unit_testing/run.php/lib/
