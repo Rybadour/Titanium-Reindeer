@@ -14,7 +14,7 @@ class UIText extends UIView
 		super(this.text);
 	}
 
-	private function calculateSize(canvas:Canvas2D):Void
+	public override function calculateSize(canvas:Canvas2D):Void
 	{
 		canvas.save();
 		this.text.state.apply(canvas);
@@ -23,8 +23,8 @@ class UIText extends UIView
 		var lineWidth = this.text.state.lineWidth;
 		var fontSize = this.text.state.fontSize;
 
-		this.width = measuredFont.width + (lineWidth > 0 ? lineWidth : 0);
-		this.height = this.fontSize + (lineWidth > 0 ? lineWidth : 0);
+		this.width = Math.round(measuredFont.width + (lineWidth > 0 ? lineWidth : 0));
+		this.height = fontSize + (lineWidth > 0 ? lineWidth : 0);
 		canvas.restore();
 	}
 }

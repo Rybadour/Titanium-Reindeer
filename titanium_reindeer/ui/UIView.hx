@@ -9,23 +9,22 @@ class UIView extends UIElement
 
 	public function new(view:IRenderer)
 	{
+		super();
+
 		this.view = view;
 	}
 
-	public function calculateSize(canvas:Canvas2D):Void
+	private function calculateSize(canvas:Canvas2D):Void
 	{
-		this.width = 0;
-		this.height = 0;
 	}
 
-	private function preRender(canvas:Canvas2D):Void
+	private override function preRender(canvas:Canvas2D):Void
 	{
 		this.calculateSize(canvas);
-
 		super.preRender(canvas);
 	}
 
-	private function _render(canvas:Canvas2D):Void
+	private override function _render(canvas:Canvas2D):Void
 	{
 		this.view.render(canvas);
 	}

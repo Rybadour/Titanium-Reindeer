@@ -63,7 +63,9 @@ class TextState extends StrokeFillState
 		fontParts.push(fontFamily);
 		
 		canvas.ctx.font = fontParts.join(" ");
-		canvas.ctx.textAlign = "center";
+		// TODO: Either use this and apply an offset in UIText (and any where else)
+		//       Or don't center the text by default
+		//canvas.ctx.textAlign = "center";
 		canvas.ctx.textBaseline = "middle";
 	}
 }
