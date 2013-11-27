@@ -4,7 +4,7 @@ import js.html.Image;
 
 class ImageAsset implements IAsset
 {
-	public var path(default, null):String;
+	public var path:String;
 	private var _isLoaded:Bool;
 
 	public var image(default, null):Image;

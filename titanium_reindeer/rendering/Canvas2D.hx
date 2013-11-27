@@ -3,6 +3,7 @@ package titanium_reindeer.rendering;
 import js.html.Element;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
+import js.html.Image;
 
 import titanium_reindeer.spatial.RectRegion;
 import titanium_reindeer.spatial.Rect;
@@ -82,6 +83,11 @@ class Canvas2D implements IRenderer
 	public inline function lineTo(vector:Vector2)
 	{
 		this.ctx.lineTo(vector.x, vector.y);
+	}
+
+	public inline function renderImage(image:Image)
+	{
+		this.ctx.drawImage(image, 0, 0);
 	}
 
 	public inline function renderCanvas(canvas:Canvas2D)

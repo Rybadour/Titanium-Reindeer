@@ -11,7 +11,7 @@ class AssetLoader implements ILoadable
 		this.assets = new Array();
 	}
 	
-	public function addAssets(assets:Array<ILoadable>)
+	private function addAssets(assets:Array<ILoadable>)
 	{
 		this.unloadedAssets = this.unloadedAssets.concat(assets);
 	}
