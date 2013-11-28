@@ -106,11 +106,12 @@ class Game
 				{
 					isRequestMade = true;
 					this.targetElement.addEventListener(changeFuncs[r], function (event) {
-						var size = js.Browser.window.getComputedStyle(this.targetElement);
+						var size = this.targetElement.getBoundingClientRect();
 						this.width = size.width;
 						this.height = size.height;
 						this.pageCanvas.width = this.width;
 						this.pageCanvas.height = this.height;
+						this.viewPortChanged();
 					});
 					this.targetElement.addEventListener(errorFuncs[r], function (event) {
 						js.Browser.window.alert("Either the target element can not be made fullscreen or you didn't request from a user interaction");
@@ -120,6 +121,10 @@ class Game
 				}
 			}
 		}
+	}
+
+	private function viewPortChanged():Void
+	{
 	}
 
 	private function gameLoop(now:Float):Bool

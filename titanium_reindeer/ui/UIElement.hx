@@ -9,8 +9,8 @@ class UIElement implements IRenderer
 	public var position(default, null):Vector2;
 	public var alignment:UIAlignment;
 
-	public var width(default, null):Int;
-	public var height(default, null):Int;
+	public var width:Int;
+	public var height:Int;
 
 	public function new()
 	{
