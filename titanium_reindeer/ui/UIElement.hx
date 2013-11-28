@@ -9,8 +9,8 @@ class UIElement implements IRenderer
 	public var position(default, null):Vector2;
 	public var alignment:UIAlignment;
 
-	public var width:Int;
-	public var height:Int;
+	public var width(default, null):Int;
+	public var height(default, null):Int;
 
 	public function new()
 	{
@@ -47,5 +47,11 @@ class UIElement implements IRenderer
 		canvas.translate(this.position);
 
 		canvas.translate( this.alignment.getFromSize(this.width, this.height).getReverse() );
+	}
+
+	public function resize(width:Int, height:Int):Void
+	{
+		this.width = width;
+		this.height = height;
 	}
 }

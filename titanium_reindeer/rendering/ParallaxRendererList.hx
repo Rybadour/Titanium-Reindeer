@@ -3,7 +3,7 @@ package titanium_reindeer.rendering;
 class ParallaxRendererList<S:IRenderState, R:IRenderer> extends Renderer<S>
 {
 	private var parallaxRatios:Map<Int, Float>;
-	private var layers:Array<R>;
+	public var layers(default, null):Array<R>;
 	public var numLayers(get, never):Int;
 	function get_numLayers():Int { return this.layers.length; }
 

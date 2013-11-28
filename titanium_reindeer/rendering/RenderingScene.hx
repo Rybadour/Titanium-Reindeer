@@ -35,9 +35,8 @@ class RenderingScene extends Scene
 		canvas.renderCanvas(this.canvas);
 	}
 
-	public function setViewPort(width:Int, height:Int):Void
+	public function resize(width:Int, height:Int):Void
 	{
-		this.canvas.width = this.width;
-		this.canvas.height = this.height;
+		this.canvas.resize(width, height);
 	}
 }

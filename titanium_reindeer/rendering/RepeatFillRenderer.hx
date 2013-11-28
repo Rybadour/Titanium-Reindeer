@@ -66,4 +66,16 @@ class RepeatFillRenderer extends Renderer<RenderState>
 			left += this.sourceWidth;
 		}
 	}
+
+	public function resize(width:Int, height:Int)
+	{
+		// Update source width and height if mimic to fill
+		if (this.sourceWidth == this.fillWidth)
+			this.sourceWidth = width;
+		if (this.sourceHeight == this.fillHeight)
+			this.sourceHeight = height;
+
+		this.fillWidth = width;
+		this.fillHeight = height;
+	}
 }

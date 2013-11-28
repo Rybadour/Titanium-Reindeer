@@ -133,4 +133,10 @@ class Canvas2D implements IRenderer
 	{
 		canvas.renderCanvas(this);
 	}
+
+	public function resize(width:Int, height:Int)
+	{
+		this.width = width;
+		this.height = height;
+	}
 }

@@ -71,6 +71,19 @@ class Game
 		requestAnimFrame();
 	}
 
+	public function recalculateViewPort():Void
+	{
+		var size = this.targetElement.getBoundingClientRect();
+		this.resize(Math.round(size.width), Math.round(size.height));
+	}
+
+	public function resize(width:Int, height:Int):Void
+	{
+		this.width = width;
+		this.height = height;
+		this.pageCanvas.resize(this.width, this.height);
+	}
+
 	public function requestFullScreen():Void
 	{
 		var isRequestMade:Bool = false;
@@ -106,12 +119,7 @@ class Game
 				{
 					isRequestMade = true;
 					this.targetElement.addEventListener(changeFuncs[r], function (event) {
-						var size = this.targetElement.getBoundingClientRect();
-						this.width = size.width;
-						this.height = size.height;
-						this.pageCanvas.width = this.width;
-						this.pageCanvas.height = this.height;
-						this.viewPortChanged();
+						this.recalculateViewPort();
 					});
 					this.targetElement.addEventListener(errorFuncs[r], function (event) {
 						js.Browser.window.alert("Either the target element can not be made fullscreen or you didn't request from a user interaction");
