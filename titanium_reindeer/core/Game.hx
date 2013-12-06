@@ -6,16 +6,30 @@ import js.html.Element;
 import titanium_reindeer.rendering.Canvas2D;
 import titanium_reindeer.rendering.Color;
 
+/**
+ * The Game class represents an instance of an entire game. It's effectively the root scene of the game.
+ * It is responsible for knowing the dom element on the web page where the game is to be rendered and
+ * input handlers are attached.
+ *
+ * This class provides convenient methods for changing the games viewport and for maintaining a game loop
+ * using the requestAnimationFrame() function.
+ */
 class Game
 {
+	// The default frame length if we have to fall back to setTimeout for the gameloop
 	public static inline var DEFAULT_UPDATES_TIME_MS:Int 	= 17; // 60 fps
 
 
+	// The dom element where rendering is done and input handlers are made
 	public var targetElement(default, null):Element;
+	// The size of the viewport assumed the maximum for the game
 	public var width:Int;
 	public var height:Int;
 
+	// A flag which determines if debugging operations should occur
 	public var debugMode:Bool;
+
+	// The defined maximum frame length in the case where a frame takes too long and the next is lengthened
 	public var maxAllowedUpdateLengthMs(default, set):Int;
 	private function set_maxAllowedUpdateLengthMs(value:Int):Int
 	{
@@ -27,11 +41,15 @@ class Game
 		return this.maxAllowedUpdateLengthMs;
 	}
 
+	// The lenght of the last frame
 	private var msLastTimeStep:Int;
 
+	// A flag which when set causes the game loop to terminate and the game to be destroyed
 	private var exitGame:Bool;
 
+	// The root canvas for rendering, it is appended inside our target dom element
 	public var pageCanvas(default, null):Canvas2D;
+	// The root input manager an instance of this is passed around for controllers to query input state
 	public var input(default, null):InputState;
 
 	public function new(targetHtmlId:String, ?width:Int, ?height:Int, ?debugMode:Bool)
