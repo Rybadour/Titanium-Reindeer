@@ -1,0 +1,18 @@
+#!/bin/bash
+
+echo "Running test suite"
+
+# Run Haxe test suite for TR
+cd "$(git rev-parse --show-toplevel)"/unit_testing
+if haxe compileTests.hxml; then
+	if neko run.n; then
+		echo "Tests passed"
+		exit 0
+	else
+		echo "You shall not pass!"
+		exit 1
+	fi
+else
+	echo "Test suite failed to compile"
+	exit 1
+fi
