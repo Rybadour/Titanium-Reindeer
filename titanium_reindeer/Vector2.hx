@@ -19,28 +19,28 @@ class Vector2
 		return outgoing;
 	}
 
-	private var mX:Float;
-	public var x(getX, setX):Float;
-	private function getX():Float { return mX; }
-	private function setX(value:Float):Float
+	public static function fromAngle(rad:Float):Vector2
 	{
-		mX = value;
-		return mX;
+		var v:Vector2 = new Vector2(1, 0);
+		v.rotate(rad);
+		return v;
 	}
 
-	private var mY:Float;
-	public var y(getY, setY):Float;
-	private function getY():Float { return mY; }
-	private function setY(value:Float):Float
+	public static function normalizedDiff(a:Vector2, b:Vector2):Vector2
 	{
-		mY = value;
-		return mY;
+		var diff:Vector2 = b.subtract(a);
+		diff.normalize();
+		return diff;
 	}
+
+
+	public var x:Float;
+	public var y:Float;
 
 	public function new(x:Float, y:Float)
 	{
-		this.mX = x;
-		this.mY = y;
+		this.x = x;
+		this.y = y;
 	}
 	
 	public function getCopy()
@@ -148,13 +148,10 @@ class Vector2
 
 		return this;
 	}
-	
-	public function equal(b:Vector2)
-	{
-		if (b == null)
-			return false;
 
-		return this.x == b.x && this.y == b.y;
+	public function equal(other:Vector2)
+	{
+		return this.x == other.x && this.y == other.y;
 	}
 
 	public function identify():String

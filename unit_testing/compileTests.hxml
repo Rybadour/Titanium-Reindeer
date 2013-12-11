@@ -1,0 +1,5 @@
+-cp ../ 
+
+#-php run.php
+-neko run.n
+-main Tests

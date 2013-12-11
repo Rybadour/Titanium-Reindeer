@@ -63,3 +63,23 @@ enum Composition
 	DestinationAtop; DestinationIn; DestinationOut; DestinationOver;
 	Lighter; Copy; Xor;
 }
+
+enum LineCapType
+{
+	Butt; Round; Square;
+}
+
+enum LineJoinType
+{
+	Round; Bevel; Miter;
+}
+
+enum FillTypes
+{
+	Gradient; Pattern; FillColor;
+}
+
+enum StrokeTypes
+{
+	Gradient; StrokeColor;
+}
