@@ -1,14 +1,6 @@
-package titanium_reindeer.components;
+package titanium_reindeer.spatial;
 
-import titanium_reindeer.core.IGroup;
-import titanium_reindeer.core.IHasId;
-import titanium_reindeer.core.IRegion;
-import titanium_reindeer.core.IHasIdProvider;
-import titanium_reindeer.core.IdProvider;
-import titanium_reindeer.core.ISpatialPartition;
-import titanium_reindeer.core.IRegionIntersecter;
-import titanium_reindeer.core.RectRegion;
-
+// TODO: Completely refactor
 class RegionGroup implements IGroup<IRegion>, implements IHasId, implements IRegion
 {
 	private var hasProvider:IHasIdProvider;
