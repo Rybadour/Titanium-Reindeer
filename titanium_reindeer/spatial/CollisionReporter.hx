@@ -1,4 +1,4 @@
-package titanium_reindeer.components;
+package titanium_reindeer.spatial;
 
 class CollisionReporter implements IHasUpdaterAndId
 {

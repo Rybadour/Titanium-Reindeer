@@ -1,11 +1,4 @@
-package titanium_reindeer.components;
-
-import titanium_reindeer.core.IHasId;
-import titanium_reindeer.core.IRegion;
-import titanium_reindeer.core.IWatchedRegion;
-import titanium_reindeer.core.Relation;
-import titanium_reindeer.core.Watcher;
-import titanium_reindeer.core.IHasIdProvider;
+package titanium_reindeer.spatial;
 
 class RegionComponent<RegionT:IWatchedRegion>
 	implements IWorldPosition,

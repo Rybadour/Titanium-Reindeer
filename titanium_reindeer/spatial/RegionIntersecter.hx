@@ -1,8 +1,4 @@
-package titanium_reindeer.components;
-
-import titanium_reindeer.core.IRegion;
-import titanium_reindeer.core.RectRegion;
-import titanium_reindeer.core.IRegionIntersecter;
+package titanium_reindeer.spatial;
 
 class RegionIntersecter implements IRegionIntersecter
 {

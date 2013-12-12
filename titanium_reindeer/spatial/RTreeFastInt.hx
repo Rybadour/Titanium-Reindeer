@@ -1,7 +1,4 @@
-package titanium_reindeer;
-
-import titanium_reindeer.core.FastRect;
-import titanium_reindeer.components.ISpatialPartition;
+package titanium_reindeer.spatial;
 
 class RTreeFastNode
 {

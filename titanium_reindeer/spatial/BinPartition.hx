@@ -1,8 +1,4 @@
-package titanium_reindeer.components;
-
-import titanium_reindeer.core.FastRect;
-import titanium_reindeer.core.RectRegion;
-import titanium_reindeer.core.ISpatialPartition;
+package titanium_reindeer.spatial;
 
 class BinCoord
 {
