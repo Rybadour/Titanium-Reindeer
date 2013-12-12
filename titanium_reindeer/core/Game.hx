@@ -54,11 +54,12 @@ class Game
 
 	public function new(targetHtmlId:String, ?width:Int, ?height:Int, ?debugMode:Bool)
 	{
+		// Append the main canvas to the our target element
 		this.targetElement = js.Browser.document.getElementById(targetHtmlId);
-		this.targetElement.style.position = "relative";
 		this.pageCanvas = new Canvas2D("main", width, height);
 		this.pageCanvas.appendToDom(this.targetElement);
 
+		// Bind input events to the target element 
 		this.input = new InputState(targetElement);
 
 		this.width = width == null ? 400 : width;
@@ -83,18 +84,27 @@ class Game
 		}
 	}
 
+	/**
+	 * Start the game
+	 */
 	public function play():Void
 	{
 		// Start the game loop
 		requestAnimFrame();
 	}
 
+	/**
+	 * Propagate resize based on the pixel size of the target element
+	 */
 	public function recalculateViewPort():Void
 	{
 		var size = this.targetElement.getBoundingClientRect();
 		this.resize(Math.round(size.width), Math.round(size.height));
 	}
 
+	/**
+	 * Causes the game to resize it's rendering region
+	 */
 	public function resize(width:Int, height:Int):Void
 	{
 		this.width = width;
@@ -102,6 +112,9 @@ class Game
 		this.pageCanvas.resize(this.width, this.height);
 	}
 
+	/**
+	 * Ask the browser (on behalf of the user) to put the game into fullscreen
+	 */
 	public function requestFullScreen():Void
 	{
 		var isRequestMade:Bool = false;
@@ -130,6 +143,7 @@ class Game
 				"mozfullScreenerror",
 				"MSFullscreenerror"
 			];
+			// Try each different request fullscreen function
 			for (r in 0...requestFuncs.length)
 			{
 				var req = requestFuncs[r];
@@ -137,6 +151,7 @@ class Game
 				{
 					isRequestMade = true;
 					this.targetElement.addEventListener(changeFuncs[r], function (event) {
+						// Find the new size of the game and propagate it
 						this.recalculateViewPort();
 					});
 					this.targetElement.addEventListener(errorFuncs[r], function (event) {
@@ -149,10 +164,9 @@ class Game
 		}
 	}
 
-	private function viewPortChanged():Void
-	{
-	}
-
+	/**
+	 * The main game loop function. Each call to this is a logical step in time in the game.
+	 */
 	private function gameLoop(now:Float):Bool
 	{
 		if (exitGame)
@@ -171,11 +185,9 @@ class Game
 				msTimeStep = Std.int(Math.min(now - this.msLastTimeStep, this.maxAllowedUpdateLengthMs));
 			this.msLastTimeStep = Math.round(now);
 
-			// Game Logic
+			// Where all the magic happens
 			this.preUpdate(msTimeStep);
-
 			this.update(msTimeStep);
-	
 			this.postUpdate(msTimeStep);
 
 			// Request a game loop tick from the browser
@@ -185,7 +197,9 @@ class Game
 		return true;
 	}
 
-	// Setup the request animation frame wrapper for browser compatibility
+	/**
+	 * Setup the request animation frame wrapper for browser compatibility
+	 */
 	private function requestAnimFrame()
 	{
 		untyped
@@ -206,29 +220,31 @@ class Game
 				js.Browser.window.msRequestAnimationFrame(gameLoop);
 
 			else
+				// setTimeout fall back
 				js.Browser.window.setTimeout(function () {
-						this.gameLoop(Game.DEFAULT_UPDATES_TIME_MS);
-						}, Game.DEFAULT_UPDATES_TIME_MS);
+					this.gameLoop(Game.DEFAULT_UPDATES_TIME_MS);
+				}, Game.DEFAULT_UPDATES_TIME_MS);
 		}
 	}
 
-	private function preUpdate(msTimeStep:Int):Void
-	{
-	}
+	/**
+	 * The update functions are designed to be overridden in a subclass
+	 */
+	private function preUpdate(msTimeStep:Int):Void {}
+	private function update(msTimeStep:Int):Void {}
+	private function postUpdate(msTimeStep:Int):Void {}
 
-	private function update(msTimeStep:Int):Void
-	{
-	}
-
-	private function postUpdate(msTimeStep:Int):Void
-	{
-	}
-
+	/**
+	 * Should be called just before the game instance is removed
+	 */
 	public function destroy():Void
 	{
 		this.targetElement = null;
 	}
 
+	/**
+	 * Tells the game to stop looping in the next step
+	 */
 	public function stopGame():Void
 	{
 		this.exitGame = true;
