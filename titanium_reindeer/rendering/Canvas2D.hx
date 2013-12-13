@@ -5,6 +5,7 @@ import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
 import js.html.Image;
 
+import titanium_reindeer.spatial.Vector2;
 import titanium_reindeer.spatial.RectRegion;
 import titanium_reindeer.spatial.Rect;
 import titanium_reindeer.spatial.Circle;

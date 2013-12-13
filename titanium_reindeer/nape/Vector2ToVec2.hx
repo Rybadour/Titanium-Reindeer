@@ -1,5 +1,6 @@
 package titanium_reindeer.nape;
 
+import titanium_reindeer.spatial.Vector2;
 import nape.geom.Vec2;
 
 abstract Vector2ToVec2(Vector2) {

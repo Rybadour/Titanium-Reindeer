@@ -1,5 +1,7 @@
 package titanium_reindeer.ui;
 
+import titanium_reindeer.spatial.Vector2;
+
 enum UIAlignX
 {
 	Left;

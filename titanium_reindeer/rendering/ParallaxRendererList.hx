@@ -1,5 +1,7 @@
 package titanium_reindeer.rendering;
 
+import titanium_reindeer.spatial.Vector2;
+
 class ParallaxRendererList<S:IRenderState, R:IRenderer> extends Renderer<S>
 {
 	private var parallaxRatios:Map<Int, Float>;

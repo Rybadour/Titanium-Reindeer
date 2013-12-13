@@ -3,6 +3,7 @@ package titanium_reindeer.core;
 import js.html.Element;
 
 import titanium_reindeer.Enums;
+import titanium_reindeer.spatial.Vector2;
 
 class RecordedEvent
 {

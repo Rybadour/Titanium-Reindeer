@@ -2,6 +2,7 @@ package titanium_reindeer.nape;
 
 import nape.phys.*;
 import nape.shape.*;
+import titanium_reindeer.spatial.Vector2;
 import titanium_reindeer.spatial.Circle in TRCircle;
 
 /**
