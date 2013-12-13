@@ -7,7 +7,6 @@ package titanium_reindeer.core;
  */
 class Scene 
 {
-	// Flag for the paused state of the Scene
 	public var isPaused(default, null):Bool;
 
 	public function new()
