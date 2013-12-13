@@ -1,5 +1,6 @@
 package titanium_reindeer.nape;
 
+import titanium_reindeer.spatial.Vector2;
 import nape.phys.BodyType;
 
 class NapeDynamicBody extends NapeBody

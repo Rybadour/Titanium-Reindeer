@@ -1,6 +1,7 @@
 package titanium_reindeer.rendering;
 
 import titanium_reindeer.assets.ILoadable;
+import titanium_reindeer.util.Utility;
 
 class ProgressBarRenderer extends Renderer<RenderState>
 {

@@ -3,6 +3,7 @@ package titanium_reindeer.ui;
 import titanium_reindeer.rendering.Canvas2D;
 import titanium_reindeer.rendering.IRenderer;
 import titanium_reindeer.ui.UIAlignment;
+import titanium_reindeer.spatial.Vector2;
 
 class UIElement implements IRenderer
 {
