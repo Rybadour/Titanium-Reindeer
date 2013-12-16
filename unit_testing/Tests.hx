@@ -1,5 +1,4 @@
-import unit_testing.util.MoreMathTests;
-import unit_testing.util.TupleTests;
+import unit_testing.util.*;
 
 class Tests
 {
@@ -14,6 +13,7 @@ class Tests
 		// Rendering
 
 		// Util
+		tests.add(new UtilityTests());
 		tests.add(new MoreMathTests());
 		tests.add(new TupleTests());
 
