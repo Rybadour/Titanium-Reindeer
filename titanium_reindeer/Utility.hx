@@ -8,6 +8,13 @@ class Utility
 	 */
 	public static function clampInt(n:Int, a:Int, b:Int):Int
 	{
+		// First ensure a and b are lowest and highest respectively
+		if (a > b)
+		{
+			var s = a;
+			a = b;
+			b = s;
+		}
 		return Math.round(Math.max(a, Math.min(n, b)));
 	}
 
@@ -16,6 +23,13 @@ class Utility
 	 */
 	public static function clampFloat(n:Float, a:Float, b:Float):Float
 	{
+		// First ensure a and b are lowest and highest respectively
+		if (a > b)
+		{
+			var s = a;
+			a = b;
+			b = s;
+		}
 		return Math.max(a, Math.min(n, b));
 	}
 
