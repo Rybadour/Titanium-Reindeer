@@ -1,10 +1,14 @@
 import unit_testing.util.*;
+import unit_testing.ai.*;
 
 class Tests
 {
 	static function main()
 	{
 		var tests = new haxe.unit.TestRunner();
+
+		// Artificial Intelligence
+		//tests.add(new PathingTests());
 
 		// Core
 
