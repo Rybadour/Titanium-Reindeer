@@ -5,6 +5,9 @@ import js.html.Element;
 import titanium_reindeer.Enums;
 import titanium_reindeer.spatial.Vector2;
 
+/**
+ * A helper class for storing a captured event.
+ */
 class RecordedEvent
 {
 	public var type:InputEvent;
@@ -17,79 +20,18 @@ class RecordedEvent
 	}
 }
 
-/* *
-class MouseButtonData
-{
-	public var button:MouseButton;
-	public var buttonState:MouseButtonState;
-	
-	public var cb:Vector2 -> Void;
-
-	public function new(button:MouseButton, buttonState:MouseButtonState, cb:Vector2 -> Void)
-	{
-		this.button = button;
-		this.buttonState = buttonState;
-		this.cb = cb;
-	}
-}
-
-class MouseMoveData
-{
-	public var cb:Vector2 -> Void;
-
-	public function new(cb:Vector2 -> Void)
-	{
-		this.cb = cb;
-	}
-}
-
-class MouseWheelData
-{
-	public var cb:Int -> Void;
-
-	public function new(cb:Int -> Void)
-	{
-		this.cb = cb;
-	}
-}
-
-class MouseButtonAnyData
-{
-	public var cb:MouseButton -> MouseButtonState -> Vector2 -> Void;
-
-	public function new(cb:MouseButton -> MouseButtonState -> Vector2 -> Void)
-	{
-		this.cb = cb;
-	}
-}
-
-class KeyData
-{
-	public var key:Key;
-	public var keyState:KeyState;
-	public var cb:Void -> Void;
-
-	public function new(key:Key, keyState:KeyState, cb:Void -> Void)
-	{
-		this.key = key;
-		this.keyState = keyState;
-		this.cb = cb;
-	}
-}
-
-class KeyAnyData
-{
-	public var cb:Key -> KeyState -> Void;
-	
-	public function new(cb:Key -> KeyState -> Void)
-	{
-		this.cb = cb;
-	}
-}
-/* */
-
+/**
+ * The InputState class keeps of track input events of every kind. Only the current frame's input
+ * events are kept in place. Each frame the previous events are forgotten and new events begin to
+ * get recorded. Lookup to the InputState should be synchronous and each question about state to it
+ * refers only to the state of things between the beginning of the current frame and the time the
+ * question was asked.
+ */
 class InputState
 {
+	// TODO: Get rid of this eventually
+	// Determines how often we check the window position of our target element
+	// Used to accurately find the mouse position in the browser window
 	public static inline var DEFAULT_OFFSET_RECALC_DELAY_MS:Int		= 1000;
 
 
@@ -570,3 +512,75 @@ class InputState
 		this.targetDocumentOffset = offset;
 	}
 }
+
+// TODO: Keep old code here until I know if I need it or not
+/* *
+class MouseButtonData
+{
+	public var button:MouseButton;
+	public var buttonState:MouseButtonState;
+	
+	public var cb:Vector2 -> Void;
+
+	public function new(button:MouseButton, buttonState:MouseButtonState, cb:Vector2 -> Void)
+	{
+		this.button = button;
+		this.buttonState = buttonState;
+		this.cb = cb;
+	}
+}
+
+class MouseMoveData
+{
+	public var cb:Vector2 -> Void;
+
+	public function new(cb:Vector2 -> Void)
+	{
+		this.cb = cb;
+	}
+}
+
+class MouseWheelData
+{
+	public var cb:Int -> Void;
+
+	public function new(cb:Int -> Void)
+	{
+		this.cb = cb;
+	}
+}
+
+class MouseButtonAnyData
+{
+	public var cb:MouseButton -> MouseButtonState -> Vector2 -> Void;
+
+	public function new(cb:MouseButton -> MouseButtonState -> Vector2 -> Void)
+	{
+		this.cb = cb;
+	}
+}
+
+class KeyData
+{
+	public var key:Key;
+	public var keyState:KeyState;
+	public var cb:Void -> Void;
+
+	public function new(key:Key, keyState:KeyState, cb:Void -> Void)
+	{
+		this.key = key;
+		this.keyState = keyState;
+		this.cb = cb;
+	}
+}
+
+class KeyAnyData
+{
+	public var cb:Key -> KeyState -> Void;
+	
+	public function new(cb:Key -> KeyState -> Void)
+	{
+		this.cb = cb;
+	}
+}
+/* */
