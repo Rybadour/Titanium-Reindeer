@@ -44,12 +44,20 @@ class RepeatFillRenderer extends Renderer<RenderState>
 		var xCount = xRepeat ? Math.ceil(this.fillWidth/this.sourceWidth)+1 : 1;
 		var yCount = yRepeat ? Math.ceil(this.fillHeight/this.sourceHeight)+1 : 1;
 		var left = this.offset.x;
-		if (xRepeat && this.offset.x > 0)
-			left = (this.offset.x % this.sourceWidth) - this.sourceWidth;
+		if (xRepeat)
+		{
+			left = (this.offset.x % this.sourceWidth);
+			if (this.offset.x > 0)
+				left = (this.offset.x % this.sourceWidth) - this.sourceWidth;
+		}
 
 		var startTop = this.offset.y;
-		if (yRepeat && this.offset.y > 0)
-			startTop = (this.offset.y % this.sourceHeight) - this.sourceHeight;
+		if (yRepeat)
+		{
+			startTop = (this.offset.y % this.sourceHeight);
+			if (this.offset.y > 0)
+				startTop = (this.offset.y % this.sourceHeight) - this.sourceHeight;
+		}
 
 		for (i in 0...xCount)
 		{
