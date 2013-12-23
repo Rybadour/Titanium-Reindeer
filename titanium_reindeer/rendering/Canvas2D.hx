@@ -76,6 +76,11 @@ class Canvas2D implements IRenderer
 		this.ctx.translate(vector.x, vector.y);
 	}
 
+	public inline function scale(sx:Float, ?sy:Float = null):Void
+	{
+		this.ctx.scale(sx, ( sy == null ? sx : sy ));
+	}
+
 	public inline function moveTo(vector:Vector2)
 	{
 		this.ctx.moveTo(vector.x, vector.y);
