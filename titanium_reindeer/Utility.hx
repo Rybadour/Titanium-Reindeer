@@ -42,6 +42,14 @@ class Utility
 	}
 
 	/**
+	 * Returns the sign of the number, either -1 for negative or 1 for positive.
+	 */
+	public static function sign(x:Float):Float
+	{
+		return ( x < 0 ? -1 : 1 );
+	}
+
+	/**
 	 * Detects the availability of web workers in the browser.
 	 * Returns true if the feature is available to use.
 	 */
