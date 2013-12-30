@@ -1,5 +1,6 @@
 package titanium_reindeer.rendering;
 
+import titanium_reindeer.util.Utility;
 import titanium_reindeer.spatial.Vector2;
 
 enum RepeatFillMethod

@@ -21,36 +21,36 @@ class TupleTests extends haxe.unit.TestCase
 	public function testTuple()
 	{
 		// A
-		assertEquals(this.a.first, 1);
-		assertEquals(this.a.second, "A");
+		assertEquals(1, this.a.first);
+		assertEquals("A", this.a.second);
 
 		// B
-		assertEquals(this.b.first, "B");
-		assertEquals(this.b.second, 5.5);
+		assertEquals("B", this.b.first);
+		assertEquals(5.5, this.b.second);
 	}
 
 	public function testReferenceUsage()
 	{
 		// By Ref
 		var another = this.a;
-		assertEquals(another.first, 1);
-		assertEquals(another.second, "A");
+		assertEquals(1, another.first);
+		assertEquals("A", another.second);
 
 		this.a.second += "bc";
-		assertEquals(this.a.second, "Abc");
-		assertEquals(another.second, "Abc");
+		assertEquals("Abc", this.a.second);
+		assertEquals("Abc", another.second);
 	}
 
 	public function testTuple3()
 	{
 		// C
-		assertEquals(this.c.first, 2);
-		assertEquals(this.c.second, "C");
-		assertEquals(this.c.third, 0.5);
+		assertEquals(2, this.c.first);
+		assertEquals("C", this.c.second);
+		assertEquals(0.5, this.c.third);
 
 		// D
-		assertEquals(this.d.first, 7);
-		assertEquals(this.d.second, "D");
-		assertEquals(this.d.third, "string");
+		assertEquals(7, this.d.first);
+		assertEquals("D", this.d.second);
+		assertEquals("string", this.d.third);
 	}
 }
