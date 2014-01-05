@@ -1,134 +1,77 @@
 package titanium_reindeer.spatial;
 
-class RTreeFastNode
-{
-	public var bounds:FastRect;
-	public var parent:RTreeFastBranch;
+import Map;
 
-	public function new(bounds:FastRect)
-	{
-		this.bounds = bounds;
-	}
-}
-
-// This class stores the actual data and should only be siblings with itself
-class RTreeFastLeaf extends RTreeFastNode
-{
-	public var value:Int;
-
-	public function new(bounds:FastRect, value:Int)
-	{
-		super(bounds);
-
-		this.value = value;
-	}
-}
-
-class RTreeFastBranch extends RTreeFastNode
-{
-	public var children:Array<RTreeFastNode>;
-	public var isLeaf:Bool; // if true then this RTreeBranch only contains leafs as children
-
-	public function new(bounds:FastRect)
-	{
-		super(bounds);
-
-		this.children = new Array();
-		this.isLeaf = false;
-	}
-
-	public function addChild(node:RTreeFastNode):Void
-	{
-		this.children.push(node);
-		node.parent = this;
-	}
-
-	public function recalculateBounds():Void
-	{
-		if (this.children.length > 0)
-		{
-			var newBounds:FastRect = this.children[0].bounds;
-			for (i in 1...this.children.length)
-			{
-				newBounds = FastRect.expandToCover(newBounds, this.children[i].bounds);
-			}
-			this.bounds = newBounds;
-		}
-	}
-}
-
-class RTreeFastInt implements ISpatialPartition
+class RTreePartition<K> implements ISpatialPartition<K>
 {
 	// Flags and values for optimizations
-	public var maxChildren(default, setMaxChildren):Int;
-	private function setMaxChildren(value:Int):Int
+	public var maxChildren(default, set):Int;
+	private function set_maxChildren(value:Int):Int
 	{
 		if (value > 1)
 		{
-			maxChildren = value;
+			this.maxChildren = value;
 		}
 		return maxChildren;
 	}
 
-	private var root:RTreeFastBranch;
-	private var intMap:IntHash<RTreeFastLeaf>;
+	private var root:RTreeNode<K>;
+	private var mapper:IMap<K, RTreeNode<K>>;
 
-	public function getBoundingRect():FastRect
+	public function getBoundingRectRegion():RectRegion
 	{
 		return root.bounds;
 	}
 
-	public var debugCanvas:String;
-	public var debugOffset:Vector2;
-	public var debugSteps:Bool;
-
-	public function new()
+	public function new(mapper:IMap<K, RTreeNode<K>>)
 	{
-		maxChildren = 3;
+		this.mapper = mapper;
 
-		intMap = new IntHash();
+		this.maxChildren = 4;
 	}
 
-	public function insert(rect:FastRect, value:Int):Void
+	public function insert(rect:RectRegion, value:K):Void
 	{
-		if (intMap.exists(value))
+		if (mapper.exists(value))
 			return;
 
-		var leaf:RTreeFastLeaf;
+		var leaf:RTreeNode<K>;
 		if (root == null)
 		{
-			root = new RTreeFastBranch(rect.getCopy());
-			leaf = new RTreeFastLeaf(rect.getCopy(), value);
+			root = new RTreeNode(RectRegion.copy(rect));
+			leaf = new RTreeNode(RectRegion.copy(rect), value);
 			root.addChild(leaf);
-			this.intMap.set(value, leaf);
-			root.isLeaf = true;
+			this.mapper.set(value, leaf);
+			root.hasOnlyLeaves = true;
 			return;
 		}
 
-		var currentNode:RTreeFastBranch = root;
-		var intersection:FastRect;
+		var currentNode:RTreeNode<K> = root;
+		var intersection:RectRegion;
 
+		var parent:RTreeNode<K> = null;
 		var continueSearching:Bool = true;
 		while (continueSearching)
 		{
 			// Leaf nodes only contain leaf nodes, this is the end of line add this new rect here
-			if (currentNode.isLeaf)
+			if (currentNode.hasOnlyLeaves)
 			{
-				leaf = new RTreeFastLeaf(rect.getCopy(), value);
+				leaf = new RTreeNode(RectRegion.copy(rect), value);
 				this.addChildToNode(currentNode, leaf);
-				this.intMap.set(value, leaf);
+				this.mapper.set(value, leaf);
 
+				parent = currentNode;
 				continueSearching = false;
 			}
 			else
 			{
 				// Find the child branch that will fit this rect while expanding the least
 				var leastExpansion:Float = Math.POSITIVE_INFINITY;
-				var leastBranch:RTreeFastBranch = null;
+				var leastBranch:RTreeNode<K> = null;
 				for (node in currentNode.children)
 				{
-					var branch:RTreeFastBranch = cast(node, RTreeFastBranch);
-					intersection = FastRect.getIntersection(branch.bounds, rect);
+					var branch:RTreeNode<K> = node;
+					intersection = Geometry.getIntersectionOfRectRegions(branch.bounds, rect);
 					if (intersection != null)
 					{
 						var leastArea:Float = rect.getArea() - intersection.getArea();
@@ -143,43 +86,48 @@ class RTreeFastInt implements ISpatialPartition
 				// No intersecting branch found, make a new one
 				if (leastBranch == null)
 				{
-					var newBranch:RTreeFastBranch = new RTreeFastBranch(rect.getCopy());
+					var newBranch:RTreeNode<K> = new RTreeNode(RectRegion.copy(rect));
 					this.addChildToNode(currentNode, newBranch);
 
 					// And append the new rect and it's value to it
-					leaf = new RTreeFastLeaf(rect.getCopy(), value);
+					leaf = new RTreeNode(RectRegion.copy(rect), value);
 					this.addChildToNode(newBranch, leaf);
-					this.intMap.set(value, leaf);
+					this.mapper.set(value, leaf);
 
+					parent = newBranch;
 					continueSearching = false;
 				}
 				// Recursive into the least node
 				else
 				{
-					currentNode.bounds = FastRect.expandToCover(currentNode.bounds, rect);
+					currentNode.bounds = RectRegion.expandToCover(currentNode.bounds, rect);
 
 					currentNode = leastBranch;
 				}
 			}
 		}
 
-		if (this.debugSteps)
-			this.drawDebug();
+		parent = parent.parent;
+		while (parent != null)
+		{
+			parent.recalculateBounds();
+			parent = parent.parent;
+		}
 	}
 
 	// This auxilary function appends a child node to a parent
 	// Will perform a split if the node capacity is breached
-	private function addChildToNode(parent:RTreeFastBranch, child:RTreeFastNode):Void
+	private function addChildToNode(parent:RTreeNode<K>, child:RTreeNode<K>):Void
 	{
 		parent.addChild(child);
-		parent.bounds = FastRect.expandToCover(parent.bounds, child.bounds);
+		parent.bounds = RectRegion.expandToCover(parent.bounds, child.bounds);
 
 		// Not full
 		if (parent.children.length <= this.maxChildren)
 		{
 			// If this first child to the parent is a leaf node then set the parent as a leaf holder
-			if (parent.children.length == 1 && Std.is(child, RTreeFastLeaf))
-				parent.isLeaf = true;
+			if (parent.children.length == 1 && child.isLeaf)
+				parent.hasOnlyLeaves = true;
 		}
 		// Time to split the parent's children
 		else
@@ -188,17 +136,17 @@ class RTreeFastInt implements ISpatialPartition
 		}
 	}
 
-	private function linearSplit(parent:RTreeFastBranch):Void
+	private function linearSplit(parent:RTreeNode<K>):Void
 	{
 		// If the width is larger then do splitting by comparing on the x-axis
 		var compareOnX:Bool = parent.bounds.width > parent.bounds.height;
-		var seedA:RTreeFastNode = null; // Left or Top most seed
+		var seedA:RTreeNode<K> = null; // Left or Top most seed
 
 		// Create the initial branches with beginning seeds
-		var children:Array<RTreeFastNode> = new Array();
+		var children:Array<RTreeNode<K>> = new Array();
 		while (parent.children.length > 0)
 		{
-			var node:RTreeFastNode = parent.children.pop();
+			var node:RTreeNode<K> = parent.children.pop();
 			if (seedA == null)
 			{
 				if (compareOnX)
@@ -245,24 +193,17 @@ class RTreeFastInt implements ISpatialPartition
 				}
 			}
 		}
-		var seedB:RTreeFastNode = children[leastIndex]; // Right or Bottom most seed
+		var seedB:RTreeNode<K> = children[leastIndex]; // Right or Bottom most seed
 		children.splice(leastIndex, 1);
 
-		/* */
-		if (seedA == null)
-		{
-			var x:Int = 2;
-		}
-		/* */
-
-		var branchA:RTreeFastBranch = new RTreeFastBranch(seedA.bounds.getCopy()); // Left or Top most branch
+		var branchA:RTreeNode<K> = new RTreeNode(RectRegion.copy(seedA.bounds)); // Left or Top most branch
 		branchA.addChild(seedA);
-		var branchB:RTreeFastBranch = new RTreeFastBranch(seedB.bounds.getCopy()); // Right or Bottom most branch
+		var branchB:RTreeNode<K> = new RTreeNode(RectRegion.copy(seedB.bounds)); // Right or Bottom most branch
 		branchB.addChild(seedB);
 		while (children.length > 0)
 		{
-			var node:RTreeFastNode = children.pop();
-			var branch:RTreeFastBranch;
+			var node:RTreeNode<K> = children.pop();
+			var branch:RTreeNode<K>;
 			var aDist:Float;
 			var bDist:Float;
 			if (compareOnX)
@@ -288,49 +229,46 @@ class RTreeFastInt implements ISpatialPartition
 					branch = branchB;
 			}
 
-			branch.bounds = FastRect.expandToCover(branch.bounds, node.bounds);
+			branch.bounds = RectRegion.expandToCover(branch.bounds, node.bounds);
 			branch.addChild(node);
 		}
 
-		branchA.isLeaf = parent.isLeaf;
-		branchB.isLeaf = parent.isLeaf;
+		branchA.hasOnlyLeaves = parent.hasOnlyLeaves;
+		branchB.hasOnlyLeaves = parent.hasOnlyLeaves;
 		parent.children = new Array();
 
-		if (branchA.children.length == 1 && !branchA.isLeaf)
+		if (branchA.children.length == 1 && !branchA.hasOnlyLeaves)
 			parent.addChild(branchA.children.pop());
 		else
 			parent.addChild(branchA);
 
-		if (branchB.children.length == 1 && !branchB.isLeaf)
+		if (branchB.children.length == 1 && !branchB.hasOnlyLeaves)
 			parent.addChild(branchB.children.pop());
 		else
 			parent.addChild(branchB);
-		parent.isLeaf = false;
-
-		if (this.debugSteps)
-			this.drawDebug();
+		parent.hasOnlyLeaves = false;
 	}
 
-	public function update(newBounds:FastRect, value:Int):Void
+	public function update(newBounds:RectRegion, value:K):Void
 	{
-		if (!this.intMap.exists(value))
+		if (!this.mapper.exists(value))
 			return;
 
-		var leaf:RTreeFastLeaf = this.intMap.get(value);
+		var leaf:RTreeNode<K> = this.mapper.get(value);
 		leaf.bounds = newBounds;
 
 		this.updateNodeHierarchy(leaf);
 	}
 
-	public function remove(value:Int):Void
+	public function remove(value:K):Void
 	{
-		if (!this.intMap.exists(value))
+		if (!this.mapper.exists(value))
 			return;
 
-		var leaf:RTreeFastLeaf = this.intMap.get(value);
-		this.intMap.remove(value);
+		var leaf:RTreeNode<K> = this.mapper.get(value);
+		this.mapper.remove(value);
 
-		var parent:RTreeFastBranch = leaf.parent;
+		var parent:RTreeNode<K> = leaf.parent;
 		leaf.parent = null;
 
 		if (parent.children.length > 1)
@@ -348,7 +286,7 @@ class RTreeFastInt implements ISpatialPartition
 		{
 			parent.children.pop();
 
-			var nextParent:RTreeFastBranch = parent.parent;
+			var nextParent:RTreeNode<K> = parent.parent;
 			var timeToStop:Bool = false;
 			while (nextParent != null)
 			{
@@ -389,10 +327,10 @@ class RTreeFastInt implements ISpatialPartition
 			{
 				parent.parent.children.pop();
 
-				var child:RTreeFastNode = parent.children.pop();
+				var child:RTreeNode<K> = parent.children.pop();
 				child.parent = parent.parent;
 
-				parent.parent.isLeaf = parent.isLeaf;
+				parent.parent.hasOnlyLeaves = parent.hasOnlyLeaves;
 				parent.parent.children.push(child);
 
 				parent.parent = null;
@@ -400,14 +338,14 @@ class RTreeFastInt implements ISpatialPartition
 				parent = child.parent;
 			}
 			
-			if (!parent.isLeaf)
+			if (!parent.hasOnlyLeaves)
 			{
-				var child:RTreeFastBranch = cast(parent.children[0], RTreeFastBranch);
+				var child:RTreeNode<K> = parent.children[0];
 				if (child.children.length == 1)
 				{
 					parent.children.pop();
 
-					parent.isLeaf = child.isLeaf;
+					parent.hasOnlyLeaves = child.hasOnlyLeaves;
 					parent.addChild(child.children.pop());
 
 					child.parent = null;
@@ -419,33 +357,29 @@ class RTreeFastInt implements ISpatialPartition
 		parent.recalculateBounds();
 
 		this.updateNodeHierarchy(parent);
-
-		if (this.debugSteps)
-			this.drawDebug();
 	}
 
-	private function updateNodeHierarchy(node:RTreeFastNode):Void
+	private function updateNodeHierarchy(node:RTreeNode<K>):Void
 	{
-		var updatedNode:RTreeFastNode = node;
-		var nextParent:RTreeFastBranch = node.parent;
+		var updatedNode:RTreeNode<K> = node;
+		var nextParent:RTreeNode<K> = node.parent;
 
 		while (nextParent != null)
 		{
 			// If we are not intersecting and this parent is not root then attempt to move the node to a better parent
-			if ( !FastRect.isIntersecting(nextParent.bounds, updatedNode.bounds) && nextParent.parent != null)
+			if ( !Geometry.isRectIntersectingRect(nextParent.bounds, updatedNode.bounds) && nextParent.parent != null)
 			{
-				var closestParent:RTreeFastBranch = null;
+				var closestParent:RTreeNode<K> = null;
 				var closestDistance:Float = Math.POSITIVE_INFINITY;
-				var parent:RTreeFastBranch;
+				var parent:RTreeNode<K>;
 				var distance:Float;
-				for (i in 0...nextParent.parent.children.length)
+				for (parent in nextParent.parent.children)
 				{
-					parent = cast(nextParent.parent.children[i], RTreeFastBranch);
 					// Can't move a leaf to a non-leaf parent
-					if (parent.isLeaf != nextParent.isLeaf)
+					if (parent.hasOnlyLeaves != nextParent.hasOnlyLeaves)
 						continue;
 
-					distance = Math.abs(parent.bounds.x - updatedNode.bounds.x) + Math.abs(parent.bounds.y - updatedNode.bounds.y);
+					distance = Math.abs(parent.bounds.left - updatedNode.bounds.left) + Math.abs(parent.bounds.top - updatedNode.bounds.top);
 					if (closestParent == null || distance < closestDistance)
 					{
 						closestDistance = distance;
@@ -465,14 +399,14 @@ class RTreeFastInt implements ISpatialPartition
 						}
 					}
 
-					// ASSUME: It's okay to move because we would not have picked a branch that has a different isLeaf value
+					// ASSUME: It's okay to move because we would not have picked a branch that has a different hasOnlyLeaves value
 					this.addChildToNode(closestParent, updatedNode);
 
 					// Now ensure that all parents of the new parent expand to fit node
-					var currentBranch:RTreeFastBranch = closestParent.parent;
+					var currentBranch:RTreeNode<K> = closestParent.parent;
 					while (currentBranch != null)
 					{
-						FastRect.expandToCover(currentBranch.bounds, updatedNode.bounds);
+						RectRegion.expandToCover(currentBranch.bounds, updatedNode.bounds);
 
 						currentBranch = currentBranch.parent;
 					}
@@ -515,15 +449,15 @@ class RTreeFastInt implements ISpatialPartition
 		}
 	}
 
-	public function requestValuesIntersectingRect(rect:FastRect):Array<Int>
+	public function requestKeysIntersectingRect(rect:RectRegion):Array<K>
 	{
 		if (root == null)
 			return [];
 
-		var results:Array<Int> = new Array();
-		var currentNodes:Array<RTreeFastBranch> = new Array();
+		var results:Array<K> = new Array();
+		var currentNodes:Array<RTreeNode<K>> = new Array();
 		currentNodes.push(this.root);
-		var searchNodes:Array<RTreeFastBranch>;
+		var searchNodes:Array<RTreeNode<K>>;
 
 		var continueSearching:Bool = true;
 		while (continueSearching)
@@ -535,17 +469,17 @@ class RTreeFastInt implements ISpatialPartition
 			var anyNonLeafs:Bool = false;
 			for (node in searchNodes)
 			{
-				if (!node.isLeaf)
+				if (!node.hasOnlyLeaves)
 					anyNonLeafs = true;
 
 				for (child in node.children)
 				{
-					if (FastRect.isIntersecting(rect, child.bounds))
+					if (Geometry.isRectIntersectingRect(rect, child.bounds))
 					{
-						if (Std.is(child, RTreeFastLeaf))
-							results.push(cast(child, RTreeFastLeaf).value);
+						if (child.isLeaf)
+							results.push(child.value);
 						else
-							currentNodes.push(cast(child, RTreeFastBranch));
+							currentNodes.push(child);
 					}
 				}
 			}
@@ -555,15 +489,15 @@ class RTreeFastInt implements ISpatialPartition
 		return results;
 	}
 
-	public function requestValuesIntersectingPoint(point:Vector2):Array<Int>
+	public function requestKeysIntersectingPoint(point:Vector2):Array<K>
 	{
 		if (root == null)
 			return [];
 
-		var results:Array<Int> = new Array();
-		var currentNodes:Array<RTreeFastBranch> = new Array();
+		var results:Array<K> = new Array();
+		var currentNodes:Array<RTreeNode<K>> = new Array();
 		currentNodes.push(this.root);
-		var searchNodes:Array<RTreeFastBranch>;
+		var searchNodes:Array<RTreeNode<K>>;
 
 		var continueSearching:Bool = true;
 		while (continueSearching)
@@ -575,17 +509,17 @@ class RTreeFastInt implements ISpatialPartition
 			var anyNonLeafs:Bool = false;
 			for (node in searchNodes)
 			{
-				if (!node.isLeaf)
+				if (!node.hasOnlyLeaves)
 					anyNonLeafs = true;
 
 				for (child in node.children)
 				{
 					if (child.bounds.isPointInside(point))
 					{
-						if (Std.is(child, RTreeFastLeaf))
-							results.push(cast(child, RTreeFastLeaf).value);
+						if (child.isLeaf)
+							results.push(child.value);
 						else
-							currentNodes.push(cast(child, RTreeFastBranch));
+							currentNodes.push(child);
 					}
 				}
 			}
@@ -595,6 +529,7 @@ class RTreeFastInt implements ISpatialPartition
 		return results;
 	}
 
+	/* *
 	public function drawDebug()
 	{
 		if (this.root == null)
@@ -602,16 +537,6 @@ class RTreeFastInt implements ISpatialPartition
 
 		var canvas:Dynamic = js.Browser.document.getElementById(this.debugCanvas);
 		var pen:Dynamic = canvas.getContext2d();
-
-		/* *
-		var colors:Array<String> = new Array();
-		colors[0] = "#FF0000";
-		colors[1] = "#000000";
-		colors[2] = "#00FFFF";
-		colors[3] = "#FF00FF";
-		colors[4] = "#FFFF00";
-		colors[5] = "#23FF23";
-		/* */
 
 		pen.fillStyle = "#FFFFFF";
 		pen.fillRect(0, 0, 1000, 1000);
@@ -622,11 +547,11 @@ class RTreeFastInt implements ISpatialPartition
 		pen.textBaseline = "middle";
 		pen.font = "20pt Arial";
 
-		var currentNodes:Array<RTreeFastNode> = new Array();
-		var nextNodes:Array<RTreeFastNode> = new Array();
+		var currentNodes:Array<RTreeNode<K>> = new Array();
+		var nextNodes:Array<RTreeNode<K>> = new Array();
 		nextNodes.push(this.root);
 
-		var node:RTreeFastNode;
+		var node:RTreeNode<K>;
 		var level:Int = 0;
 		while (nextNodes.length > 0)
 		{
@@ -637,24 +562,60 @@ class RTreeFastInt implements ISpatialPartition
 			while (currentNodes.length > 0)
 			{
 				node = currentNodes.pop();
-				pen.strokeRect(node.bounds.x + debugOffset.x, node.bounds.y + debugOffset.y, node.bounds.width, node.bounds.height);
-				pen.strokeText(level+"", node.bounds.x + debugOffset.x + node.bounds.width/2, node.bounds.y + debugOffset.y + node.bounds.height/2);
+				pen.strokeRect(node.bounds.left + debugOffset.left, node.bounds.top + debugOffset.top, node.bounds.width, node.bounds.height);
+				pen.strokeText(level+"", node.bounds.left + debugOffset.left + node.bounds.width/2, node.bounds.top + debugOffset.top + node.bounds.height/2);
 	
-				if (Std.is(node, RTreeFastBranch))
+				if (!node.isLeaf)
 				{
-					var branch:RTreeFastBranch = cast(node, RTreeFastBranch);
-					for (i in 0...branch.children.length)
+					for (child in node.children)
 					{
-						nextNodes.push(branch.children[i]);
+						nextNodes.push(child);
 					}
 				}
 			}
 
 			level++;
-			/* *
-			if (level >= colors.length)
-				level = 0;
-			/* */
+		}
+	}
+	/* */
+}
+
+class RTreeNode<K>
+{
+	public var bounds:RectRegion;
+	public var value:K;
+
+	public var parent:RTreeNode<K>;
+	public var children:Array<RTreeNode<K>>;
+	// if true then this only contains leafs as children
+	public var hasOnlyLeaves:Bool;
+	public var isLeaf:Bool;
+
+	public function new(bounds:RectRegion, ?value:K = null)
+	{
+		this.bounds = bounds;
+		this.children = new Array();
+		this.hasOnlyLeaves = false;
+		this.isLeaf = (value != null);
+		this.value = value;
+	}
+
+	public function addChild(node:RTreeNode<K>):Void
+	{
+		this.children.push(node);
+		node.parent = this;
+	}
+
+	public function recalculateBounds():Void
+	{
+		if (this.children.length > 0)
+		{
+			var newBounds:RectRegion = this.children[0].bounds;
+			for (i in 1...this.children.length)
+			{
+				newBounds = RectRegion.expandToCover(newBounds, this.children[i].bounds);
+			}
+			this.bounds = newBounds;
 		}
 	}
 }

@@ -1,5 +1,6 @@
-import unit_testing.util.*;
 import unit_testing.ai.*;
+import unit_testing.util.*;
+import unit_testing.spatial.*;
 
 class Tests
 {
@@ -13,6 +14,7 @@ class Tests
 		// Core
 
 		// Spatial
+		tests.add(new RTreePartitionTests());
 
 		// Rendering
 
