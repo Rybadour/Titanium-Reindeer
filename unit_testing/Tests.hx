@@ -14,6 +14,7 @@ class Tests
 		// Core
 
 		// Spatial
+		tests.add(new RectRegionTests());
 		tests.add(new RTreePartitionTests());
 
 		// Rendering
