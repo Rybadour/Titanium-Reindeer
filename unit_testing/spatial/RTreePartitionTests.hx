@@ -47,6 +47,74 @@ class RTreePartitionTests extends haxe.unit.TestCase
 
 	public function testBounds()
 	{
+		this.testOriginalState();
+
+		var tempRect = new RectRegion(200, 200, new Vector2(-10, -12));
+		this.partition.insert(tempRect, 99);
+
+		var bounds = this.partition.getBoundingRectRegion();
+		assertEquals(-10.0, bounds.left);
+		assertEquals(-12.0, bounds.top);
+		assertEquals(190.0, bounds.right);
+		assertEquals(188.0, bounds.bottom);
+		this.partition.remove(99);
+
+		this.testOriginalState();
+	}
+
+	public function testIntersection()
+	{
+		var intersecting = this.partition.requestKeysIntersectingRect(aR);
+		assertTrue(this.hasAll([a, b, c], intersecting));
+
+		intersecting = this.partition.requestKeysIntersectingRect(bR);
+		assertTrue(this.hasAll([a, b], intersecting));
+
+		intersecting = this.partition.requestKeysIntersectingRect(cR);
+		assertTrue(this.hasAll([a, c], intersecting));
+
+		intersecting = this.partition.requestKeysIntersectingRect(dR);
+		assertTrue(this.hasAll([d], intersecting));
+
+		intersecting = this.partition.requestKeysIntersectingRect(this.partition.getBoundingRectRegion());
+		assertTrue(this.hasAll([a, b, c, d], intersecting));
+		
+		intersecting = this.partition.requestKeysIntersectingRect(new RectRegion(2, 2, new Vector2(78, 100)));
+		assertTrue(this.hasAll([a, d], intersecting));
+ 
+ 		// Points
+		intersecting = this.partition.requestKeysIntersectingPoint(new Vector2(0, 0));
+		assertTrue(this.hasAll([a], intersecting));
+
+		intersecting = this.partition.requestKeysIntersectingPoint(new Vector2(11, 11));
+		assertTrue(this.hasAll([a, b], intersecting));
+
+		intersecting = this.partition.requestKeysIntersectingPoint(new Vector2(78, 101));
+		assertTrue(this.hasAll([d], intersecting));
+
+		intersecting = this.partition.requestKeysIntersectingPoint(new Vector2(5, 5));
+		assertTrue(this.hasAll([a, b], intersecting));
+
+		intersecting = this.partition.requestKeysIntersectingPoint(new Vector2(101, 77));
+		assertTrue(this.hasAll([], intersecting));
+	}
+
+	private function hasAll(asserted:Array<Int>, checked:Array<Int>):Bool
+	{
+		if (asserted.length != checked.length)
+			return false;
+
+		for (value in asserted)
+		{
+			if ( !Lambda.has(checked, value))
+				return false;
+		}
+
+		return true;
+	}
+
+	private function testOriginalState()
+	{
 		var bounds = this.partition.getBoundingRectRegion();
 		assertEquals(0.0, bounds.left);
 		assertEquals(0.0, bounds.top);

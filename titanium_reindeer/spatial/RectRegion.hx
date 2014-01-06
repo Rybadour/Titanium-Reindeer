@@ -69,8 +69,8 @@ class RectRegion extends Rect implements IRegion
 
 	public function isPointInside(p:Vector2):Bool
 	{
-		return (p.x >= this.left) && (p.x < this.right) &&
-			   (p.y >= this.top)  && (p.y < this.bottom);
+		return (p.x >= this.left) && (p.x <= this.right) &&
+			   (p.y >= this.top)  && (p.y <= this.bottom);
 	}
 
 	public function expand(margin:Int):Void
