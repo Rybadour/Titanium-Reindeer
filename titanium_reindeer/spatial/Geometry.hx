@@ -35,7 +35,29 @@ class Geometry
 
 		// Step D: compute the distance from the center of the circle and the corner, and then verify that the distance is not more than the radius of the circle.
 		var cornerDistance:Float = (circleDistX-rWidthHalf)*(circleDistX-rWidthHalf) + (circleDistY-rHeightHalf)*(circleDistY-rHeightHalf);
-		return cornerDistance <= (c.radius*c.radius);
+		return cornerDistance <= (c.radius * c.radius);
+	}
+
+	public static function getIntersectionOfRectRegions(a:RectRegion, b:RectRegion):RectRegion
+	{        
+		// True if the rectangle intersects
+		if ( (a.right >= b.left) && (a.left <= b.right) && (a.bottom >= b.top) && (a.top <= b.bottom) )
+		{
+			var left:Float = Math.max(a.left, b.left);
+			var top:Float = Math.max(a.top, b.top); 
+			return new RectRegion(
+				left, 
+				top, 
+				new Vector2(
+					Math.min(a.right, b.right) - left, 
+					Math.min(a.bottom, b.bottom) - top
+				)
+			);
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	public static function getMidPoint(a:Vector2, b:Vector2):Vector2

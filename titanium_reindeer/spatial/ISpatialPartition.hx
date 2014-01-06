@@ -1,19 +1,13 @@
 package titanium_reindeer.spatial;
 
-interface ISpatialPartition
+interface ISpatialPartition<K>
 {
-	var debugCanvas:String;
-	var debugOffset:Vector2;
-	var debugSteps:Bool;
+	function insert(rect:RectRegion, key:K):Void;
+	function update(newBounds:RectRegion, key:K):Void;
+	function remove(key:K):Void;
 
-	function insert(rect:RectRegion, value:Int):Void;
-	function update(newBounds:RectRegion, value:Int):Void;
-	function remove(value:Int):Void;
-
-	function requestValuesIntersectingRect(rect:RectRegion):Array<Int>;
-	function requestValuesIntersectingPoint(point:Vector2):Array<Int>;
+	function requestKeysIntersectingRect(rect:RectRegion):Array<K>;
+	function requestKeysIntersectingPoint(point:Vector2):Array<K>;
 
 	function getBoundingRectRegion():RectRegion;
-
-	function drawDebug():Void;
 }
