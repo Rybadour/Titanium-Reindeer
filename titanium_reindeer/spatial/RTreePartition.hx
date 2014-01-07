@@ -514,7 +514,7 @@ class RTreePartition<K> implements ISpatialPartition<K>
 
 				for (child in node.children)
 				{
-					if (child.bounds.isPointInside(point))
+					if (child.bounds.intersectsPoint(point))
 					{
 						if (child.isLeaf)
 							results.push(child.value);
