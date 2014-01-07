@@ -67,12 +67,6 @@ class RectRegion extends Rect implements IRegion
 		return RectRegion.copy(this);
 	}
 
-	public function isPointInside(p:Vector2):Bool
-	{
-		return (p.x >= this.left) && (p.x <= this.right) &&
-			   (p.y >= this.top)  && (p.y <= this.bottom);
-	}
-
 	public function expand(margin:Int):Void
 	{
 		this.position.x -= margin;
@@ -86,5 +80,21 @@ class RectRegion extends Rect implements IRegion
 		var region:RectRegion = RectRegion.copy(this);
 		region.expand(margin);
 		return region;
+	}
+
+	public function intersectsRectRegion(rect:RectRegion):Bool
+	{
+		return Geometry.isRectIntersectingRect(this, rect);
+	}
+
+	public function intersectsCircleRegion(circle:CircleRegion):Bool
+	{
+		return Geometry.isCircleIntersectingRect(circle, this);
+	}
+
+	public function intersectsPoint(p:Vector2):Bool
+	{
+		return (p.x >= this.left) && (p.x <= this.right) &&
+			   (p.y >= this.top)  && (p.y <= this.bottom);
 	}
 }
