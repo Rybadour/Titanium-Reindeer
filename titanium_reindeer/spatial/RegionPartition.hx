@@ -1,66 +1,53 @@
 package titanium_reindeer.spatial;
 
-import Map;
+import titanium_reindeer.core.IUnique;
+import titanium_reindeer.spatial.RegionList;
 
 /**
  * A group of things paired with an IRegion stored in a partition for faster intersection checks.
  */
-class RegionPartition<T:IPartitionable<Int>> implements IRegionGroup<T>
+class RegionPartition<T:IUnique<Int>> extends RegionList<T>
 {
 	public var partition(default, null):ISpatialPartition<Int>;
-	private var mapping:Map<Int, RegionPair<T>>;
 
 	public function new(partition:ISpatialPartition<Int>)
 	{
+		super();
+
 		this.partition = partition;
-		this.mapping = new Map();
 	}
 
-	public function add(thing:T, region:IRegion):Void
+	public override function add(thing:T, region:IRegion):Void
 	{
-		this.mapping.set(thing.getKey(), {thing: thing, region: region});
-		this.partition.insert(region.getBoundingRectRegion(), thing.getKey());
+		var key = thing.getKey();
+		if (this.mapping.exists(key))
+			this.partition.update(region.getBoundingRectRegion(), key);
+		else
+			this.partition.insert(region.getBoundingRectRegion(), key);
+
+		super.add(thing, region);
 	}
 
-	public function getIntersectingRect(rect:RectRegion):Array<T>
+	public override function remove(thing:T):Void
 	{
-		var intersecting = new Array();
-		// Perform more accurate check against the actual shape
-		for (pair in this.getIntersectingRegion(rect))
+		var key = thing.getKey();
+		if (this.mapping.exists(key))
 		{
-			if (pair.region.intersectsRectRegion(rect))
-				intersecting.push(pair.thing);
+			this.partition.remove(key);
 		}
-		return intersecting;
-	}
-	
-	public function getIntersectingCircle(circle:CircleRegion):Array<T>
-	{
-		var intersecting = new Array();
-		// Perform more accurate check against the actual shape
-		for (pair in this.getIntersectingRegion(circle))
-		{
-			if (pair.region.intersectsCircleRegion(circle))
-				intersecting.push(pair.thing);
-		}
-		return intersecting;
+		super.remove(thing);
 	}
 
-	private function getIntersectingRegion(region:IRegion):Array<RegionPair<T>>
+	private override function getIntersectingRegion(region:IRegion):Iterator<RegionPair<T>>
 	{
 		return this.getValuesFromKeys(this.partition.requestKeysIntersectingRect(region.getBoundingRectRegion()));
 	}
 
-	private function getValuesFromKeys(keys:Array<Int>):Array<RegionPair<T>>
+	private function getValuesFromKeys(keys:Array<Int>):Iterator<RegionPair<T>>
 	{
 		var values = new Array();
 		for (k in keys)
 			values.push(this.mapping.get(k));
-		return values;
+		return values.iterator();
 	}
-}
-
-typedef RegionPair<T> = {
-	var region:IRegion;
-	var thing:T;
 }
