@@ -7,7 +7,7 @@ of this projec is to provide a comprehension suite of tools for making games of
 all shapes and sizes. Haxe is used because it is staticly typed and provides many
 useful language features that pure Javascript gravely lacks.
 
---Using the framework--
+## Using the framework
 
 To compile the haxe code, run the compile.hxml for the particular project
 and it will attempt to compile the Haxe code and create/modify a specified
@@ -19,7 +19,7 @@ is already provided. You should be able to open the file in your browser
 and it will work. Ensure you are using Chrome, Firefox 4+, Internet
 Explorer 9+ or Opera 10+ for full compatibility.
 
---Liscence--
+## Liscence
 
 Titanium-Reindeer is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
