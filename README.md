@@ -1,5 +1,4 @@
-Titanium-Reindeer
------------------
+# Titanium-Reindeer
 
 Titanium-Reindeer is a web based game framework written for Javascript using
 Haxe. The current target for rendering is the canvas tag of HTML 5. The purpose
