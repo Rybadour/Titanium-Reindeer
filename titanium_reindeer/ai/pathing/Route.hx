@@ -9,7 +9,7 @@ class Route<N:PathNode>
 {
 	public var nodes(default, null):Array<N>;
 
-	public var start(get, null):PathNode;
+	public var start(get, null):N;
 	function get_start()
 	{
 		if (nodes.length > 0)
@@ -17,7 +17,7 @@ class Route<N:PathNode>
 		else
 			return null;
 	}
-	public var end(get, null):PathNode;
+	public var end(get, null):N;
 	function get_end()
 	{
 		if (nodes.length > 0)
