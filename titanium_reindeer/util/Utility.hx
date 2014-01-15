@@ -1,5 +1,9 @@
 package titanium_reindeer.util;
 
+/**
+ * A collection of static functions for a variety of simple operations not already specified in the
+ * Haxe standard library.
+ */
 class Utility
 {
 	/**
