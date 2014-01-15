@@ -2,33 +2,108 @@ package titanium_reindeer.util;
 
 import Map;
 
-typedef TrieNode<T> = {
-	var prefix:String;
-	var children:Array<TrieNode<T>>;
-	var valueExists:ExistsTuple<T>;
-}
-
-typedef ExistsTuple<T> = {
-	var exists:Bool;
-	var value:T;
-}
-
-typedef TrieKeyValue<T> = {
-	var key:String;
-	var value:T;
-}
-
 /**
  * My implementation of the Trie data structure. It has several advantages over other key value
  * mappings and is very simple to implement and can be sorted very easily.
  */
 class Trie<T> implements IMap<String, T>
 {
-	public var root:TrieNode<T>;
+	/**
+	 * The root node of the trie.
+	 * Should have no value or prefix.
+	 */
+	private var root:TrieNode<T>;
 
 	public function new()
 	{
 		this.root = {prefix: "", children: new Array(), valueExists: {exists: false, value: null}};
+	}
+
+	/**
+	 * Returns true if the specified key is found within the Trie, and false otherwise;
+	 */
+	public function exists(k:String):Bool
+	{
+		var node = this.recursiveFind(k, this.root);
+		if ( node == null )
+			return false;
+		return node.valueExists.exists;
+	}
+	
+	/**
+	 * Retrieve the value of the specified key.
+	 * Returns null if the key was not found.
+	 */
+	public function get(k:String):T
+	{
+		var node = this.recursiveFind(k, this.root);
+		if ( node == null || !node.valueExists.exists )
+			return null;
+		return node.valueExists.value;
+	}
+
+	/**
+	 * Returns the values stored at the leaves of the Trie.
+	 */
+	public function iterator():Iterator<T>
+	{
+		var pairs = this.recursiveFold(this.root);
+		var result:Array<T> = new Array();
+		for (pair in pairs)
+			result.push(pair.value);
+		return result.iterator();
+	}
+
+	/**
+	 * Returns the keys of the Trie. This requires recursing through the whole structure while
+	 * appending each node's prefix to it's children.
+	 */
+	public function keys():Iterator<String>
+	{
+		var pairs = this.recursiveFold(this.root);
+		var result:Array<String> = new Array();
+		for (pair in pairs)
+			result.push(pair.key);
+		return result.iterator();
+	}
+
+	/**
+	 * If the key is found it's associated value is remove from the Trie.
+	 * Returns true if the key was found, false otherwise.
+	 */
+	public function remove(k:String):Bool
+	{
+		var node = this.recursiveFind(k, this.root);
+		if ( node == null || !node.valueExists.exists )
+			return false;
+
+		node.valueExists.exists = false;
+		node.valueExists.value = null;
+		
+		return true;
+	}
+
+	/**
+	 * Adds or changes the value of a given key. For new keys more nodes maybe be generated
+	 * internally.
+	 */
+	public function set(k:String, v:T):Void
+	{
+		var node = this.recursiveFind(k, this.root, true);
+		node.valueExists.exists = true;
+		node.valueExists.value = v;
+	}
+
+	/**
+	 * Returns the keys and values of the Trie like JSON.
+	 */
+	public function toString():String
+	{
+		var pairs = this.recursiveFold(this.root);
+		var result_pairs = new Array();
+		for (pair in pairs)
+			result_pairs.push(pair.key+':'+pair.value);
+		return '{'+(result_pairs.join(','))+'}';
 	}
 
 	/**
@@ -106,66 +181,20 @@ class Trie<T> implements IMap<String, T>
 
 		return list;
 	}
+}
 
-	public function exists(k:String):Bool
-	{
-		var node = this.recursiveFind(k, this.root);
-		if ( node == null )
-			return false;
-		return node.valueExists.exists;
-	}
-	
-	public function get(k:String):T
-	{
-		var node = this.recursiveFind(k, this.root);
-		if ( node == null || !node.valueExists.exists )
-			return null;
-		return node.valueExists.value;
-	}
+typedef TrieNode<T> = {
+	var prefix:String;
+	var children:Array<TrieNode<T>>;
+	var valueExists:ExistsTuple<T>;
+}
 
-	public function iterator():Iterator<T>
-	{
-		var pairs = this.recursiveFold(this.root);
-		var result:Array<T> = new Array();
-		for (pair in pairs)
-			result.push(pair.value);
-		return result.iterator();
-	}
+typedef ExistsTuple<T> = {
+	var exists:Bool;
+	var value:T;
+}
 
-	public function keys():Iterator<String>
-	{
-		var pairs = this.recursiveFold(this.root);
-		var result:Array<String> = new Array();
-		for (pair in pairs)
-			result.push(pair.key);
-		return result.iterator();
-	}
-
-	public function remove(k:String):Bool
-	{
-		var node = this.recursiveFind(k, this.root);
-		if ( node == null || !node.valueExists.exists )
-			return false;
-
-		node.valueExists.exists = false;
-		node.valueExists.value = null;
-		
-		return true;
-	}
-
-	public function set(k:String, v:T):Void
-	{
-		var node = this.recursiveFind(k, this.root, true);
-		node.valueExists.exists = true;
-		node.valueExists.value = v;
-	}
-
-	public function toString():String
-	{
-		var pairs = this.recursiveFold(this.root);
-		var result = '{';
-		for (pair in pairs)
-			result += pair.key+':'+pair.value;
-		return result;
-	}
+typedef TrieKeyValue<T> = {
+	var key:String;
+	var value:T;
 }
