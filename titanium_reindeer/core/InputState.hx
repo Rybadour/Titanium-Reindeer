@@ -46,12 +46,14 @@ class InputState
 	private var heldKeys:Map<Int, Key>;
 	
 	/**
-	 * 
+	 * The current offset of the game DOM element used to capture events. This offset is subtracted
+	 * from the mouse position captured to accurately calculate the mouse position in the game.
 	 */
-	private var queueRegisters:Bool;
-
 	private var targetDocumentOffset:Vector2;
 
+	/**
+	 * The relative position of the mouse over the game's DOM element.
+	 */
 	public var mousePos(default, null):Vector2;
 
 	public function new(targetElement:Element)
@@ -84,16 +86,24 @@ class InputState
 		this.targetDocumentOffset = new Vector2(0, 0);
 	}
 
+	/**
+	 * Callback function for right click or context menu action.
+	 * Returning false disabled the context menu from appearing.
+	 */
 	private function contextMenu(event:Dynamic):Bool
 	{
 		// TODO: Set a state to check 
 		return false;
 	}
 
-	/*
-		Input Event Handlers
-		------------------------------------------------
-	*/
+	// Input Event Handlers
+	// -----------------------------------------------------------------------------------------------
+
+	/**
+	 * Calls the right method for the particular input event.
+	 * Used to queue up events to be called in the update method.
+	 * Kept around for when I might choose to keep a frame-by-frame history of input events.
+	 */
 	private function recordEvent(type:InputEvent, event:Dynamic):Void
 	{
 		var func:Dynamic -> Void;
@@ -123,6 +133,9 @@ class InputState
 		func(event);
 	}
 
+	/**
+	 * Called whenever a mouse button is pressed.
+	 */
 	private function mouseDown(event:Dynamic):Void
 	{
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
@@ -131,6 +144,9 @@ class InputState
 		mouseButtonsHeld.set(Type.enumIndex(mouseButton), mouseButton);
 	}
 
+	/**
+	 * Called whenever a mouse button is released.
+	 */
 	private function mouseUp(event:Dynamic):Void
 	{
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
@@ -139,11 +155,20 @@ class InputState
 		mouseButtonsHeld.remove(Type.enumIndex(mouseButton));
 	}
 
+	/**
+	 * Called whenever the button moves.
+	 * Keeps public property mousePos up-to-date
+	 */
 	private function mouseMove(event:Dynamic):Void
 	{
 		this.mousePos = this.getMousePositionFromEvent(event);
 	}
 
+	// TODO: Need a way to use this function...
+	/**
+	 * Called whenever the mouse wheel is used.
+	 * After recent refactored it doesn't do anything though...
+	 */
 	private function mouseWheel(event:Dynamic):Void
 	{
 		var ticks:Int = 0;
@@ -155,6 +180,9 @@ class InputState
 			ticks = Math.round(event.wheelDelta / 120);
 	}
 
+	/**
+	 * Called whenever a key is pressed.
+	 */
 	private function keyDown(event:Dynamic):Void
 	{
 		var keyCode:Int = event.keyCode; 
@@ -163,6 +191,9 @@ class InputState
 		heldKeys.set(Type.enumIndex(key), key);
 	}
 
+	/**
+	 * Called whenever a key is released.
+	 */
 	private function keyUp(event:Dynamic):Void
 	{
 		var keyCode:Int = event.keyCode; 
@@ -171,6 +202,10 @@ class InputState
 		heldKeys.remove(Type.enumIndex(key));
 	}
 
+	/**
+	 * Call to update the offset of target element.
+	 * Will hopefully get removed in later refactors.
+	 */
 	public function update(msTimeStep:Int):Void
 	{
 		this.timeLeftToRecalculateOffsetMs -= msTimeStep;
@@ -181,29 +216,35 @@ class InputState
 		}
 	}
 
-	/*
-		Current state getter functions
-		------------------------------------------
-	*/
+	/**
+	 * Returns the state of a mouse button. If true it's currently depressed.
+	 */
 	public function isMouseButtonDown(mouseButton:MouseButton):Bool
 	{
 		return mouseButtonsHeld.exists(Type.enumIndex(mouseButton));
 	}
 
+	/**
+	 * Returns the state of a key. If true it's currently depressed.
+	 */
 	public function isKeyDown(key:Key):Bool
 	{
 		return heldKeys.exists(Type.enumIndex(key));
 	}
 
-	/*
-		Key and Button Mapping functions	
-		------------------------------------------
-	*/
+	/**
+	 * Allows the target elements document offset to be set manually.
+	 */
 	public function setDocumentOffset(value:Vector2):Void
 	{
 		this.targetDocumentOffset = value;
 	}
 
+	/**
+	 * A conveinent wrapper function for getting the mouse position with all the right calculations
+	 * and offsets applied to get the right position of the mouse relative to the top left of the
+	 * target element.
+	 */
 	private function getMousePositionFromEvent(event:Dynamic):Vector2
 	{
 		if (event == null)
@@ -226,6 +267,9 @@ class InputState
 		return mousePos.subtract(this.targetDocumentOffset);
 	}
 
+	/**
+	 * Converts the int returns by event.button to a value of the MouseButton enum.
+	 */
 	private function getMouseButtonFromButton(which:Int):MouseButton
 	{
 		var mouseButton:MouseButton;
@@ -241,6 +285,9 @@ class InputState
 		return mouseButton;
 	}
 
+	/**
+	 * Converts the int returns by event.keyCode to a value of the Key enum.
+	 */
 	private function getKeyFromCode(keyCode:Int):Key
 	{
 		var key:Key;
@@ -353,6 +400,11 @@ class InputState
 		return key;
 	}
 
+	/**
+	 * Iterates over all the ancestors of the target element to find it's absolute position on the
+	 * web page.
+	 * Used to ensure an accurate mouse position relative to the target element.
+	 */
 	public function recalculateCanvasOffset():Void
 	{
 		var offset:Vector2 = new Vector2(0, 0);
