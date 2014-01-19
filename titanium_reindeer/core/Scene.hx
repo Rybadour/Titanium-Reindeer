@@ -7,6 +7,9 @@ package titanium_reindeer.core;
  */
 class Scene 
 {
+	/**
+	 * Determines the paused state of the scene. If true it is designed not to update normally.
+	 */
 	public var isPaused(default, null):Bool;
 
 	public function new()
@@ -46,10 +49,23 @@ class Scene
 	}
 
 	/**
-	 * These functions are designed to be overridden by the sub-class.
-	 * They are called automatically when update() is called, but only if the scene is unpaused.
+	 * This function is designed to be overridden by the sub-class.
+	 * Automatically call when update() is called, but only if the scene is unpaused.
+	 * preUpdate is called before _update.
 	 */
 	private function preUpdate(msTimeStep:Int):Void {}
+
+	/**
+	 * This function is designed to be overridden by the sub-class.
+	 * Automatically call when update() is called, but only if the scene is unpaused.
+	 * _update is called before postUpdate.
+	 */
 	private function _update(msTimeStep:Int):Void {}
+
+	/**
+	 * This function is designed to be overridden by the sub-class.
+	 * Automatically call when update() is called, but only if the scene is unpaused.
+	 * postUpdate is called after _update.
+	 */
 	private function postUpdate(msTimeStep:Int):Void {}
 }
