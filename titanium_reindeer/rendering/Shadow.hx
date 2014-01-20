@@ -1,5 +1,7 @@
 package titanium_reindeer.rendering;
 
+import titanium_reindeer.spatial.Vector2;
+
 class Shadow
 {
 	public var color(default, null):Color;

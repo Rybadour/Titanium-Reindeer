@@ -5,6 +5,7 @@ import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
 import js.html.Image;
 
+import titanium_reindeer.spatial.Vector2;
 import titanium_reindeer.spatial.RectRegion;
 import titanium_reindeer.spatial.Rect;
 import titanium_reindeer.spatial.Circle;
@@ -73,6 +74,16 @@ class Canvas2D implements IRenderer
 	public inline function translate(vector:Vector2)
 	{
 		this.ctx.translate(vector.x, vector.y);
+	}
+
+	public inline function scale(sx:Float, ?sy:Float = null):Void
+	{
+		this.ctx.scale(sx, ( sy == null ? sx : sy ));
+	}
+
+	public inline function rotate(r:Float):Void
+	{
+		this.ctx.rotate(r);
 	}
 
 	public inline function moveTo(vector:Vector2)

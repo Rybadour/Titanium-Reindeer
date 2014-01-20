@@ -1,4 +1,6 @@
-package titanium_reindeer;
+package titanium_reindeer.network;
+
+import titanium_reindeer.util.EventBinder;
 
 enum ReadyState
 {

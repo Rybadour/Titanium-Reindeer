@@ -1,5 +1,6 @@
-import unit_testing.util.MoreMathTests;
-import unit_testing.util.TupleTests;
+import unit_testing.ai.*;
+import unit_testing.util.*;
+import unit_testing.spatial.*;
 
 class Tests
 {
@@ -7,14 +8,22 @@ class Tests
 	{
 		var tests = new haxe.unit.TestRunner();
 
+		// Artificial Intelligence
+		//tests.add(new PathingTests());
+
 		// Core
 
 		// Spatial
+		tests.add(new RectRegionTests());
+		tests.add(new RTreePartitionTests());
+		tests.add(new RegionPartitionTests());
 
 		// Rendering
 
 		// Util
+		tests.add(new UtilityTests());
 		tests.add(new MoreMathTests());
+		//tests.add(new TrieTests());
 		tests.add(new TupleTests());
 
 		tests.run();

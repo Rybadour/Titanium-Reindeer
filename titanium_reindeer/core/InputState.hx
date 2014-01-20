@@ -3,124 +3,58 @@ package titanium_reindeer.core;
 import js.html.Element;
 
 import titanium_reindeer.Enums;
+import titanium_reindeer.spatial.Vector2;
 
-class RecordedEvent
-{
-	public var type:InputEvent;
-	public var event:Dynamic;
-
-	public function new(type:InputEvent, event:Dynamic)
-	{
-		this.type = type;
-		this.event = event;
-	}
-}
-
-/* *
-class MouseButtonData
-{
-	public var button:MouseButton;
-	public var buttonState:MouseButtonState;
-	
-	public var cb:Vector2 -> Void;
-
-	public function new(button:MouseButton, buttonState:MouseButtonState, cb:Vector2 -> Void)
-	{
-		this.button = button;
-		this.buttonState = buttonState;
-		this.cb = cb;
-	}
-}
-
-class MouseMoveData
-{
-	public var cb:Vector2 -> Void;
-
-	public function new(cb:Vector2 -> Void)
-	{
-		this.cb = cb;
-	}
-}
-
-class MouseWheelData
-{
-	public var cb:Int -> Void;
-
-	public function new(cb:Int -> Void)
-	{
-		this.cb = cb;
-	}
-}
-
-class MouseButtonAnyData
-{
-	public var cb:MouseButton -> MouseButtonState -> Vector2 -> Void;
-
-	public function new(cb:MouseButton -> MouseButtonState -> Vector2 -> Void)
-	{
-		this.cb = cb;
-	}
-}
-
-class KeyData
-{
-	public var key:Key;
-	public var keyState:KeyState;
-	public var cb:Void -> Void;
-
-	public function new(key:Key, keyState:KeyState, cb:Void -> Void)
-	{
-		this.key = key;
-		this.keyState = keyState;
-		this.cb = cb;
-	}
-}
-
-class KeyAnyData
-{
-	public var cb:Key -> KeyState -> Void;
-	
-	public function new(cb:Key -> KeyState -> Void)
-	{
-		this.cb = cb;
-	}
-}
-/* */
-
+/**
+ * The InputState class keeps of track input events of every kind. Only the current frame's input
+ * events are kept in place. Each frame the previous events are forgotten and new events begin to
+ * get recorded. Lookup to the InputState should be synchronous and each question about state to it
+ * refers only to the state of things between the beginning of the current frame and the time the
+ * question was asked.
+ */
 class InputState
 {
-	public static inline var DEFAULT_OFFSET_RECALC_DELAY_MS:Int		= 1000;
+	// TODO: Get rid of this eventually
+	/**
+	 * Determines how often we check the window position of our target element
+	 * Used to accurately find the mouse position in the browser window
+	 * 
+	 * value = 1000
+	 */
+	public static inline var DEFAULT_OFFSET_RECALC_DELAY_MS:Int = 1000;
 
 
+	/**
+	 * The DOM element where input handlers are attached.
+	 */
 	private var targetElement:Element;
+
+	/**
+	 * Milliseconds left before the DOM element offset should be recalculated.
+	 * This is used to make sure an expensive operation is not performed too often.
+	 */
 	private var timeLeftToRecalculateOffsetMs:Int;
 
+	/**
+	 * A mapping of mouse buttons held down at any given moment.
+	 */
 	private var mouseButtonsHeld:Map<Int, MouseButton>;
+
+	/**
+	 * A mapping of keyboard buttons held down at any given moment.
+	 */
 	private var heldKeys:Map<Int, Key>;
 	
-	public var mousePos(default, null):Vector2;
-
-	private var recordedEvents:Array<RecordedEvent>;
-
-	/* *
-	private var queuedMouseButtonRegisters:Array<MouseButtonData>;
-	private var queuedMouseMoveRegisters:Array<MouseMoveData>;
-	private var queuedMouseWheelRegisters:Array<MouseWheelData>;
-	private var queuedMouseButtonAnyRegisters:Array<MouseButtonAnyData>;
-	private var queuedKeyRegisters:Array<KeyData>;
-	private var queuedKeyAnyRegisters:Array<KeyAnyData>;
-
-	private var queuedMouseButtonUnregisters:Array<MouseButtonData>;
-	private var queuedMouseMoveUnregisters:Array<MouseMoveData>;
-	private var queuedMouseWheelUnregisters:Array<MouseWheelData>;
-	private var queuedMouseButtonAnyUnregisters:Array<MouseButtonAnyData>;
-	private var queuedKeyUnregisters:Array<KeyData>;
-	private var queuedKeyAnyUnregisters:Array<KeyAnyData>;
-	/* */
-
-	private var queueRegisters:Bool;
-
+	/**
+	 * The current offset of the game DOM element used to capture events. This offset is subtracted
+	 * from the mouse position captured to accurately calculate the mouse position in the game.
+	 */
 	private var targetDocumentOffset:Vector2;
+
+	/**
+	 * The relative position of the mouse over the game's DOM element.
+	 */
+	public var mousePos(default, null):Vector2;
 
 	public function new(targetElement:Element)
 	{
@@ -149,39 +83,27 @@ class InputState
 		js.Browser.document.onkeydown = function(event) { me.recordEvent(InputEvent.KeyDown, event); };
 		js.Browser.document.onkeyup = function(event) { me.recordEvent(InputEvent.KeyUp, event); };
 
-		this.recordedEvents = new Array();
-
-		/* *
-		this.queuedMouseButtonRegisters = new Array();
-		this.queuedMouseMoveRegisters = new Array();
-		this.queuedMouseWheelRegisters = new Array();
-		this.queuedMouseButtonAnyRegisters = new Array();
-		this.queuedKeyRegisters = new Array();
-		this.queuedKeyAnyRegisters = new Array();
-
-		this.queuedMouseButtonUnregisters = new Array();
-		this.queuedMouseMoveUnregisters = new Array();
-		this.queuedMouseWheelUnregisters = new Array();
-		this.queuedMouseButtonAnyUnregisters = new Array();
-		this.queuedKeyUnregisters = new Array();
-		this.queuedKeyAnyUnregisters = new Array();
-
-		this.queueRegisters = false;
-		/* */
-
 		this.targetDocumentOffset = new Vector2(0, 0);
 	}
 
+	/**
+	 * Callback function for right click or context menu action.
+	 * Returning false disabled the context menu from appearing.
+	 */
 	private function contextMenu(event:Dynamic):Bool
 	{
 		// TODO: Set a state to check 
 		return false;
 	}
 
-	/*
-		Input Event Handlers
-		------------------------------------------------
-	*/
+	// Input Event Handlers
+	// -----------------------------------------------------------------------------------------------
+
+	/**
+	 * Calls the right method for the particular input event.
+	 * Used to queue up events to be called in the update method.
+	 * Kept around for when I might choose to keep a frame-by-frame history of input events.
+	 */
 	private function recordEvent(type:InputEvent, event:Dynamic):Void
 	{
 		var func:Dynamic -> Void;
@@ -209,10 +131,11 @@ class InputState
 				func = null;
 		}
 		func(event);
-
-		//this.recordedEvents.push(new RecordedEvent(type, event));
 	}
 
+	/**
+	 * Called whenever a mouse button is pressed.
+	 */
 	private function mouseDown(event:Dynamic):Void
 	{
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
@@ -221,6 +144,9 @@ class InputState
 		mouseButtonsHeld.set(Type.enumIndex(mouseButton), mouseButton);
 	}
 
+	/**
+	 * Called whenever a mouse button is released.
+	 */
 	private function mouseUp(event:Dynamic):Void
 	{
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
@@ -229,11 +155,20 @@ class InputState
 		mouseButtonsHeld.remove(Type.enumIndex(mouseButton));
 	}
 
+	/**
+	 * Called whenever the button moves.
+	 * Keeps public property mousePos up-to-date
+	 */
 	private function mouseMove(event:Dynamic):Void
 	{
 		this.mousePos = this.getMousePositionFromEvent(event);
 	}
 
+	// TODO: Need a way to use this function...
+	/**
+	 * Called whenever the mouse wheel is used.
+	 * After recent refactored it doesn't do anything though...
+	 */
 	private function mouseWheel(event:Dynamic):Void
 	{
 		var ticks:Int = 0;
@@ -245,6 +180,9 @@ class InputState
 			ticks = Math.round(event.wheelDelta / 120);
 	}
 
+	/**
+	 * Called whenever a key is pressed.
+	 */
 	private function keyDown(event:Dynamic):Void
 	{
 		var keyCode:Int = event.keyCode; 
@@ -253,6 +191,9 @@ class InputState
 		heldKeys.set(Type.enumIndex(key), key);
 	}
 
+	/**
+	 * Called whenever a key is released.
+	 */
 	private function keyUp(event:Dynamic):Void
 	{
 		var keyCode:Int = event.keyCode; 
@@ -261,16 +202,12 @@ class InputState
 		heldKeys.remove(Type.enumIndex(key));
 	}
 
+	/**
+	 * Call to update the offset of target element.
+	 * Will hopefully get removed in later refactors.
+	 */
 	public function update(msTimeStep:Int):Void
 	{
-		// Get all recorded events into a temporary store so that new events don't affect the loop
-		var tempEvents:Array<RecordedEvent> = new Array();
-		for (recordedEvent in this.recordedEvents)
-		{
-			tempEvents.push(recordedEvent);
-		}
-		this.recordedEvents = new Array();
-
 		this.timeLeftToRecalculateOffsetMs -= msTimeStep;
 		if (this.timeLeftToRecalculateOffsetMs <= 0)
 		{
@@ -279,128 +216,35 @@ class InputState
 		}
 	}
 
-
-	/*
-		Usual Framework type Functions
-		------------------------------------------------
-	*/
-	/* *
-	public function preUpdate(msTimeStep:Int):Void
-	{
-		this.queueRegisters = true;
-	}
-
-	public function postUpdate(msTimeStep:Int):Void
-	{
-		this.queueRegisters = false;
-		this.flushQueues();
-	}
-
-	public function destroy():Void
-	{
-		for (mouseButton in mouseButtonsHeld.keys())
-			mouseButtonsHeld.remove(mouseButton);
-		mouseButtonsHeld = null;
-
-		this.mousePos = null;
-
-		for (key in heldKeys.keys())
-			heldKeys.remove(key);
-		heldKeys = null;
-
-		this.targetElement.onmousedown = null;
-		this.targetElement.onmouseup = null;
-		this.targetElement.onmousemove = null;
-
-		this.targetElement.oncontextmenu = null;
-		js.Browser.document.onmousewheel = null;
-		js.Browser.document.onkeydown = null;
-		js.Browser.document.onkeyup = null;
-		var firefoxReg:EReg = new EReg("Firefox", "i");
-		if (firefoxReg.match(js.Browser.window.navigator.userAgent))
-			js.Browser.document.removeEventListener("DOMMouseScroll", this.mouseWheel, true);
-		else
-			js.Browser.document.onmousewheel = null;
-		this.targetElement = null;
-	}
-
-	private function flushQueues():Void
-	{
-		for (data in this.queuedMouseButtonRegisters)
-			this.registerMouseButtonEvent(data.button, data.buttonState, data.cb);
-		this.queuedMouseButtonRegisters = new Array();
-
-		for (data in this.queuedMouseMoveRegisters)
-			this.registerMouseMoveEvent(data.cb);
-		this.queuedMouseMoveRegisters = new Array();
-
-		for (data in this.queuedMouseWheelRegisters)
-			this.registerMouseWheelEvent(data.cb);
-		this.queuedMouseWheelRegisters = new Array();
-
-		for (data in this.queuedMouseButtonAnyRegisters)
-			this.registerMouseButtonAnyEvent(data.cb);
-		this.queuedMouseButtonAnyRegisters = new Array();
-
-		for (data in this.queuedKeyRegisters)
-			this.registerKeyEvent(data.key, data.keyState, data.cb);
-		this.queuedKeyRegisters = new Array();
-
-		for (data in this.queuedKeyAnyRegisters)
-			this.registerKeyAnyEvent(data.cb);
-		this.queuedKeyAnyRegisters = new Array();
-
-
-		for (data in this.queuedMouseButtonUnregisters)
-			this.unregisterMouseButtonEvent(data.button, data.buttonState, data.cb);
-		this.queuedMouseButtonUnregisters = new Array();
-
-		for (data in this.queuedMouseMoveUnregisters)
-			this.unregisterMouseMoveEvent(data.cb);
-		this.queuedMouseMoveUnregisters = new Array();
-
-		for (data in this.queuedMouseWheelUnregisters)
-			this.unregisterMouseWheelEvent(data.cb);
-		this.queuedMouseWheelUnregisters = new Array();
-
-		for (data in this.queuedMouseButtonAnyUnregisters)
-			this.unregisterMouseButtonAnyEvent(data.cb);
-		this.queuedMouseButtonAnyUnregisters = new Array();
-
-		for (data in this.queuedKeyUnregisters)
-			this.unregisterKeyEvent(data.key, data.keyState, data.cb);
-		this.queuedKeyUnregisters = new Array();
-
-		for (data in this.queuedKeyAnyUnregisters)
-			this.unregisterKeyAnyEvent(data.cb);
-		this.queuedKeyAnyUnregisters = new Array();
-	}
-	/* */
-
-
-	/*
-		Current state getter functions
-		------------------------------------------
-	*/
+	/**
+	 * Returns the state of a mouse button. If true it's currently depressed.
+	 */
 	public function isMouseButtonDown(mouseButton:MouseButton):Bool
 	{
 		return mouseButtonsHeld.exists(Type.enumIndex(mouseButton));
 	}
 
+	/**
+	 * Returns the state of a key. If true it's currently depressed.
+	 */
 	public function isKeyDown(key:Key):Bool
 	{
 		return heldKeys.exists(Type.enumIndex(key));
 	}
 
-	/*
-		Key and Button Mapping functions	
-		------------------------------------------
-	*/
+	/**
+	 * Allows the target elements document offset to be set manually.
+	 */
 	public function setDocumentOffset(value:Vector2):Void
 	{
 		this.targetDocumentOffset = value;
 	}
 
+	/**
+	 * A conveinent wrapper function for getting the mouse position with all the right calculations
+	 * and offsets applied to get the right position of the mouse relative to the top left of the
+	 * target element.
+	 */
 	private function getMousePositionFromEvent(event:Dynamic):Vector2
 	{
 		if (event == null)
@@ -423,6 +267,9 @@ class InputState
 		return mousePos.subtract(this.targetDocumentOffset);
 	}
 
+	/**
+	 * Converts the int returns by event.button to a value of the MouseButton enum.
+	 */
 	private function getMouseButtonFromButton(which:Int):MouseButton
 	{
 		var mouseButton:MouseButton;
@@ -438,6 +285,9 @@ class InputState
 		return mouseButton;
 	}
 
+	/**
+	 * Converts the int returns by event.keyCode to a value of the Key enum.
+	 */
 	private function getKeyFromCode(keyCode:Int):Key
 	{
 		var key:Key;
@@ -550,6 +400,11 @@ class InputState
 		return key;
 	}
 
+	/**
+	 * Iterates over all the ancestors of the target element to find it's absolute position on the
+	 * web page.
+	 * Used to ensure an accurate mouse position relative to the target element.
+	 */
 	public function recalculateCanvasOffset():Void
 	{
 		var offset:Vector2 = new Vector2(0, 0);

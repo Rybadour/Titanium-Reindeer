@@ -1,5 +1,9 @@
-package titanium_reindeer;
+package titanium_reindeer.util;
 
+/**
+ * A collection of static functions for a variety of simple operations not already specified in the
+ * Haxe standard library.
+ */
 class Utility
 {
 	/**
@@ -8,6 +12,13 @@ class Utility
 	 */
 	public static function clampInt(n:Int, a:Int, b:Int):Int
 	{
+		// First ensure a and b are lowest and highest respectively
+		if (a > b)
+		{
+			var s = a;
+			a = b;
+			b = s;
+		}
 		return Math.round(Math.max(a, Math.min(n, b)));
 	}
 
@@ -16,6 +27,13 @@ class Utility
 	 */
 	public static function clampFloat(n:Float, a:Float, b:Float):Float
 	{
+		// First ensure a and b are lowest and highest respectively
+		if (a > b)
+		{
+			var s = a;
+			a = b;
+			b = s;
+		}
 		return Math.max(a, Math.min(n, b));
 	}
 
@@ -25,6 +43,14 @@ class Utility
 	public static function randomWithNeg(x:Int):Int
 	{
 		return Std.random(x*2) - x;
+	}
+
+	/**
+	 * Returns the sign of the number, either -1 for negative or 1 for positive.
+	 */
+	public static function sign(x:Float):Float
+	{
+		return ( x < 0 ? -1 : 1 );
 	}
 
 	/**
