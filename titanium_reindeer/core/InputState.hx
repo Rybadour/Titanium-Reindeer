@@ -38,12 +38,22 @@ class InputState
 	/**
 	 * A mapping of mouse buttons held down at any given moment.
 	 */
-	private var mouseButtonsHeld:Map<Int, MouseButton>;
+	private var mouseButtonsHeld:Map<MouseButton, Bool>;
 
 	/**
 	 * A mapping of keyboard buttons held down at any given moment.
 	 */
-	private var heldKeys:Map<Int, Key>;
+	private var heldKeys:Map<Key, Bool>;
+
+	/**
+	 * A temporary history of mouse buttons clicked since the state was refreshed.
+	 */
+	private var mouseButtonsClicked:Map<MouseButton, Bool>;
+
+	/**
+	 * A temporary history of mouse buttons clicked since the state was refreshed.
+	 */
+	private var keysPressed:Map<MouseButton, Bool>;
 	
 	/**
 	 * The current offset of the game DOM element used to capture events. This offset is subtracted
@@ -141,7 +151,7 @@ class InputState
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
 		var mouseButton:MouseButton = getMouseButtonFromButton(event.button);
 
-		mouseButtonsHeld.set(Type.enumIndex(mouseButton), mouseButton);
+		mouseButtonsHeld.set(mouseButton, true);
 	}
 
 	/**
@@ -152,7 +162,9 @@ class InputState
 		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
 		var mouseButton:MouseButton = getMouseButtonFromButton(event.button);
 
-		mouseButtonsHeld.remove(Type.enumIndex(mouseButton));
+		if ( mouseButtonsHeld.exists(mouseButton) )
+			mouseButtonsClicked.set(mouseButton, true);
+		mouseButtonsHeld.remove(mouseButton);
 	}
 
 	/**
@@ -188,7 +200,7 @@ class InputState
 		var keyCode:Int = event.keyCode; 
 		var key:Key = getKeyFromCode(keyCode);
 
-		heldKeys.set(Type.enumIndex(key), key);
+		heldKeys.set(key, true);
 	}
 
 	/**
@@ -199,7 +211,9 @@ class InputState
 		var keyCode:Int = event.keyCode; 
 		var key:Key = getKeyFromCode(keyCode);
 
-		heldKeys.remove(Type.enumIndex(key));
+		if ( keysHeld.exists(mouseButton) )
+			keyPressed.set(mouseButton, true);
+		heldKeys.remove(key);
 	}
 
 	/**
@@ -221,7 +235,7 @@ class InputState
 	 */
 	public function isMouseButtonDown(mouseButton:MouseButton):Bool
 	{
-		return mouseButtonsHeld.exists(Type.enumIndex(mouseButton));
+		return this.mouseButtonsHeld.exists(mouseButton);
 	}
 
 	/**
@@ -229,7 +243,23 @@ class InputState
 	 */
 	public function isKeyDown(key:Key):Bool
 	{
-		return heldKeys.exists(Type.enumIndex(key));
+		return this.heldKeys.exists(key);
+	}
+
+	/**
+	 * Returns true if the mouse button was clicked since the last refresh.
+	 */
+	public function wasMouseButtonClicked(mouseButton:MouseButton):Bool
+	{
+		return this.mouseButtonsClicked.exists(mouseButton);
+	}
+
+	/**
+	 * Returns true if the key was pressed since the last refresh.
+	 */
+	public function wasKeyPressed(key:Key):Bool
+	{
+		return this.keysPressed.exists(key);
 	}
 
 	/**
