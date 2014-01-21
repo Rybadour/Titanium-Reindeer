@@ -172,8 +172,10 @@ class Game
 				{
 					isRequestMade = true;
 					this.targetElement.addEventListener(changeFuncs[r], function (event) {
-						// Find the new size of the game and propagate it
-						this.recalculateViewPort();
+						haxe.Timer.delay(function () {
+							// Find the new size of the game and propagate it
+							this.recalculateViewPort();
+						}, 1);
 					});
 					this.targetElement.addEventListener(errorFuncs[r], function (event) {
 						js.Browser.window.alert("Either the target element can not be made fullscreen or you didn't request from a user interaction");
