@@ -19,7 +19,7 @@ class Circle implements IShape
 		return new Rect(this.radius*2, this.radius*2);
 	}
 
-	public function isPointInside(p:Vector2):Bool
+	public function intersectsPoint(p:Vector2):Bool
 	{
 		return this.radius >= p.getMagnitude();
 	}

@@ -40,8 +40,8 @@ class CircleRegion extends Circle implements IRegion
 		return Geometry.isCircleIntersectingCircle(this, circle);
 	}
 
-	public function intersectsPoint(p:Vector2):Bool
+	public override function intersectsPoint(p:Vector2):Bool
 	{
-		return super.isPointInside(p.subtract(this.center));
+		return super.intersectsPoint(p.subtract(this.center));
 	}
 }
