@@ -43,17 +43,17 @@ class InputState
 	/**
 	 * A mapping of keyboard buttons held down at any given moment.
 	 */
-	private var heldKeys:Map<Key, Bool>;
+	private var keysHeld:Map<Key, Bool>;
 
 	/**
-	 * A temporary history of mouse buttons clicked since the state was refreshed.
+	 * A temporary history of mouse buttons pressed since the state was refreshed.
 	 */
-	private var mouseButtonsClicked:Map<MouseButton, Bool>;
+	private var mouseButtonsPressed:Map<MouseButton, Bool>;
 
 	/**
-	 * A temporary history of mouse buttons clicked since the state was refreshed.
+	 * A temporary history of mouse buttons pressed since the state was refreshed.
 	 */
-	private var keysPressed:Map<MouseButton, Bool>;
+	private var keysPressed:Map<Key, Bool>;
 	
 	/**
 	 * The current offset of the game DOM element used to capture events. This offset is subtracted
@@ -72,9 +72,11 @@ class InputState
 		this.timeLeftToRecalculateOffsetMs = DEFAULT_OFFSET_RECALC_DELAY_MS;
 
 		this.mouseButtonsHeld = new Map();
+		this.mouseButtonsPressed = new Map();
+		this.keysHeld = new Map();
+		this.keysPressed = new Map();
 
 		this.mousePos = new Vector2(0, 0);
-		this.heldKeys = new Map();
 
 		var me = this;
 		this.targetElement.onmousedown = function(event) { me.recordEvent(InputEvent.MouseDown, event); };
@@ -163,7 +165,7 @@ class InputState
 		var mouseButton:MouseButton = getMouseButtonFromButton(event.button);
 
 		if ( mouseButtonsHeld.exists(mouseButton) )
-			mouseButtonsClicked.set(mouseButton, true);
+			mouseButtonsPressed.set(mouseButton, true);
 		mouseButtonsHeld.remove(mouseButton);
 	}
 
@@ -200,7 +202,7 @@ class InputState
 		var keyCode:Int = event.keyCode; 
 		var key:Key = getKeyFromCode(keyCode);
 
-		heldKeys.set(key, true);
+		keysHeld.set(key, true);
 	}
 
 	/**
@@ -211,9 +213,9 @@ class InputState
 		var keyCode:Int = event.keyCode; 
 		var key:Key = getKeyFromCode(keyCode);
 
-		if ( keysHeld.exists(mouseButton) )
-			keyPressed.set(mouseButton, true);
-		heldKeys.remove(key);
+		if ( keysHeld.exists(key) )
+			keysPressed.set(key, true);
+		keysHeld.remove(key);
 	}
 
 	/**
@@ -228,6 +230,9 @@ class InputState
 			this.timeLeftToRecalculateOffsetMs = DEFAULT_OFFSET_RECALC_DELAY_MS;
 			this.recalculateCanvasOffset();
 		}
+
+		this.mouseButtonsPressed = new Map();
+		this.keysPressed = new Map();
 	}
 
 	/**
@@ -243,15 +248,15 @@ class InputState
 	 */
 	public function isKeyDown(key:Key):Bool
 	{
-		return this.heldKeys.exists(key);
+		return this.keysHeld.exists(key);
 	}
 
 	/**
-	 * Returns true if the mouse button was clicked since the last refresh.
+	 * Returns true if the mouse button was pressed since the last refresh.
 	 */
-	public function wasMouseButtonClicked(mouseButton:MouseButton):Bool
+	public function wasMouseButtonPressed(mouseButton:MouseButton):Bool
 	{
-		return this.mouseButtonsClicked.exists(mouseButton);
+		return this.mouseButtonsPressed.exists(mouseButton);
 	}
 
 	/**
