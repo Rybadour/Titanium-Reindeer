@@ -25,7 +25,7 @@ class RegionList<T:IUnique<Int>> implements IRegionGroup<T>
 	{
 		var intersecting = new Array();
 		// Perform more accurate check against the actual shape
-		for (pair in this.getIntersectingRegion(rect))
+		for (pair in this.pairsIntersectingRegion(rect))
 		{
 			if (pair.region.intersectsRectRegion(rect))
 				intersecting.push(pair.thing);
@@ -37,7 +37,7 @@ class RegionList<T:IUnique<Int>> implements IRegionGroup<T>
 	{
 		var intersecting = new Array();
 		// Perform more accurate check against the actual shape
-		for (pair in this.getIntersectingRegion(circle))
+		for (pair in this.pairsIntersectingRegion(circle))
 		{
 			if (pair.region.intersectsCircleRegion(circle))
 				intersecting.push(pair.thing);
@@ -45,7 +45,27 @@ class RegionList<T:IUnique<Int>> implements IRegionGroup<T>
 		return intersecting;
 	}
 
-	private function getIntersectingRegion(region:IRegion):Iterator<RegionPair<T>>
+	public function getIntersectingPoint(point:Vector2):Array<T>
+	{
+		var intersecting = new Array();
+		for (pair in this.pairsIntersectingPoint())
+		{
+			if (pair.region.intersectsPoint(point))
+				intersecting.push(pair.thing);
+		}
+		return intersecting;
+	}
+
+	/**
+	 * Less specific check for a point intersecting the regions in this list.
+	 * For internal re-use.
+	 */
+	private function pairsIntersectingPoint(point:Vector2):Iterator<RegionPair<T>>
+	{
+		return this.mapping.iterator();
+	}
+
+	private function pairsIntersectingRegion(region:IRegion):Iterator<RegionPair<T>>
 	{
 		return this.mapping.iterator();
 	}

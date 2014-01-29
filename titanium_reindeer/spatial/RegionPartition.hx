@@ -38,7 +38,12 @@ class RegionPartition<T:IUnique<Int>> extends RegionList<T>
 		super.remove(thing);
 	}
 
-	private override function getIntersectingRegion(region:IRegion):Iterator<RegionPair<T>>
+	private override function pairsIntersectingPoint(point:Vector2):Array<T>
+	{
+		return this.getValuesFromKeys(this.partition.requestKeysIntersectingPoint(point));
+	}
+
+	private override function pairsIntersectingRegion(region:IRegion):Iterator<RegionPair<T>>
 	{
 		return this.getValuesFromKeys(this.partition.requestKeysIntersectingRect(region.getBoundingRectRegion()));
 	}
