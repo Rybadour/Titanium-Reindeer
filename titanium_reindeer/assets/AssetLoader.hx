@@ -5,9 +5,9 @@ class AssetLoader implements ILoadable
 	public var assets(default, null):Array<ILoadable>;
 	private var unloadedAssets:Array<ILoadable>;
 
-	public function new(assets:Array<ILoadable>)
+	public function new(?assets:Array<ILoadable>)
 	{
-		this.unloadedAssets = assets.copy();
+		this.unloadedAssets = (assets == null ? [] : assets.copy());
 		this.assets = new Array();
 	}
 	
