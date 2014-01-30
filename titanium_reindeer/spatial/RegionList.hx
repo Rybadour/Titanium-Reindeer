@@ -48,7 +48,7 @@ class RegionList<T:IUnique<Int>> implements IRegionGroup<T>
 	public function getIntersectingPoint(point:Vector2):Array<T>
 	{
 		var intersecting = new Array();
-		for (pair in this.pairsIntersectingPoint())
+		for (pair in this.pairsIntersectingPoint(point))
 		{
 			if (pair.region.intersectsPoint(point))
 				intersecting.push(pair.thing);
