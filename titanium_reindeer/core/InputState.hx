@@ -66,6 +66,16 @@ class InputState
 	 */
 	public var mousePos(default, null):Vector2;
 
+	/**
+	 * True if the mouse moved at all since the last update.
+	 */
+	public var mouseMoved(default, null):Bool;
+
+	/**
+	 * The number of ticks of the mouse wheel since the last update.
+	 */
+	public var mouseWheelTicks(default, null):Int;
+
 	public function new(targetElement:Element)
 	{
 		this.targetElement = targetElement;
@@ -176,6 +186,7 @@ class InputState
 	private function mouseMove(event:Dynamic):Void
 	{
 		this.mousePos = this.getMousePositionFromEvent(event);
+		this.mouseMoved = true;
 	}
 
 	// TODO: Need a way to use this function...
@@ -192,6 +203,8 @@ class InputState
 			ticks = event.detail;
 		else
 			ticks = Math.round(event.wheelDelta / 120);
+
+		this.mouseWheelTicks += ticks;
 	}
 
 	/**
@@ -233,6 +246,8 @@ class InputState
 
 		this.mouseButtonsPressed = new Map();
 		this.keysPressed = new Map();
+		this.mouseMoved = false;
+		this.mouseWheelTicks = 0;
 	}
 
 	/**
