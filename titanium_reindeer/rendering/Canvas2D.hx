@@ -117,13 +117,18 @@ class Canvas2D implements IRenderer
 		this.renderRectf(rect.width, rect.height);
 	}
 
-	public function renderCircle(circle:Circle)
+	public function renderCirclef(radius:Float)
 	{
 		this.ctx.beginPath();
-		this.ctx.arc(0, 0, circle.radius, 0, 2*Math.PI, false);
+		this.ctx.arc(0, 0, radius, 0, 2*Math.PI, false);
 		this.ctx.fill();
 		this.ctx.stroke();
 		this.ctx.closePath();
+	}
+
+	public function renderCircle(circle:Circle)
+	{
+		this.renderCirclef(circle.radius);
 	}
 
 	public function renderText(text:String)
