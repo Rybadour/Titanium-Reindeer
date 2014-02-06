@@ -12,20 +12,47 @@ enum RepeatFillMethod
 
 class RepeatFillRenderer extends Renderer<RenderState>
 {
+	/**
+	 * The internal offset within the view port.
+	 */
 	public var offset:Vector2;
-	public var renderer:IRenderer;
-	public var fillWidth:Int;
-	public var fillHeight:Int;
-	public var method:RepeatFillMethod;
-	public var sourceWidth:Int;
-	public var sourceHeight:Int;
 
-	public function new(r:IRenderer, width:Int, height:Int, method:RepeatFillMethod, ?sWidth:Int, ?sHeight:Int)
+	/**
+	 * The view port width. Rendering will only be done within this width starting at the x offset.
+	 */
+	public var fillWidth:Int;
+
+	/**
+	 * The view port width. Rendering will only be done within this width starting at the x offset.
+	 */
+	public var fillHeight:Int;
+
+	/**
+	 * The expected width of one renderer. 
+	 * Defaults to fillWidth.
+	 */
+	public var sourceWidth:Int;
+
+	/**
+	 * The expected height of one renderer. 
+	 * Defaults to fillHeight.
+	 */
+	public var sourceHeight:Int;
+	
+	/**
+	 * The 
+	 */
+	public var method:RepeatFillMethod;
+	public var definedRenderer:IRenderer;
+	public var rendererProvider:Int -> Int -> IRenderer;
+
+	public function new(r:IRenderer, width:Int, height:Int, method:RepeatFillMethod, ?sWidth:Int, ?sHeight:Int, ?rendererProvider:Int -> Int -> IRenderer)
 	{
 		super(new RenderState());
 
 		this.offset = new Vector2(0, 0);
-		this.renderer = r;
+		this.definedRenderer = r;
+		this.rendererProvider = rendererProvider;
 		this.fillWidth = width;
 		this.fillHeight = height;
 		this.method = method;
