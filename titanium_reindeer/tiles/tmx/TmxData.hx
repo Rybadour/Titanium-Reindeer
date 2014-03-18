@@ -14,9 +14,9 @@ class TmxData
 	{
 	}
 
-	public static function getOrientationFromString(str:String):TileMapOrientation
+	public function setOrientation(str:String):TileMapOrientation
 	{
-		return switch (str)
+		this.orientation = switch (str)
 		{
 			case "orthogonal":
 			   TileMapOrientation.Orthogonal;	
@@ -26,5 +26,6 @@ class TmxData
 			   TileMapOrientation.Isometric(Staggered);
 			default:
 			   TileMapOrientation.Unknown;
+		};
 	}
 }
