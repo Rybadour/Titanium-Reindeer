@@ -1,5 +1,7 @@
 package titanium_reindeer.tiling.tmx;
 
+import titanium_reindeer.core.AssertionException;
+
 class TmxAsset extends XmlAsset
 {
 	public var tmxMap:TmxMap;
@@ -16,5 +18,6 @@ class TmxAsset extends XmlAsset
 
 		// Should be data?
 		this.tmxMap = new TmxMap(new TmxXml(Xml.parse(this.data)));//, this.expectedVersion));
+		AssertionException.assert(this.expectedVersion, this.tmxMap.version);
 	}
 }
