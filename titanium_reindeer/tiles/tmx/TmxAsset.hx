@@ -1,4 +1,4 @@
-package titanium_reindeer.tiling.tmx;
+package titanium_reindeer.tiles.tmx;
 
 import titanium_reindeer.core.AssertionException;
 

@@ -1,6 +1,6 @@
 package unit_testing.tiles;
 
-import titanium_reindeer.tiles.*;
+import titanium_reindeer.tiles.tmx.*;
 
 class TmxXmlTests extends haxe.unit.TestCase
 {
@@ -22,11 +22,13 @@ class TmxXmlTests extends haxe.unit.TestCase
 				'<tile id="1" terrain="1,1,0,0"/>' +
 				'<tile id="2" terrain="1,1,0,0"/>' +
 				'<tile id="3" terrain="1,1,0,0"/>' +
-				'<tile id="4" terrain="1,1,0,1"/>';
+				'<tile id="4" terrain="1,1,0,1"/>' +
+			'</tileset>' +
+		'</map>';
 	}
 
 	public function testExpandToCover()
 	{
-		this.tmxMap = 
+		this.tmxMap = new TmxXml(new TmxData(Xml.parse(this.xml_data)));
 	}
 }

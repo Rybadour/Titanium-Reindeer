@@ -1,4 +1,4 @@
-package titanium_reindeer.tiling.tmx;
+package titanium_reindeer.tiles.tmx;
 
 /**
  * The class responsible for taking an XML document and mapping it to the TmxData typed definition
@@ -11,7 +11,7 @@ class TmxXml extends TmxData
 		super();
 
 		var map:Xml = null;
-		for (xml.elements() as element)
+		for (element in xml.elements())
 		{
 			if (element.nodeName == "map")
 			{
@@ -27,11 +27,11 @@ class TmxXml extends TmxData
 		}
 
 		this.version         = map.get('version');
-		this.orientation     = TmxData.getOrientationFromString(map.get('orientation'));
 		this.width           = Std.parseInt(map.get('width'));
 		this.height          = Std.parseInt(map.get('height'));
 		this.tileWidth       = Std.parseInt(map.get('tileWidth'));
 		this.tileHeight      = Std.parseInt(map.get('tileHeight'));
 		this.backgroundColor = map.get('backgroundcolor');
+		this.setOrientation( TmxData.getOrientationFromString(map.get('orientation')) );
 	}
 }

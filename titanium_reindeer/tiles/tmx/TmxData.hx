@@ -1,4 +1,6 @@
-package titanium_reindeer.tiling.tmx;
+package titanium_reindeer.tiles.tmx;
+
+import titanium_reindeer.rendering.Color;
 
 class TmxData
 {
@@ -14,7 +16,7 @@ class TmxData
 	{
 	}
 
-	public function setOrientation(str:String):TileMapOrientation
+	public function setOrientation(str:String):Void
 	{
 		this.orientation = switch (str)
 		{

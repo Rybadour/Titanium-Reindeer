@@ -1,5 +1,6 @@
 import unit_testing.ai.*;
 import unit_testing.util.*;
+import unit_testing.tiles.*;
 import unit_testing.spatial.*;
 
 class Tests
@@ -19,6 +20,9 @@ class Tests
 		tests.add(new RegionPartitionTests());
 
 		// Rendering
+
+		// Tiles
+		tests.add(new TmxXmlTests());
 
 		// Util
 		tests.add(new UtilityTests());
