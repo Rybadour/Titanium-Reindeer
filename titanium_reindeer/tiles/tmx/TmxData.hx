@@ -30,4 +30,23 @@ class TmxData
 			   TileMapOrientation.Unknown;
 		};
 	}
+
+	/**
+	 * Expects a rgb color value as 6 hex characters preceeded by a #.
+	 */
+	public function setBackgroundColor(str:String):Void
+	{
+		if (str == null)
+		{
+			this.backgroundColor = Color.Clear;
+		}
+		else
+		{
+			this.backgroundColor = new Color(
+				Std.parseInt('0x' + str.substr(1, 2)),
+				Std.parseInt('0x' + str.substr(3, 2)),
+				Std.parseInt('0x' + str.substr(5, 2))
+			);
+		}
+	}
 }

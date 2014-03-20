@@ -26,12 +26,12 @@ class TmxXml extends TmxData
 			return;
 		}
 
-		this.version         = map.get('version');
-		this.width           = Std.parseInt(map.get('width'));
-		this.height          = Std.parseInt(map.get('height'));
-		this.tileWidth       = Std.parseInt(map.get('tileWidth'));
-		this.tileHeight      = Std.parseInt(map.get('tileHeight'));
-		this.backgroundColor = map.get('backgroundcolor');
-		this.setOrientation( TmxData.getOrientationFromString(map.get('orientation')) );
+		this.version    = map.get('version');
+		this.width      = Std.parseInt(map.get('width'));
+		this.height     = Std.parseInt(map.get('height'));
+		this.tileWidth  = Std.parseInt(map.get('tilewidth'));
+		this.tileHeight = Std.parseInt(map.get('tileheight'));
+		this.setBackgroundColor( map.get('backgroundcolor') );
+		this.setOrientation( map.get('orientation') );
 	}
 }

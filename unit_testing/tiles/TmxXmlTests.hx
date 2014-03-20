@@ -1,10 +1,13 @@
 package unit_testing.tiles;
 
 import titanium_reindeer.tiles.tmx.*;
+import titanium_reindeer.tiles.*;
+import titanium_reindeer.rendering.Color;
 
 class TmxXmlTests extends haxe.unit.TestCase
 {
 	public var tmxMap:TmxMap;
+	public var tmxXmlData:TmxXml;
 	public var xml_data:String;
 
 	public override function setup()
@@ -27,8 +30,16 @@ class TmxXmlTests extends haxe.unit.TestCase
 		'</map>';
 	}
 
-	public function testExpandToCover()
+	public function testParseXml()
 	{
-		this.tmxMap = new TmxXml(new TmxData(Xml.parse(this.xml_data)));
+		this.tmxXmlData = new TmxXml(Xml.parse(this.xml_data));
+
+		assertEquals(this.tmxXmlData.version, "1.0");
+		assertEquals(this.tmxXmlData.orientation, TileMapOrientation.Orthogonal);
+		assertEquals(this.tmxXmlData.width, 30);
+		assertEquals(this.tmxXmlData.height, 30);
+		assertEquals(this.tmxXmlData.tileWidth, 16);
+		assertEquals(this.tmxXmlData.tileHeight, 16);
+		assertTrue( Color.Clear.equal(this.tmxXmlData.backgroundColor) );
 	}
 }
