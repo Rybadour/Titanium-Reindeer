@@ -33,5 +33,25 @@ class TmxXml extends TmxData
 		this.tileHeight = Std.parseInt(map.get('tileheight'));
 		this.setBackgroundColor( map.get('backgroundcolor') );
 		this.setOrientation( map.get('orientation') );
+		this.customProperties = parseProperties(map);
+
+		for (tileSet in map.elementsNamed("tileset"))
+		{
+			var tileSetData = new TmxTileSet();
+			tileSetData.firstGlobalId = tileSet.get('firstgid');
+			// TODO: Support external Tilesets through source attribute
+			tileSetData.name = tileSet.get('name');
+			tileSetData.tileWidth = tileSet.get('tileWidth');
+			tileSetData.tileHeight = tileSet.get('tileHeight');
+			tileSetData.spacing = tileSet.get('spacing');
+			tileSetData.margin = tileSet.get('margin');
+			tileSetData.customProperties = parseProperties(tileSet);
+		}
+	}
+
+	// Return list of properties directly under this node
+	public function parseProperties(node:Xml)
+	{
+		for (
 	}
 }
