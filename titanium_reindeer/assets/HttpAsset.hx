@@ -96,4 +96,17 @@ class HttpAsset implements IAsset
 		this._size = event.totalSize;
 		this._loadedSize = event.position;
 	}
+
+	private function _onLoad(event:XmlHttpRequestLoadEvent)
+	{
+		this._isLoaded = true;
+	}
+
+	private function _onError(event:XmlHttpRequestErrorEvent)
+	{
+	}
+
+	private function _onAbort(event:XmlHttpRequestAbortEvent)
+	{
+	}
 }
