@@ -43,16 +43,12 @@ class RepeatFillRenderer extends Renderer<RenderState>
 	 * The 
 	 */
 	public var method:RepeatFillMethod;
-	public var definedRenderer:IRenderer;
-	public var rendererProvider:Int -> Int -> IRenderer;
 
-	public function new(r:IRenderer, width:Int, height:Int, method:RepeatFillMethod, ?sWidth:Int, ?sHeight:Int, ?rendererProvider:Int -> Int -> IRenderer)
+	public function new(width:Int, height:Int, method:RepeatFillMethod, ?sWidth:Int, ?sHeight:Int)
 	{
 		super(new RenderState());
 
 		this.offset = new Vector2(0, 0);
-		this.definedRenderer = r;
-		this.rendererProvider = rendererProvider;
 		this.fillWidth = width;
 		this.fillHeight = height;
 		this.method = method;
@@ -60,14 +56,12 @@ class RepeatFillRenderer extends Renderer<RenderState>
 		this.sourceHeight = (sHeight == null) ? height : sHeight;
 	}
 
+	private function renderTile(x:Int, y:Int, canvas:Canvas2D):Void
+	{
+	}
+
 	private override function _render(canvas:Canvas2D):Void
 	{
-		if (this.renderer == null)
-			return;
-
-		var temp = new Canvas2D("temp", this.sourceWidth, this.sourceHeight);
-		this.renderer.render(temp);
-
 		var xRepeat = method == Horizontal || method == Both;
 		var yRepeat = method == Vertical || method == Both;
 
@@ -96,7 +90,7 @@ class RepeatFillRenderer extends Renderer<RenderState>
 			{
 				canvas.ctx.save();
 				canvas.ctx.translate(left, top);
-				canvas.renderCanvas(temp);
+				this.renderTile(i, j, canvas);
 				canvas.ctx.restore();
 
 				top += this.sourceHeight;

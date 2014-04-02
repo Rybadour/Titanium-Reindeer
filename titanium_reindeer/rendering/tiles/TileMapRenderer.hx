@@ -5,26 +5,30 @@ import titanium_reindeer.rendering.RepeatFillRenderer;
 class TileMapRenderer extends RepeatFillRenderer
 {
 	/**
-	 * The object queried for a tile asset at a given tile position (x, y).
+	 * The object queried for a tile id at a given tile position (x, y).
 	 */
-	public var tileProvider:TileMap;
+	public var tileMap:TileMap;
 
 	/**
-	 * The single ImageRenderer instance responsible for rendering a tile at each position.
+	 * The object for rendering one tile based on a given tile Id.
 	 */
-	public var tileRenderer:ImageRenderer;
+	public var tileRenderer:ITileRenderer;
 
-	public function new(width:Int, height:Int, provider:TileMap)
+	public function new(width:Int, height:Int, tileMap:TileMap, tileRenderer:ITileRenderer)
 	{
-		super(null, width, height, RepeatFillMethod.Both, provider.tileWidth, provider.tileHeight, this.tileMappingFunc);
+		super(width, height, RepeatFillMethod.Both, provider.tileWidth, provider.tileHeight);
 
-		this.tileProvider = provider;
-		this.tileRenderer = new ImageRenderer(null);
+		this.tileMap = tileMap;
+		this.tileRenderer = tileRenderer;
 	}
 
-	private function tileMappingFunc(x:Int, y:Int):ImageRenderer
+	private override function renderTile(x:Int, y:Int, canvas:Canvas2D):Void
 	{
-		this.tileRenderer.image = this.tileProvider.getTileImage(x, y);
-		return this.tileRenderer;
+		// Add the offset to obtain the x and y of the tile relative to the tile map.
+		x += Math.floor(this.offset.x / this.sourceWidth);
+		y += Math.floor(this.offset.y / this.sourceHeight);
+
+		var tileId = this.tileProvider.getTileId(x, y);
+		this.tileRenderer.render(canvas, tileId);
 	}
 }
