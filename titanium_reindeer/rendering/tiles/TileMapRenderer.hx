@@ -7,14 +7,14 @@ class TileMapRenderer extends RepeatFillRenderer
 	/**
 	 * The object queried for a tile id at a given tile position (x, y).
 	 */
-	public var tileMap:TileMap;
+	public var tileMap:ITileMap;
 
 	/**
 	 * The object for rendering one tile based on a given tile Id.
 	 */
 	public var tileRenderer:ITileRenderer;
 
-	public function new(width:Int, height:Int, tileMap:TileMap, tileRenderer:ITileRenderer)
+	public function new(width:Int, height:Int, tileMap:ITileMap, tileRenderer:ITileRenderer)
 	{
 		super(width, height, RepeatFillMethod.Both, provider.tileWidth, provider.tileHeight);
 
@@ -28,7 +28,7 @@ class TileMapRenderer extends RepeatFillRenderer
 		x += Math.floor(this.offset.x / this.sourceWidth);
 		y += Math.floor(this.offset.y / this.sourceHeight);
 
-		var tileId = this.tileProvider.getTileId(x, y);
-		this.tileRenderer.render(canvas, tileId);
+		var tileIndex = this.tileMap.getTileIndex(x, y);
+		this.tileRenderer.render(canvas, tileIndex);
 	}
 }
