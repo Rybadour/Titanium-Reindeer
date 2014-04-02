@@ -1,45 +1,53 @@
 package unit_testing.tiles;
 
+import haxe.io.Eof;
+import sys.io.File;
+import neko.Lib;
+
 import titanium_reindeer.tiles.tmx.*;
 import titanium_reindeer.tiles.*;
 import titanium_reindeer.rendering.Color;
 
 class TmxXmlTests extends haxe.unit.TestCase
 {
+	public static inline var TMX_CSV_TEST_FILE:String = 'tiles/csv_test.tmx';
+	public static inline var TMX_XML_TEST_FILE:String = 'tiles/xml_test.tmx';
+
 	public var tmxMap:TmxMap;
-	public var tmxXmlData:TmxXml;
-	public var xml_data:String;
+	public var tmxXmlWithCsv:TmxXml;
+	public var tmxXmlWithXml:TmxXml;
+	public var tmxCsvData:String;
+	public var tmxXmlData:String;
 
 	public override function setup()
 	{
-		this.xml_data =
-		'<?xml version="1.0" encoding="UTF-8"?>' +
-		'<map version="1.0" orientation="orthogonal" width="30" height="30" tilewidth="16" tileheight="16">' +
-			'<tileset firstgid="1" name="Dungeon" tilewidth="16" tileheight="16">' +
-				'<image source="dungeon_tiles_compact_and_varied.png" width="336" height="104"/>' +
-				'<terraintypes>' +
-					'<terrain name="dirt" tile="-1"/>' +
-					'<terrain name="water" tile="-1"/>' +
-				'</terraintypes>' +
-				'<tile id="0" terrain="1,1,1,0"/>' +
-				'<tile id="1" terrain="1,1,0,0"/>' +
-				'<tile id="2" terrain="1,1,0,0"/>' +
-				'<tile id="3" terrain="1,1,0,0"/>' +
-				'<tile id="4" terrain="1,1,0,1"/>' +
-			'</tileset>' +
-		'</map>';
+		this.tmxCsvData = File.getContent(TMX_CSV_TEST_FILE);
+		this.tmxXmlData = File.getContent(TMX_XML_TEST_FILE);
 	}
 
-	public function testParseXml()
+	public function testParseXmlWithCsvData()
 	{
-		this.tmxXmlData = new TmxXml(Xml.parse(this.xml_data));
+		this.tmxXmlWithCsv = new TmxXml(Xml.parse(this.tmxCsvData));
 
-		assertEquals(this.tmxXmlData.version, "1.0");
-		assertEquals(this.tmxXmlData.orientation, TileMapOrientation.Orthogonal);
-		assertEquals(this.tmxXmlData.width, 30);
-		assertEquals(this.tmxXmlData.height, 30);
-		assertEquals(this.tmxXmlData.tileWidth, 16);
-		assertEquals(this.tmxXmlData.tileHeight, 16);
-		assertTrue( Color.Clear.equal(this.tmxXmlData.backgroundColor) );
+		assertEquals(this.tmxXml.version, "1.0");
+		assertEquals(this.tmxXml.orientation, TileMapOrientation.Orthogonal);
+		assertEquals(this.tmxXml.width, 30);
+		assertEquals(this.tmxXml.height, 30);
+		assertEquals(this.tmxXml.tileWidth, 16);
+		assertEquals(this.tmxXml.tileHeight, 16);
+		assertTrue( Color.Black.equal(this.tmxXml.backgroundColor) );
+	}
+
+	public function testParseXmlWithXmlData()
+	{
+		this.tmxXmlWithXml = new TmxXml(Xml.parse(this.tmxXmlData));
+
+		assertEquals(this.tmxXml.version, "1.0");
+		assertEquals(this.tmxXml.orientation, TileMapOrientation.Orthogonal);
+		assertEquals(this.tmxXml.width, 30);
+		assertEquals(this.tmxXml.height, 30);
+		assertEquals(this.tmxXml.tileWidth, 16);
+		assertEquals(this.tmxXml.tileHeight, 16);
+		assertTrue( Color.Black.equal(this.tmxXml.backgroundColor) );
 	}
 }

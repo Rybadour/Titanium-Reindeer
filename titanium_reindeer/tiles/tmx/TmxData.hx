@@ -11,6 +11,12 @@ class TmxData
 	public var tileWidth:Int;
 	public var tileHeight:Int;
 	public var backgroundColor:Color;
+	
+	public var customProperties:Map<String, String>;
+
+	public var tileSets:Array<TmxTileSet>;
+
+	public var layers:Array<TmxLayer>;
 
 	public function new()
 	{
