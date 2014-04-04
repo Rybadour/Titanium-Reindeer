@@ -1,6 +1,6 @@
 package titanium_reindeer.util;
 
-class URLParser
+class UrlParser
 {
     public var url:String;
 	public var parts:Map<String, String>;
@@ -20,7 +20,7 @@ class URLParser
     public var query : String;
     public var anchor : String;
  
-    inline static private var PART_NAMES:Array<String> = ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"];
+    inline static private var PART_NAMES:String = "source,protocol,authority,userInfo,user,password,host,port,relative,path,directory,file,query,anchor";
  
     public function new(url:String)
     {
@@ -34,7 +34,7 @@ class URLParser
  
         // Use reflection to set each part
 		var i = 0;
-		for (partName in PART_NAMES)
+		for (partName in PART_NAMES.split(','))
         {
             this.parts.set(partName,  r.matched(i));
 			++i;

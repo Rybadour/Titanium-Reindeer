@@ -11,27 +11,27 @@ class HttpLoader extends AssetLoader
 
 		this.rootPath = rootPath;
 		this.uniqueAssets = new Map();
-		this.addAssets(assets);
+		this.addHttpAssets(assets);
 	}
 
 	public function addHttpAssets(assets:Array<HttpAsset>):Void
 	{
-		var newUniqueAssets = new Array();
+		var newUniqueAssets:Array<ILoadable> = new Array();
 
 		// Pick out unique assets
 		for (asset in assets)
 		{
-			var url = rootPath + asset.url;
+			var url = rootPath + asset.path;
 			if ( !this.uniqueAssets.exists(url) )
 			{
 				this.uniqueAssets.set(url, asset);
-				asset.url = url;
+				asset.path = url;
 				newUniqueAssets.push(asset);
 			}	
 		}
 
 		// Only load unique image paths
-		super.addHttpAssets(newUniqueAssets);
+		super.addAssets(newUniqueAssets);
 	}
 
 	public function get(url:String):HttpAsset

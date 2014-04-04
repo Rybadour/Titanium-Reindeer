@@ -1,6 +1,6 @@
 package titanium_reindeer.assets;
 
-import js.html.XmlHttpRequest;
+import js.html.XMLHttpRequest;
 
 /**
  * The base class of all assets loaded using an HttpRequest.
@@ -10,7 +10,7 @@ import js.html.XmlHttpRequest;
 class HttpAsset implements IAsset
 {
 	// The URL of the file. It may be relative to some loader (with a root path specified).
-	public var url:String;
+	public var path:String;
 	
 	// The contents of the file (undecoded)
 	public var data(default, null):String;
@@ -23,7 +23,7 @@ class HttpAsset implements IAsset
 	private var _isLoaded:Bool;
 
 	// The request used to retrieve the file
-	private var _request:XmlHttpRequest;
+	private var _request:XMLHttpRequest;
 
 	// The absolute size of the file.
 	private var _size:Int;
@@ -33,7 +33,7 @@ class HttpAsset implements IAsset
 
 	public function new(url:String, type:HttpAssetType)
 	{
-		this.url = url;
+		this.path = url;
 		this.type = type;
 
 		this._isLoaded = false;
@@ -54,10 +54,10 @@ class HttpAsset implements IAsset
 	 */
 	public function load():Void
 	{
-		this._request = new XmlHttpRequest();
+		this._request = new XMLHttpRequest();
 
 		// Set the expected type of file
-		if (this._request.overrideMimeType) {
+		if (this._request.overrideMimeType != null) {
 			switch (this.type)
 			{
 				case Json:
@@ -73,7 +73,7 @@ class HttpAsset implements IAsset
 		this._request.addEventListener("error", this._onError, false);
 		this._request.addEventListener("abort", this._onAbort, false);
 
-		this._request.open("GET", this.url, true);
+		this._request.open("GET", this.path, true);
 		this._request.send();
 	}
 
@@ -82,7 +82,7 @@ class HttpAsset implements IAsset
 		if (this._size == 0)
 			return (this._isLoaded ? 1 : 0);
 		else
-			return this._loadedSize / this._size);
+			return this._loadedSize / this._size;
 	}
 
 	public function getSize():Int
@@ -90,23 +90,23 @@ class HttpAsset implements IAsset
 		return this._size;
 	}
 	
-	private function _onProgress(event:XmlHttpRequestProgressEvent)
+	private function _onProgress(event:Dynamic)
 	{
 		// The haxe api differs from the HTML5 spec about how this event works
 		this._size = event.totalSize;
 		this._loadedSize = event.position;
 	}
 
-	private function _onLoad(event:XmlHttpRequestLoadEvent)
+	private function _onLoad(event:Dynamic)
 	{
 		this._isLoaded = true;
 	}
 
-	private function _onError(event:XmlHttpRequestErrorEvent)
+	private function _onError(event:Dynamic)
 	{
 	}
 
-	private function _onAbort(event:XmlHttpRequestAbortEvent)
+	private function _onAbort(event:Dynamic)
 	{
 	}
 }
