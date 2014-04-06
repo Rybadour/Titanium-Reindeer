@@ -24,17 +24,14 @@ class TmxAsset extends XmlAsset
 		this.tmxData = new TmxXml(Xml.parse(this.data));
 		if (this.imageLoader != null)
 		{
-			// Ensure the image path is relative
 			if (this.imageBasePath == null)
-			{
-				var url = new UrlParser(this.path);
-				this.imageBasePath = url.getUntilDirectory();
-			}
+				this.imageBasePath = '';
 
 			var images:Array<ImageAsset> = new Array();
 			for (tileSet in this.tmxData.tileSets)
 				images.push(new ImageAsset(this.imageBasePath + tileSet.imagePath));
 			this.imageLoader.addImages(images);
+			this.imageLoader.load();
 		}
 	}
 }

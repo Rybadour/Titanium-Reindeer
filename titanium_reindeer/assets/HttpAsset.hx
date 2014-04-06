@@ -99,6 +99,7 @@ class HttpAsset implements IAsset
 
 	private function _onLoad(event:Dynamic)
 	{
+		this.data = event.target.responseText;
 		this._isLoaded = true;
 	}
 
