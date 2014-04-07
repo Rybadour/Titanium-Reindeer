@@ -19,7 +19,7 @@ class TileMap implements ITileMap
 	 */
 	public function getTileIndex(x:Int, y:Int):Int
 	{
-		if (x < 0 OR x >= this.width OR y < 0 OR y >= this.height)
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height)
 		{
 			return null;
 		}

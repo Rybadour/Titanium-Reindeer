@@ -1,5 +1,6 @@
 package titanium_reindeer.rendering.tiles;
 
+import titanium_reindeer.tiles.ITileMap;
 import titanium_reindeer.rendering.RepeatFillRenderer;
 
 class TileMapRenderer extends RepeatFillRenderer
@@ -14,9 +15,9 @@ class TileMapRenderer extends RepeatFillRenderer
 	 */
 	public var tileRenderer:ITileRenderer;
 
-	public function new(width:Int, height:Int, tileMap:ITileMap, tileRenderer:ITileRenderer)
+	public function new(width:Int, height:Int, tileWidth:Int, tileHeight:Int, tileMap:ITileMap, tileRenderer:ITileRenderer)
 	{
-		super(width, height, RepeatFillMethod.Both, provider.tileWidth, provider.tileHeight);
+		super(width, height, RepeatFillMethod.Both, tileWidth, tileHeight);
 
 		this.tileMap = tileMap;
 		this.tileRenderer = tileRenderer;
@@ -29,6 +30,6 @@ class TileMapRenderer extends RepeatFillRenderer
 		y += Math.floor(this.offset.y / this.sourceHeight);
 
 		var tileIndex = this.tileMap.getTileIndex(x, y);
-		this.tileRenderer.render(canvas, tileIndex);
+		this.tileRenderer.render(canvas, tileIndex, this.sourceWidth, this.sourceHeight);
 	}
 }

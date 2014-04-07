@@ -1,7 +1,6 @@
 package titanium_reindeer.assets;
 
 import titanium_reindeer.tiles.tmx.*;
-import titanium_reindeer.util.UrlParser;
 
 class TmxAsset extends XmlAsset
 {

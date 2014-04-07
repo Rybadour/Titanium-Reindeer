@@ -102,7 +102,7 @@ class TmxXml extends TmxData
 			layerData.opacity = Std.parseFloat(layer.get('opacity'));
 			layerData.visible = layer.get('visible') == '1';
 
-			layerData.tileIds = new Array();
+			layerData.tileIndices = new Array();
 			for (data in layer.elementsNamed("data"))
 			{
 				// Defaults to xml
@@ -110,7 +110,7 @@ class TmxXml extends TmxData
 				{
 					for (tile in layer.elementsNamed("tile"))
 					{
-						layerData.tileIds.push(Std.parseInt(tile.get('gid')));
+						layerData.tileIndices.push(Std.parseInt(tile.get('gid')));
 					}
 				}
 				else
@@ -120,7 +120,7 @@ class TmxXml extends TmxData
 					{
 						for (gid in raw.split(','))
 						{
-							layerData.tileIds.push(Std.parseInt(gid));
+							layerData.tileIndices.push(Std.parseInt(gid));
 						}
 					}
 					else if (data.get('encoding') == 'base64')
