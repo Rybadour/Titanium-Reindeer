@@ -137,6 +137,22 @@ class Canvas2D implements IRenderer
 		this.ctx.strokeText(text, 0, 0);
 	}
 
+	/**
+	 * Set the current fill style to the specified color.
+	 */
+	public function fillColor(color:Color):Void
+	{
+		this.ctx.fillStyle = color.rgba;
+	}
+
+	/**
+	 * Set the current stroke style to the specified color.
+	 */
+	public function strokeColor(color:Color):Void
+	{
+		this.ctx.strokeStyle = color.rgba;
+	}
+
 	public function clear(rect:RectRegion = null):Void
 	{
 		if (rect == null)
