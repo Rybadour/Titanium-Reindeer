@@ -1,5 +1,8 @@
 package titanium_reindeer.tiles;
 
+/**
+ * A way in which a tile map renders it's tiles and rules for adjacency of tiles.
+ */
 enum TileMapOrientation
 {
 	// Simple non-rotated grid of tiles.
@@ -15,6 +18,9 @@ enum TileMapOrientation
 
 // See for more info on various isometric styles.
 // http://gamedev.stackexchange.com/questions/49847/difference-between-staggered-isometric-and-normal-isometric-tilemaps
+/**
+ * A specific variation of the isometric orientation.
+ */
 enum IsometricStyle
 {
 	// Represents a grid which was basically rotated to the right.

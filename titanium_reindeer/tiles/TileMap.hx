@@ -1,9 +1,18 @@
 package titanium_reindeer.tiles;
 
+/**
+ * TileMap is a basic implementation that maps the indices stored in an array of length width *
+ * height. Tile indices are assumed to be row by row, every width number of elements is a new row.
+ */
 class TileMap implements ITileMap
 {
+	// Flat array of tile indices
 	public var tileIndices:Array<Int>;
+
+	// Size of each row
 	public var width:Int;
+
+	// Size of each column
 	public var height:Int;
 
 	public function new(tileIndices:Array<Int>, width:Int, height:Int)
