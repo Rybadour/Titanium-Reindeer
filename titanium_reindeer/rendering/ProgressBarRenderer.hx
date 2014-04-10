@@ -1,7 +1,7 @@
 package titanium_reindeer.rendering;
 
 import titanium_reindeer.assets.ILoadable;
-import titanium_reindeer.util.Utility;
+import titanium_reindeer.util.MoreMath;
 
 class ProgressBarRenderer extends Renderer<RenderState>
 {
@@ -42,7 +42,7 @@ class ProgressBarRenderer extends Renderer<RenderState>
 		canvas.renderRectf(width, height);
 		canvas.restore();
 
-		var progress = Utility.clampFloat(this.asset.getProgress(), 0, 1);
+		var progress = MoreMath.clampFloat(this.asset.getProgress(), 0, 1);
 
 		canvas.save();
 		this.fgState.apply(canvas);
