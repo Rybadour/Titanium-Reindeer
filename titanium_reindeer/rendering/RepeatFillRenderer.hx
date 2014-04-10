@@ -12,20 +12,43 @@ enum RepeatFillMethod
 
 class RepeatFillRenderer extends Renderer<RenderState>
 {
+	/**
+	 * The internal offset within the view port.
+	 */
 	public var offset:Vector2;
-	public var renderer:IRenderer;
-	public var fillWidth:Int;
-	public var fillHeight:Int;
-	public var method:RepeatFillMethod;
-	public var sourceWidth:Int;
-	public var sourceHeight:Int;
 
-	public function new(r:IRenderer, width:Int, height:Int, method:RepeatFillMethod, ?sWidth:Int, ?sHeight:Int)
+	/**
+	 * The view port width. Rendering will only be done within this width starting at the x offset.
+	 */
+	public var fillWidth:Int;
+
+	/**
+	 * The view port width. Rendering will only be done within this width starting at the x offset.
+	 */
+	public var fillHeight:Int;
+
+	/**
+	 * The expected width of one renderer. 
+	 * Defaults to fillWidth.
+	 */
+	public var sourceWidth:Int;
+
+	/**
+	 * The expected height of one renderer. 
+	 * Defaults to fillHeight.
+	 */
+	public var sourceHeight:Int;
+	
+	/**
+	 * The 
+	 */
+	public var method:RepeatFillMethod;
+
+	public function new(width:Int, height:Int, method:RepeatFillMethod, ?sWidth:Int, ?sHeight:Int)
 	{
 		super(new RenderState());
 
 		this.offset = new Vector2(0, 0);
-		this.renderer = r;
 		this.fillWidth = width;
 		this.fillHeight = height;
 		this.method = method;
@@ -33,14 +56,12 @@ class RepeatFillRenderer extends Renderer<RenderState>
 		this.sourceHeight = (sHeight == null) ? height : sHeight;
 	}
 
+	private function renderTile(x:Int, y:Int, canvas:Canvas2D):Void
+	{
+	}
+
 	private override function _render(canvas:Canvas2D):Void
 	{
-		if (this.renderer == null)
-			return;
-
-		var temp = new Canvas2D("temp", this.sourceWidth, this.sourceHeight);
-		this.renderer.render(temp);
-
 		var xRepeat = method == Horizontal || method == Both;
 		var yRepeat = method == Vertical || method == Both;
 
@@ -69,7 +90,7 @@ class RepeatFillRenderer extends Renderer<RenderState>
 			{
 				canvas.ctx.save();
 				canvas.ctx.translate(left, top);
-				canvas.renderCanvas(temp);
+				this.renderTile(i, j, canvas);
 				canvas.ctx.restore();
 
 				top += this.sourceHeight;
