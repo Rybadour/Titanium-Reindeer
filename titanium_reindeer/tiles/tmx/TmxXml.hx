@@ -100,7 +100,7 @@ class TmxXml extends TmxData
 			layerData.width   = Std.parseInt(layer.get('width'));
 			layerData.height  = Std.parseInt(layer.get('height'));
 			layerData.opacity = Std.parseFloat(layer.get('opacity'));
-			layerData.visible = layer.get('visible') == '1';
+			layerData.visible = layer.get('visible') != '0';
 
 			layerData.tileIndices = new Array();
 			for (data in layer.elementsNamed("data"))
