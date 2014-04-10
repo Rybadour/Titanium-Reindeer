@@ -42,8 +42,8 @@ class TmxXml extends TmxData
 			tileSetData.firstTileId    = Std.parseInt(tileSet.get('firstgid'));
 			// TODO: Support external Tilesets through source attribute
 			tileSetData.name             = tileSet.get('name');
-			tileSetData.tileWidth        = Std.parseInt(tileSet.get('tileWidth'));
-			tileSetData.tileHeight       = Std.parseInt(tileSet.get('tileHeight'));
+			tileSetData.tileWidth        = Std.parseInt(tileSet.get('tilewidth'));
+			tileSetData.tileHeight       = Std.parseInt(tileSet.get('tileheight'));
 			tileSetData.spacing          = Std.parseInt(tileSet.get('spacing'));
 			tileSetData.margin           = Std.parseInt(tileSet.get('margin'));
 			tileSetData.customProperties = parseProperties(tileSet);
@@ -134,7 +134,9 @@ class TmxXml extends TmxData
 		}
 	}
 
-	// Return list of properties directly under this node
+	/**
+	 * Return list of properties directly under under a node.
+	 */
 	public function parseProperties(node:Xml):Map<String, String>
 	{
 		var tmxProperties:Map<String, String> = new Map();

@@ -20,22 +20,24 @@ class TmxData
 	public var orientation:TileMapOrientation;
 
 	/**
-	 * The maximum width in tiles of any layer
+	 * The width in tiles of the map and all layers
 	 */
 	public var width:Int;
 
 	/**
-	 * The maximum height in tiles of any layer
+	 * The height in tiles of the map and all layers
 	 */
 	public var height:Int;
 
 	/**
-	 * The maximum width of a tile in any layer
+	 * The width of a column of the tile map for alignment purposed only. Individual tiles may be
+	 * drawn larger or smaller but will be anchored to the bottom left.
 	 */
 	public var tileWidth:Int;
 
 	/**
-	 * The maximum width of a tile in any layer
+	 * The height of a row of the tile map for alignment purposed only. Individual tiles may be drawn
+	 * larger or smaller but will be anchored to the bottom left.
 	 */
 	public var tileHeight:Int;
 

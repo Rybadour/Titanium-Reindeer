@@ -1,6 +1,12 @@
 package titanium_reindeer.rendering.tiles;
 
+/**
+ * A tile renderer is intended to be a class that is capable of rendering a tile given it's index.
+ */
 interface ITileRenderer
 {
-	public function render(canvas:Canvas2D, tileId:Int, width:Int, height:Int):Void;
+	/**
+	 * Intended to render a tile indetified by a tile index.
+	 */
+	public function render(canvas:Canvas2D, tileId:Int):Void;
 }

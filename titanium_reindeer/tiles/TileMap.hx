@@ -6,13 +6,19 @@ package titanium_reindeer.tiles;
  */
 class TileMap implements ITileMap
 {
-	// Flat array of tile indices
+	/**
+	 * Flat array of tile indices.
+	 */
 	public var tileIndices:Array<Int>;
 
-	// Size of each row
+	/**
+	 * The size of each row in tiles.
+	 */
 	public var width:Int;
 
-	// Size of each column
+	/**
+	 * The size of each column in tiles.
+	 */
 	public var height:Int;
 
 	public function new(tileIndices:Array<Int>, width:Int, height:Int)
@@ -32,6 +38,10 @@ class TileMap implements ITileMap
 		{
 			return null;
 		}
-		return this.tileIndices[x + y*this.width];
+		var tileIndex = x + y*this.width;
+		if (tileIndex >= this.tileIndices.length)
+			return null;
+		else
+			return this.tileIndices[tileIndex];
 	}
 }

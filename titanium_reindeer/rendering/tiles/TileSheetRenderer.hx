@@ -20,17 +20,21 @@ class TileSheetRenderer implements ITileRenderer
 		this.tileHeight = tileHeight;
 	}
 
-	public function render(canvas:Canvas2D, tileIndex:Int, width:Int, height:Int):Void
+	/**
+	 * Render a portion of the tile sheet image at the given index.
+	 */
+	public function render(canvas:Canvas2D, tileIndex:Int):Void
 	{
 		var widthInTiles = Math.floor(this.tileSheet.width / this.tileWidth);
 		// Render the part of the tile sheet that tile Id corresponds to
 		var sx = (tileIndex % widthInTiles) * this.tileWidth;
 		var sy = Math.floor(tileIndex / widthInTiles) * this.tileHeight;
-		canvas.ctx.drawImage(tileSheet,
+		canvas.ctx.drawImage(
+			tileSheet,
 			sx, sy,
 			this.tileWidth, this.tileHeight,
 			0, 0, 
-			width, height
+			this.tileWidth, this.tileHeight
 		);
 	}
 }
