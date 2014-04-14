@@ -41,15 +41,7 @@ class TmxTileRenderer implements ITileRenderer
 	 */
 	public function render(canvas:Canvas2D, tileIndex:Int)
 	{
-		var chosenTileSet = null;
-		for (tileSet in this.tmxData.tileSets)
-		{
-			if (tileSet.firstTileId <= tileIndex)
-				chosenTileSet = tileSet;
-			else
-				break;
-		}
-
+		var chosenTileSet = this.tmxData.getContainingTileSet(tileIndex);
 		if (chosenTileSet == null)
 			return;
 

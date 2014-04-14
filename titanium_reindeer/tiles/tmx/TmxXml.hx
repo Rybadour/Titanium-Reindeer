@@ -76,12 +76,16 @@ class TmxXml extends TmxData
 			for (tile in tileSet.elementsNamed('tile'))
 			{
 				var tileData = new TmxTile(Std.parseInt(tile.get('id')));
-				var corners = tile.get('terrain').split(',');
-				tileData.terrainTopLeft     = Std.parseInt(corners[0]);
-				tileData.terrainTopRight    = Std.parseInt(corners[1]);
-				tileData.terrainBottomLeft  = Std.parseInt(corners[2]);
-				tileData.terrainBottomRight = Std.parseInt(corners[3]);
-				tileData.terrainProbability = Std.parseFloat(tile.get('probability'));
+				var terrain = tile.get('terrain');
+				if (terrain != null)
+				{
+					var corners = terrain.split(',');
+					tileData.terrainTopLeft     = Std.parseInt(corners[0]);
+					tileData.terrainTopRight    = Std.parseInt(corners[1]);
+					tileData.terrainBottomLeft  = Std.parseInt(corners[2]);
+					tileData.terrainBottomRight = Std.parseInt(corners[3]);
+					tileData.terrainProbability = Std.parseFloat(tile.get('probability'));
+				}
 				tileData.customProperties   = parseProperties(tile);
 				tileSetData.tiles.push(tileData);
 			}

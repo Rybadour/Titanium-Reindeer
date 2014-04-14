@@ -67,6 +67,16 @@ class TmxData
 	{
 	}
 
+	public function getLayer(name:String):TmxLayer
+	{
+		for (layer in this.layers)
+		{
+			if (layer.name == name)
+				return layer;
+		}
+		return null;
+	}
+
 	/**
 	 * Determines the orientation type from the string representation and sets the member to it.
 	 */
@@ -102,5 +112,18 @@ class TmxData
 				Std.parseInt('0x' + str.substr(5, 2))
 			);
 		}
+	}
+
+	public function getContainingTileSet(tileIndex:Int):TmxTileSet
+	{
+		var chosenTileSet = null;
+		for (tileSet in this.tileSets)
+		{
+			if (tileSet.firstTileId <= tileIndex)
+				chosenTileSet = tileSet;
+			else
+				break;
+		}
+		return chosenTileSet;
 	}
 }

@@ -35,9 +35,8 @@ class TileMap implements ITileMap
 	public function getTileIndex(x:Int, y:Int):Int
 	{
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height)
-		{
 			return null;
-		}
+
 		var tileIndex = x + y*this.width;
 		if (tileIndex >= this.tileIndices.length)
 			return null;

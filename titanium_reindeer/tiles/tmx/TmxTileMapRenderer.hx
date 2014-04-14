@@ -1,5 +1,6 @@
 package titanium_reindeer.tiles.tmx;
 
+import titanium_reindeer.spatial.Vector2;
 import titanium_reindeer.rendering.*;
 import titanium_reindeer.rendering.tiles.TileMapRenderer;
 import titanium_reindeer.assets.ImageLoader;
@@ -26,6 +27,11 @@ class TmxTileMapRenderer extends Renderer<RenderState>
 	 * The tmx map to render.
 	 */
 	public var tmxData:TmxData;
+
+	/**
+	 * The internal offset that layers of the tile map are drawn with.
+	 */
+	public var offset:Vector2;
 
 	/**
 	 * Using a basic tile renderer to render one layer at a time.
@@ -67,6 +73,8 @@ class TmxTileMapRenderer extends Renderer<RenderState>
 		canvas.renderRectf(this.width, this.height);
 		canvas.restore();
 
+		canvas.save();
+		canvas.translate(this.offset);
 		for (layer in this.tmxData.layers)
 		{
 			if (layer.visible)
@@ -78,5 +86,6 @@ class TmxTileMapRenderer extends Renderer<RenderState>
 				canvas.restore();
 			}
 		}
+		canvas.restore();
 	}
 }
