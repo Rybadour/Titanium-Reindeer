@@ -1,6 +1,6 @@
 package titanium_reindeer.rendering.tiles;
 
-import titanium_reindeer.tiles.ITileMap;
+import titanium_reindeer.tiles.*;
 import titanium_reindeer.rendering.RepeatFillRenderer;
 
 /**
@@ -11,6 +11,11 @@ import titanium_reindeer.rendering.RepeatFillRenderer;
 class TileMapRenderer extends RepeatFillRenderer
 {
 	/**
+	 * A definition instance which tells the renderer how big tiles are.
+	 */
+	public var definition:TileMapDefinition;
+
+	/**
 	 * The object queried for a tile id at a given tile position (x, y).
 	 */
 	public var tileMap:ITileMap;
@@ -20,10 +25,11 @@ class TileMapRenderer extends RepeatFillRenderer
 	 */
 	public var tileRenderer:ITileRenderer;
 
-	public function new(width:Int, height:Int, tileWidth:Int, tileHeight:Int, tileMap:ITileMap, tileRenderer:ITileRenderer)
+	public function new(width:Int, height:Int, definition:TileMapDefinition, tileMap:ITileMap, tileRenderer:ITileRenderer)
 	{
-		super(width, height, RepeatFillMethod.Both, tileWidth, tileHeight);
+		super(width, height, RepeatFillMethod.Both, definition.tileWidth, definition.tileHeight);
 
+		this.definition = definition;
 		this.tileMap = tileMap;
 		this.tileRenderer = tileRenderer;
 	}

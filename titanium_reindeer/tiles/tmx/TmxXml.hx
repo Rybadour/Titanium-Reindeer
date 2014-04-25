@@ -8,8 +8,6 @@ class TmxXml extends TmxData
 {
 	public function new(xml:Xml)
 	{
-		super();
-
 		var map:Xml = null;
 		for (element in xml.elements())
 		{
@@ -29,8 +27,8 @@ class TmxXml extends TmxData
 		this.version    = map.get('version');
 		this.width      = Std.parseInt(map.get('width'));
 		this.height     = Std.parseInt(map.get('height'));
-		this.tileWidth  = Std.parseInt(map.get('tilewidth'));
-		this.tileHeight = Std.parseInt(map.get('tileheight'));
+		this.sourceTileWidth  = this.tileWidth  = Std.parseInt(map.get('tilewidth'));
+		this.sourceTileHeight = this.tileHeight = Std.parseInt(map.get('tileheight'));
 		this.setBackgroundColor( map.get('backgroundcolor') );
 		this.setOrientation( map.get('orientation') );
 		this.customProperties = parseProperties(map);
@@ -97,7 +95,7 @@ class TmxXml extends TmxData
 		this.layers = new Array();
 		for (layer in map.elementsNamed("layer"))
 		{
-			var layerData = new TmxLayer();
+			var layerData = new TmxLayer(this);
 			layerData.name    = layer.get('name');
 			layerData.layerX  = Std.parseInt(layer.get('x'));
 			layerData.layerY  = Std.parseInt(layer.get('y'));

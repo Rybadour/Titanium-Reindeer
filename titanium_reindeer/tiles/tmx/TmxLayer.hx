@@ -12,6 +12,16 @@ class TmxLayer extends TileMap
 	public var name:String;
 
 	/**
+	 * The width in tiles of the layer.
+	 */
+	public var width:Int;
+
+	/**
+	 * The height in tiles of the layer.
+	 */
+	public var height:Int;
+
+	/**
 	 * The x offset of the layer in tiles.
 	 * Note: This is apparently deprecated (2014, April).
 	 */
@@ -33,8 +43,8 @@ class TmxLayer extends TileMap
 	 */
 	public var visible:Bool;
 
-	public function new()
+	public function new(tmxData:TmxData)
 	{
-		super([], 0, 0);
+		super(tmxData, []);
 	}
 }

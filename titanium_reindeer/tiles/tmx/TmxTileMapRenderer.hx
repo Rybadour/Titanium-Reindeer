@@ -53,8 +53,7 @@ class TmxTileMapRenderer extends Renderer<RenderState>
 		this.layerRenderer = new TileMapRenderer(
 			width,
 			height,
-			tmxData.tileWidth,
-			tmxData.tileHeight,
+			this.tmxData,
 			null,
 			this.tmxTileRenderer
 		);

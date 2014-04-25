@@ -33,17 +33,13 @@ class TileMapping
 	public function getTiles(type:String):Array<Vector2>
 	{
 		var tiles:Array<Vector2> = new Array();
-		var i = 0;
-		for (y in 0...this.tileMap.height)
+		var positions:Map<Int, Vector2> = this.tileMap.getAllTilePositions();
+		for (index in positions.keys())
 		{
-			for (x in 0...this.tileMap.width)
+			var types = this._map(index);
+			if (this.hasType(types, type))
 			{
-				var types = this._map(this.tileMap.tileIndices[i]);
-				if (this.hasType(types, type))
-				{
-					tiles.push(new Vector2(x, y));
-				}
-				++i;
+				tiles.push(positions.get(index));
 			}
 		}
 

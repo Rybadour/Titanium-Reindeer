@@ -7,7 +7,7 @@ import titanium_reindeer.rendering.Color;
  * information for one map file can be retrieved. A Tmx asset takes a file name and creates one of
  * these objects.
  */
-class TmxData
+class TmxData extends TileMapDefinition
 {
 	/**
 	 * The version of the format of the tmx file loaded.
@@ -15,31 +15,16 @@ class TmxData
 	public var version:String;
 
 	/**
-	 * The tile orientation of each layer of this tmx file.
+	 * The width of a tile in pixels when the Tmx map was created. This tells us how big relative to
+	 * tile sheets the tile grid is.
 	 */
-	public var orientation:TileMapOrientation;
+	public var sourceTileWidth:Int;
 
 	/**
-	 * The width in tiles of the map and all layers
+	 * The height of a tile in pixels when the Tmx map was created. This tells us how big relative to
+	 * tile sheets the tile grid is.
 	 */
-	public var width:Int;
-
-	/**
-	 * The height in tiles of the map and all layers
-	 */
-	public var height:Int;
-
-	/**
-	 * The width of a column of the tile map for alignment purposed only. Individual tiles may be
-	 * drawn larger or smaller but will be anchored to the bottom left.
-	 */
-	public var tileWidth:Int;
-
-	/**
-	 * The height of a row of the tile map for alignment purposed only. Individual tiles may be drawn
-	 * larger or smaller but will be anchored to the bottom left.
-	 */
-	public var tileHeight:Int;
+	public var sourceTileHeight:Int;
 
 	/**
 	 * The chosen background colour to appear behind the lowest layer.
@@ -62,10 +47,6 @@ class TmxData
 	 * indexes. A tile index in any layer may refer to an tile set.
 	 */
 	public var layers:Array<TmxLayer>;
-
-	public function new()
-	{
-	}
 
 	public function getLayer(name:String):TmxLayer
 	{

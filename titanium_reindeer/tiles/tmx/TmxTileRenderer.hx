@@ -31,7 +31,7 @@ class TmxTileRenderer implements ITileRenderer
 	public function new(tmxData:TmxData, imageLoader:ImageLoader)
 	{
 		this.tmxData = tmxData;
-		this.tileRenderer = new TileSheetRenderer(null, tmxData.tileWidth, tmxData.tileHeight);
+		this.tileRenderer = new TileSheetRenderer(null, this.tmxData, 0, 0);
 		this.imageLoader = imageLoader;
 	}
 
@@ -46,14 +46,15 @@ class TmxTileRenderer implements ITileRenderer
 			return;
 
 		canvas.save();
+		// TODO: Fix this bug if I forgot to when i wrote this
 		canvas.translatef(
-			0,//this.tmxData.tileWidth - chosenTileSet.tileWidth,
+			0,
 			this.tmxData.tileHeight - chosenTileSet.tileHeight
 		);
 
 		this.tileRenderer.tileSheet = this.imageLoader.get(chosenTileSet.imagePath);
-		this.tileRenderer.tileWidth = chosenTileSet.tileWidth;
-		this.tileRenderer.tileHeight = chosenTileSet.tileHeight;
+		this.tileRenderer.sourceTileWidth = chosenTileSet.tileWidth;
+		this.tileRenderer.sourceTileHeight = chosenTileSet.tileHeight;
 		this.tileRenderer.render(canvas, tileIndex - chosenTileSet.firstTileId);
 		canvas.restore();
 	}
