@@ -1,7 +1,8 @@
 import unit_testing.ai.*;
-import unit_testing.util.*;
-import unit_testing.tiles.*;
+import unit_testing.assets.*;
 import unit_testing.spatial.*;
+import unit_testing.tiles.*;
+import unit_testing.util.*;
 
 class Tests
 {
@@ -11,6 +12,9 @@ class Tests
 
 		// Artificial Intelligence
 		//tests.add(new PathingTests());
+
+		// Asset Loading
+		tests.add(new TmxAssetTests());
 
 		// Core
 

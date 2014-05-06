@@ -18,8 +18,6 @@ class TmxAsset extends XmlAsset
 
 	private override function _onLoad(event)
 	{
-		super._onLoad(event);
-
 		this.tmxData = new TmxXml(Xml.parse(this.data));
 		if (this.imageLoader != null)
 		{
@@ -32,5 +30,7 @@ class TmxAsset extends XmlAsset
 			this.imageLoader.addImages(images);
 			this.imageLoader.load();
 		}
+
+		super._onLoad(event);
 	}
 }
