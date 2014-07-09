@@ -43,15 +43,19 @@ class TileMap implements ITileMap
 	/**
 	 * Returns a map of tile indices to their corresponding tile positions.
 	 */
-	public function getAllTilePositions():Map<Int, Vector2>
+	public function getAllTilePositions():Map<Int, Array<Vector2>>
 	{
-		var positions:Map<Int, Vector2> = new Map();
+		var positions:Map<Int, Array<Vector2>> = new Map();
 		var i = 0;
 		for (y in 0...this.definition.height)
 		{
 			for (x in 0...this.definition.width)
 			{
-				positions.set(this.tileIndices[i++], new Vector2(x, y));
+				var index = this.tileIndices[i++];
+				if (positions.exists(index))
+					positions.get(index).push(new Vector2(x, y));
+				else
+					positions.set(index, [new Vector2(x, y)]);
 			}
 		}
 		return positions;

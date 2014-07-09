@@ -14,7 +14,7 @@ interface ITileMap
 	public function getTileIndex(x:Int, y:Int):Int;
 
 	/**
-	 * Intended to return all the tile indices mapped to their tile coordinates.
+	 * Intended to return all the tile indices mapped to all the tile positions where they are found.
 	 */
-	public function getAllTilePositions():Map<Int, Vector2>;
+	public function getAllTilePositions():Map<Int, Array<Vector2>>;
 }
