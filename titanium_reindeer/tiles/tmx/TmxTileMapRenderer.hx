@@ -9,7 +9,7 @@ import titanium_reindeer.assets.ImageLoader;
  * A class which will render and entire tmx map. This class renders the background colour first then
  * all the visible layers with their specified opacity.
  */
-class TmxTileMapRenderer extends Renderer<RenderState>
+class TmxTileMapRenderer
 {
 	/**
 	 * The drawn width of the renderer. Will clip tiles outside this width and draw the background
@@ -57,33 +57,46 @@ class TmxTileMapRenderer extends Renderer<RenderState>
 			null,
 			this.tmxTileRenderer
 		);
-
-		super(new RenderState());
 	}
 
 	/**
-	 * Render the tile at position x, y. This method is called when render for each portion of the
-	 * total space.
+	 * Render the background and all the layers of the tmx map
 	 */
-	private override function _render(canvas:Canvas2D):Void
+	public function renderAll(canvas:Canvas2D):Void
+	{
+		this.renderBackground(canvas);
+
+		for (layer in this.tmxData.layers)
+		{
+			this.renderLayer(layer, canvas);
+		}
+	}
+
+	/**
+	 * Render the background colour of the tmx map
+	 */
+	public function renderBackground(canvas:Canvas2D):Void
 	{
 		canvas.save();
 		canvas.fillColor(this.tmxData.backgroundColor);
 		canvas.renderRectf(this.width, this.height);
 		canvas.restore();
+	}
 
+	/**
+	 * Render the given layer of the tmx map
+	 */
+	public function renderLayer(layer:TmxLayer, canvas:Canvas2D):Void
+	{
 		canvas.save();
 		canvas.translate(this.offset);
-		for (layer in this.tmxData.layers)
+		if (layer.visible)
 		{
-			if (layer.visible)
-			{
-				canvas.save();
-				this.layerRenderer.state.alpha = layer.opacity;
-				this.layerRenderer.tileMap = layer;
-				this.layerRenderer.render(canvas);
-				canvas.restore();
-			}
+			canvas.save();
+			this.layerRenderer.state.alpha = layer.opacity;
+			this.layerRenderer.tileMap = layer;
+			this.layerRenderer.render(canvas);
+			canvas.restore();
 		}
 		canvas.restore();
 	}
