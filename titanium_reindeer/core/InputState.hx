@@ -89,21 +89,21 @@ class InputState
 		this.mousePos = new Vector2(0, 0);
 
 		var me = this;
-		this.targetElement.onmousedown = function(event) { me.recordEvent(InputEvent.MouseDown, event); };
-		this.targetElement.onmouseup = function(event) { me.recordEvent(InputEvent.MouseUp, event); };
-		this.targetElement.onmousemove = function(event) { me.recordEvent(InputEvent.MouseMove, event); };
+		this.targetElement.onmousedown = function(event) { return me.recordEvent(InputEvent.MouseDown, event); };
+		this.targetElement.onmouseup = function(event) { return me.recordEvent(InputEvent.MouseUp, event); };
+		this.targetElement.onmousemove = function(event) { return me.recordEvent(InputEvent.MouseMove, event); };
 
 		this.targetElement.oncontextmenu = this.contextMenu;
 
 		var firefoxReg:EReg = new EReg("Firefox", "i");
-		var wheelFunc = function(event) { me.recordEvent(InputEvent.MouseWheel, event); };
+		var wheelFunc = function(event) { return me.recordEvent(InputEvent.MouseWheel, event); };
 		if (firefoxReg.match(js.Browser.window.navigator.userAgent))
 			js.Browser.document.addEventListener("DOMMouseScroll", wheelFunc, true);
 		else
 			js.Browser.document.onmousewheel = wheelFunc;
 
-		js.Browser.document.onkeydown = function(event) { me.recordEvent(InputEvent.KeyDown, event); };
-		js.Browser.document.onkeyup = function(event) { me.recordEvent(InputEvent.KeyUp, event); };
+		js.Browser.document.onkeydown = function(event) { return me.recordEvent(InputEvent.KeyDown, event); };
+		js.Browser.document.onkeyup = function(event) { return me.recordEvent(InputEvent.KeyUp, event); };
 
 		this.targetDocumentOffset = new Vector2(0, 0);
 	}
@@ -126,7 +126,7 @@ class InputState
 	 * Used to queue up events to be called in the update method.
 	 * Kept around for when I might choose to keep a frame-by-frame history of input events.
 	 */
-	private function recordEvent(type:InputEvent, event:Dynamic):Void
+	private function recordEvent(type:InputEvent, event:Dynamic):Bool
 	{
 		var func:Dynamic -> Void;
 		switch (type)
@@ -153,6 +153,8 @@ class InputState
 				func = null;
 		}
 		func(event);
+
+		return false;
 	}
 
 	/**
