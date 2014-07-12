@@ -46,10 +46,10 @@ class TmxTileRenderer implements ITileRenderer
 			return;
 
 		canvas.save();
-		// TODO: Fix this bug if I forgot to when i wrote this
+		// These lines were causing tiles to be drawn badly hopefully sourceTileHeight is right
 		canvas.translatef(
 			0,
-			this.tmxData.tileHeight - chosenTileSet.tileHeight
+			this.tmxData.sourceTileHeight - chosenTileSet.tileHeight
 		);
 
 		this.tileRenderer.tileSheet = this.imageLoader.get(chosenTileSet.imagePath);
