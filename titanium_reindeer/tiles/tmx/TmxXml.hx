@@ -110,7 +110,7 @@ class TmxXml extends TmxData
 				// Defaults to xml
 				if (!data.exists('encoding'))
 				{
-					for (tile in layer.elementsNamed("tile"))
+					for (tile in data.elementsNamed("tile"))
 					{
 						layerData.tileIndices.push(Std.parseInt(tile.get('gid')));
 					}
