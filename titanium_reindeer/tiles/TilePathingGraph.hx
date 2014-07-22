@@ -17,6 +17,15 @@ class TilePathingGraph implements IPathNodeGraph<PathNode>
 	{
 		this.tileDefinition = tileDefinition;
 		this.tilesAsNodes = new Array();
+		this.resize();
+	}
+
+	private function resize():Void
+	{
+		for (r in 0...this.tileDefinition.height)
+		{
+			this.tilesAsNodes.push(new Array());
+		}
 	}
 
 	public function setTiles(asNode:Bool, x:Int, y:Int, ?width:Int = 1, ?height:Int = 1)
@@ -67,6 +76,14 @@ class TilePathingGraph implements IPathNodeGraph<PathNode>
 	public function tileCenterPoint(x:Int, y:Int):PathNode
 	{
 		return new PathNode(x * tileWidth() + tileWidth()/2, y * tileHeight() + tileHeight()/2);
+	}
+	
+	public function getClosestNode(point:Vector2):PathNode
+	{
+		return new PathNode(
+			Math.round((point.x - tileWidth()/2) / tileWidth()) * tileWidth() + tileWidth()/2,
+			Math.round((point.y - tileHeight()/2) / tileHeight()) * tileHeight() + tileHeight()/2
+		);
 	}
 
 	public function getTileCoordsFromPoint(p:Vector2):TileCoords
