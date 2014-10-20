@@ -30,6 +30,11 @@ class InputState
 	private var targetElement:Element;
 
 	/**
+	 * A flag which determines if all events captured should be prevented from propagating.
+	 */
+	public var isStoppingAllEvents:Bool;
+
+	/**
 	 * Milliseconds left before the DOM element offset should be recalculated.
 	 * This is used to make sure an expensive operation is not performed too often.
 	 */
@@ -79,6 +84,7 @@ class InputState
 	public function new(targetElement:Element)
 	{
 		this.targetElement = targetElement;
+		this.isStoppingAllEvents = false;
 		this.timeLeftToRecalculateOffsetMs = DEFAULT_OFFSET_RECALC_DELAY_MS;
 
 		this.mouseButtonsHeld = new Map();
@@ -154,7 +160,7 @@ class InputState
 		}
 		func(event);
 
-		return false;
+		return !this.isStoppingAllEvents;
 	}
 
 	/**

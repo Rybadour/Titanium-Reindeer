@@ -114,6 +114,16 @@ class Game
 		requestAnimFrame();
 	}
 
+	public function focusGame():Void
+	{
+		this.input.isStoppingAllEvents = true;
+	}
+
+	public function unfocusGame():Void
+	{
+		this.input.isStoppingAllEvents = false;
+	}
+
 	/**
 	 * Propagate resize based on the pixel size of the target element
 	 */
