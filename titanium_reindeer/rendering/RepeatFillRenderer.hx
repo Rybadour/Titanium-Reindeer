@@ -70,17 +70,17 @@ class RepeatFillRenderer extends Renderer<RenderState>
 		var left = this.offset.x;
 		if (xRepeat)
 		{
-			left = (this.offset.x % this.sourceWidth);
+			left %= this.sourceWidth;
 			if (this.offset.x > 0)
-				left = (this.offset.x % this.sourceWidth) - this.sourceWidth;
+				left -= this.sourceWidth;
 		}
 
 		var startTop = this.offset.y;
 		if (yRepeat)
 		{
-			startTop = (this.offset.y % this.sourceHeight);
+			startTop %= this.sourceHeight;
 			if (this.offset.y > 0)
-				startTop = (this.offset.y % this.sourceHeight) - this.sourceHeight;
+				startTop -= this.sourceHeight;
 		}
 
 		for (i in 0...xCount)
