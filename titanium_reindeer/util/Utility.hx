@@ -19,4 +19,9 @@ class Utility
 		}
 		return r;
 	}
+
+	public static function randomBool():Bool
+	{
+		return Std.random(2) == 1;
+	}
 }
