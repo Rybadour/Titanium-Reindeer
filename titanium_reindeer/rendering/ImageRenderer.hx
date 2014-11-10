@@ -1,37 +1,22 @@
 package titanium_reindeer.rendering;
 
-import titanium_reindeer.core.IHasIdProvider;
-import titanium_reindeer.core.IRegion;
-import titanium_reindeer.core.RectRegion;
+import js.html.Image;
 
-class ImageRenderer extends Renderer
+class ImageRenderer extends Renderer<RenderState>
 {
-	public var image(default, setImage):ImageSource;
-	private function setImage(value:ImageSource):ImageSource
-	{
-		if (value != this.image)
-		{
-			this.image = value;
-			if (this.image.isLoaded)
-				this.imageLoaded();
-		}
+	public var image:Image;
 
-		return this.image;
-	}
-
-	public function new(image:ImageSource)
+	public function new(image:Image)
 	{
 		super(new RenderState());
 
 		this.image = image;
-		if (!this.image.isLoaded)
-			this.image.registerLoadEvent(imageLoaded);
 	}
 
-	public function _render(canvas:Canvas2D):Void
+	public override function _render(canvas:Canvas2D):Void
 	{
 		canvas.ctx.drawImage(
-			this.image.image,
+			this.image,
 			0, 0,
 			this.image.width, this.image.height
 		);
