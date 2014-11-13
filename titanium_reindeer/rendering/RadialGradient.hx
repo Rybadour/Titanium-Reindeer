@@ -1,4 +1,4 @@
-package titanium_reindeer;
+package titanium_reindeer.rendering;
 
 class RadialGradient extends LinearGradient
 {
