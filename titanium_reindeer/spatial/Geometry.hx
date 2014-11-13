@@ -14,6 +14,22 @@ class Geometry
 		return a.radius + b.radius > Vector2.getDistance(a.center, b.center);
 	}
 
+	public static function getCircleCircleIntersectionPoints(a:CircleRegion, b:CircleRegion):Array<Vector2>
+	{
+		var dist = Vector2.getDistance(a.center, b.center);
+		var ra = a.radius;
+		var rb = b.radius;
+		var area:Float = Math.sqrt((dist + ra + rb) * (dist + ra - rb) * (dist - ra - rb) * (-dist + ra + rb)) / 4;
+		if (area > 0)
+		{
+			// Should be two solutions
+		}
+		else
+		{
+			return null;
+		}
+	}
+
 	public static function isCircleIntersectingRect(c:CircleRegion, r:RectRegion):Bool
 	{
 		var rWidthHalf:Float = r.width/2;
