@@ -14,6 +14,12 @@ class Geometry
 		return a.radius + b.radius > Vector2.getDistance(a.center, b.center);
 	}
 
+	public static function isCircleInsideCircle(a:CircleRegion, b:CircleRegion):Bool
+	{
+		var dist = Vector2.getDistance(a.center, b.center);	
+		return (dist + a.radius <= b.radius);
+	}
+
 	public static function isCircleIntersectingRect(c:CircleRegion, r:RectRegion):Bool
 	{
 		var rWidthHalf:Float = r.width/2;

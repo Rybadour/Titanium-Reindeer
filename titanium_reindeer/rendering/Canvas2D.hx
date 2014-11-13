@@ -156,9 +156,9 @@ class Canvas2D implements IRenderer
 	public function clear(rect:RectRegion = null):Void
 	{
 		if (rect == null)
-			rect = new RectRegion(this.width, this.height, new Vector2(this.width/2, this.height/2));
-
-		this.ctx.clearRect(rect.left, rect.top, rect.width, rect.height);
+			this.ctx.clearRect(0, 0, this.width, this.height);
+		else
+			this.ctx.clearRect(rect.left, rect.top, rect.width, rect.height);
 	}
 
 	public function render(canvas:Canvas2D)
