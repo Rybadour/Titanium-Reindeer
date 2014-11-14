@@ -8,5 +8,5 @@ interface ITileRenderer
 	/**
 	 * Intended to render a tile indetified by a tile index.
 	 */
-	public function render(canvas:Canvas2D, tileId:Int):Void;
+	public function render(canvas:Canvas2D, tileIndex:Int):Void;
 }
