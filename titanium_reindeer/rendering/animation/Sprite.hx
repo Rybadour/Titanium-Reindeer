@@ -9,6 +9,7 @@ class Sprite extends Renderer<RenderState>
 	public var currentAnimationName:String;
 	public var currentAnimation:Animation;
 	public var currentFrame:Int;
+	public var playing:Bool;
 	public var looping:Bool;
 	public var elapsedMs:Int;
 	public var durationMs:Int;
@@ -18,6 +19,7 @@ class Sprite extends Renderer<RenderState>
 		this.animations = animations;
 		this.width = width;
 		this.height = height;
+		this.playing = false;
 
 		super(new RenderState());
 	}
@@ -30,21 +32,26 @@ class Sprite extends Renderer<RenderState>
 			this.durationMs = durationMs;
 			this.elapsedMs = 0;
 	
+			this.playing = true;
 			this.currentAnimationName = name;
 			this.currentAnimation = this.animations.get(name);
 			this.currentFrame = 0;
 		}
 	}
 
-	public function stopAnimation(?tryFallback:Bool = false)
+	public function stopAnimation(?keepLastFrame:Bool = true)
 	{
-		this.currentAnimation = null;
-		this.currentAnimationName = '';
+		this.playing = false;
+		if (keepLastFrame)
+		{
+			// Keep the last frame of the animation so it can still be rendered
+			this.currentFrame = this.currentAnimation.getNumFrames() - 1;
+		}
 	}
 
 	public function update(msTimeStep:Int):Void
 	{
-		if (this.currentAnimation != null)
+		if (this.playing)
 		{
 			if (this.elapsedMs > this.getFrameTime(this.currentFrame + 1))
 			{
@@ -58,7 +65,7 @@ class Sprite extends Renderer<RenderState>
 					}
 					else
 					{
-						this.stopAnimation();
+						this.stopAnimation(true);
 						// Intended to skip the elapsed += timeStep line
 						return;
 					}
@@ -66,6 +73,13 @@ class Sprite extends Renderer<RenderState>
 			}
 			this.elapsedMs += msTimeStep;
 		}
+	}
+
+	public function clearAnimation():Void
+	{
+		this.stopAnimation(false);
+		this.currentAnimation = null;
+		this.currentAnimationName = '';
 	}
 
 	public function getFrameTime(frame:Int):Int
