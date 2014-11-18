@@ -114,4 +114,32 @@ class Geometry
 
 		return closestComparison;
 	}
+
+	/**
+	 * Get the average center point of a list of points.
+	 */
+	public static function getCentroid(points:Array<Vector2>):Vector2
+	{
+		if (points.length == 0)
+			return null;
+
+		var totalX:Float = 0;
+		var totalY:Float = 0;
+		for (p in points)
+		{
+			totalX += p.x;
+			totalY += p.y;
+		}
+		return new Vector2(totalX / points.length, totalY / points.length);
+	}
+
+	public static function getRectRegionFromCorners(a:Vector2, b:Vector2):RectRegion
+	{
+		var topLeft = new Vector2(Math.min(a.x, b.x), Math.min(a.y, b.y));
+		return new RectRegion(
+			Math.abs(a.x - b.x),
+			Math.abs(a.y - b.y),
+			topLeft
+		);
+	}
 }
