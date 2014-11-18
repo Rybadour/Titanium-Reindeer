@@ -32,7 +32,7 @@ class RectRegion extends Rect implements IRegion
 		);
 	}
 
-	public var position(default, null):Vector2;
+	public var position:Vector2;
 
 	public var top(get, never):Float;
 	private inline function get_top():Float { return this.position.y; }
