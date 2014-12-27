@@ -1,16 +1,20 @@
 package titanium_reindeer.ai.pathing;
 
+import titanium_reindeer.spatial.Vector2;
+
 class RoutingAlgorithms
 {
-	public static function aStar<N:PathNode>(start:N, end:N, graph:IPathNodeGraph<N>, ?heuristic:Float -> Float -> Float):Array<N>
+	public static function aStar<N:PathNode>(start:N, end:N, graph:IPathNodeGraph<N>, ?heuristic:Vector2 -> Vector2 -> Float):Array<N>
 	{
-		// TODO: Parameter or class member or something sometime
-		var weight = 1;
-
 		var openList:Array<WeightedNode<N>> = new Array();
 		if (heuristic == null)
 		{
-			heuristic = function (dx, dy) { return dx + dy; };
+			// Default to manhanttan heuristic
+			heuristic = function (a, b) {
+				var dx = Math.abs(b.x - a.x);
+				var dy = Math.abs(b.y - a.y);
+				return dx + dy;
+			};
 		}
 
 		var SQRT2:Float = Math.sqrt(2);
@@ -23,10 +27,16 @@ class RoutingAlgorithms
 			return nodeMap.get(key);
 		};
 
+		var applyHeuristic:WeightedNode<N> -> Void = function (node) {
+			if (node.h == null)
+				node.h = heuristic(node.node, end);
+		};
+
 		// push the start node into the open list
 		var startNode:WeightedNode<N> = getWeighted(start);
 		openList.push(startNode);
 		startNode.open();
+		applyHeuristic(startNode);
 
 		// while the open list is not empty
 		while (openList.length > 0)
@@ -58,19 +68,14 @@ class RoutingAlgorithms
 				if (neighbor.closed)
 					continue;
 
-				var x = neighbor.node.x;
-				var y = neighbor.node.y;
-
-				// get the distance between current node and the neighbor
-				// and calculate the next g score
-				var ng = wNode.g + ((x - wNode.node.x == 0 || y - wNode.node.y == 0) ? 1 : SQRT2);
+				// Find the cost of the neighbor node from the start
+				var ng = wNode.g + pNode.weight;
 
 				// check if the neighbor has not been inspected yet, or
 				// can be reached with smaller cost from the current node
 				if (!neighbor.opened || ng < neighbor.g) {
 					neighbor.g = ng;
-					if (neighbor.h == null)
-						neighbor.h = weight * heuristic(Math.abs(x - end.x), Math.abs(y - end.y));
+					applyHeuristic(neighbor);
 					neighbor.f = neighbor.g + neighbor.h;
 					neighbor.parent = wNode;
 
