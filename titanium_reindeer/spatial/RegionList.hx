@@ -31,6 +31,11 @@ class RegionList<T:IUnique<Int>> implements IRegionGroup<T>
 		return array;
 	}
 
+	public function getThing(key:Int):T
+	{
+		return (this.mapping.exists(key) ? this.mapping.get(key).thing : null);
+	}
+
 	public function getIntersectingRect(rect:RectRegion):Array<T>
 	{
 		var intersecting = new Array();

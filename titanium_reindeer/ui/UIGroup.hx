@@ -1,11 +1,10 @@
 package titanium_reindeer.ui;
 
 import titanium_reindeer.rendering.Canvas2D;
-import titanium_reindeer.util.Tuple;
 
 class UIGroup extends UIElement
 {
-	public var children(default, null):Array< Tuple<UIElement, UIAlignment> >;
+	public var children(default, null):Array<{element:UIElement, alignment:UIAlignment}>;
 
 	public function new()
 	{
@@ -16,7 +15,7 @@ class UIGroup extends UIElement
 
 	public function addChild(e:UIElement, a:UIAlignment)
 	{
-		this.children.push(new Tuple(e, a));
+		this.children.push({element: e, alignment: a});
 	}
 
 	private override function _render(canvas:Canvas2D):Void
@@ -24,8 +23,8 @@ class UIGroup extends UIElement
 		for (child in children)
 		{
 			canvas.save();
-			this.applyChildAlign(child.second, canvas);
-			this.renderChild(child.first, canvas);
+			this.applyChildAlign(child.alignment, canvas);
+			this.renderChild(child.element, canvas);
 			canvas.restore();
 		}
 	}
