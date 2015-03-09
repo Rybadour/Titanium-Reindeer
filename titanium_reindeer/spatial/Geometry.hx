@@ -72,6 +72,12 @@ class Geometry
 		return b.add( a.subtract(b).getExtend(0.5) );
 	}
 
+	/**
+	 * Returns true if the given target angle is inside of a pair of angles made by start + bounds
+	 * and start - bounds, inclusive. All angles are in radians.
+	 * Care was taken to ensure that angles around Math.PI * 2 are checked accruately. Basically,
+	 * the angles are normalized to 0 relative to start.
+	 */
 	public static function isAngleWithin(start:Float, target:Float, bounds:Float):Bool
 	{
 		if (bounds >= Math.PI)
