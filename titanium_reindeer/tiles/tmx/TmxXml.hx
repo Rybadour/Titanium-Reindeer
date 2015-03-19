@@ -134,6 +134,8 @@ class TmxXml extends TmxData
 
 			this.layers.push(layerData);
 		}
+
+		super();
 	}
 
 	/**

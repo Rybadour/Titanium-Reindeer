@@ -42,11 +42,12 @@ class RoutingAlgorithms
 		while (openList.length > 0)
 		{
 			// pop the position of node which has the minimum `f` value.
-			var wNode = openList.pop();
+			var wNode = openList.shift();
 			wNode.close();
 
 			// if reached the end position, construct the path and return it
-			if (wNode.node == end)
+			// Use the getWeighted() mapping to do an accurate equals check
+			if (wNode == getWeighted(end))
 			{
 				var path:Array<N> = new Array();
 				var n = wNode;

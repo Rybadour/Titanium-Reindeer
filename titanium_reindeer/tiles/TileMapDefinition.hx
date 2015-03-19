@@ -28,4 +28,8 @@ class TileMapDefinition
 	 * larger or smaller but will be anchored to the bottom left.
 	 */
 	public var tileHeight:Int;
+
+	public function new()
+	{
+	}
 }

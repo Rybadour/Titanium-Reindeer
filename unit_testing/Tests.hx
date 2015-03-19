@@ -10,7 +10,7 @@ class Tests
 		var tests = new haxe.unit.TestRunner();
 
 		// Artificial Intelligence
-		//tests.add(new PathingTests());
+		tests.add(new PathingTests());
 
 		// Core
 

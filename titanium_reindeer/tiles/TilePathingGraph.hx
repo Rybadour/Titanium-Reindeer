@@ -17,9 +17,12 @@ class TilePathingGraph implements IPathNodeGraph<PathNode>
 	{
 		for (r in y...y+height)
 		{
+			if (this.tilesAsNodes[r] == null)
+				this.tilesAsNodes[r] = new Array();
+
 			for (c in x...x+width)
 			{
-				this.tilesAsNodes[y][x] = asNode;
+				this.tilesAsNodes[r][c] = asNode;
 			}
 		}
 	}
@@ -36,8 +39,9 @@ class TilePathingGraph implements IPathNodeGraph<PathNode>
 
 	public function getAdjacentNodes(pathNode:PathNode):Array<PathNode>
 	{
-		var x:Int = Math.round((pathNode.x - tileWidth()/2) % tileWidth());
-		var y:Int = Math.round((pathNode.y - tileHeight()/2) % tileHeight());
+		var x:Int = Math.round( (pathNode.x - this.tileWidth()/2) / this.tileWidth() );
+		var y:Int = Math.round( (pathNode.y - this.tileHeight()/2) / this.tileHeight() );
+		Sys.print("("+x+", "+y+"), ");
 		
 		var adjacent:Array<PathNode> = new Array();
 		if (this.isWalkable(x, y))
@@ -45,11 +49,11 @@ class TilePathingGraph implements IPathNodeGraph<PathNode>
 			if (this.isWalkable(x-1, y))
 				adjacent.push(this.tileCenterPoint(x-1, y));
 			if (this.isWalkable(x, y-1))
-				adjacent.push(this.tileCenterPoint(x-1, y));
+				adjacent.push(this.tileCenterPoint(x, y-1));
 			if (this.isWalkable(x+1, y))
-				adjacent.push(this.tileCenterPoint(x-1, y));
+				adjacent.push(this.tileCenterPoint(x+1, y));
 			if (this.isWalkable(x, y+1))
-				adjacent.push(this.tileCenterPoint(x-1, y));
+				adjacent.push(this.tileCenterPoint(x, y+1));
 		}
 		return adjacent;
 	}
