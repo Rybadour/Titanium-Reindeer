@@ -41,7 +41,6 @@ class TilePathingGraph implements IPathNodeGraph<PathNode>
 	{
 		var x:Int = Math.round( (pathNode.x - this.tileWidth()/2) / this.tileWidth() );
 		var y:Int = Math.round( (pathNode.y - this.tileHeight()/2) / this.tileHeight() );
-		Sys.print("("+x+", "+y+"), ");
 		
 		var adjacent:Array<PathNode> = new Array();
 		if (this.isWalkable(x, y))

@@ -96,6 +96,20 @@ class Canvas2D implements IRenderer
 		this.ctx.lineTo(vector.x, vector.y);
 	}
 
+	public inline function renderLinef(ax:Float, ay:Float, bx:Float, by:Float)
+	{
+		this.ctx.beginPath();
+		this.ctx.moveTo(ax, ay);
+		this.ctx.lineTo(bx, by);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+	public inline function renderLine(a:Vector2, b:Vector2)
+	{
+		this.renderLinef(a.x, a.y, b.x, b.y);
+	}
+
 	public inline function renderImage(image:Image)
 	{
 		this.ctx.drawImage(image, 0, 0);
