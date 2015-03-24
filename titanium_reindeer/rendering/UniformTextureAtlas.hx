@@ -3,7 +3,8 @@ package titanium_reindeer.rendering;
 import js.html.Image;
 
 /**
- * TODO: EXPLAIN
+ * UniformTextureAtlas is a class that encompasses a composite image of smaller images laid out in a
+ * uniform grid. The atlas allows easy rendering of portions of the composite.
  */
 class UniformTextureAtlas implements ITextureAtlas
 {
