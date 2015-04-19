@@ -18,12 +18,38 @@ class TileBasedContainer<T>
 		return null;
 	}
 
-	public function set(x:Int, y:Int, thing:T):Void
+	public function iterateTileRegion(cb:T -> Void, x:Int, y:Int, ?width:Int = 1, ?height:Int = 1)
 	{
-		if ( !this.things.exists(x) )
-			this.things.set(x, new Map());
+		for (i in x...x+width)
+		{
+			if (this.things.exists(i))
+			{
+				for (j in y...y+height)
+				{
+					cb(this.things.get(i).get(j));
+				}
+			}
+			else
+			{
+				cb(null);
+			}
+		}
+	}
 
-		this.things.get(x).set(y, thing);
+	public function set(thing:T, x:Int, y:Int, ?width:Int = 1, ?height:Int = 1):Void
+	{
+		width = Math.floor(Math.abs(width));
+		height = Math.floor(Math.abs(height));
+		for (i in x...x+width)
+		{
+			if ( !this.things.exists(i) )
+				this.things.set(i, new Map());
+
+			for (j in y...y+height)
+			{
+				this.things.get(i).set(j, thing);
+			}
+		}
 	}
 
 	public function remove(x:Int, y:Int):T
@@ -37,8 +63,25 @@ class TileBasedContainer<T>
 		return thing;
 	}
 
-	public function exists(x:Int, y:Int)
+	public function exists(x:Int, y:Int):Bool
 	{
 		return this.things.exists(x) && this.things.get(x).exists(y);
+	}
+
+	public function anyExists(x:Int, y:Int, width:Int, height:Int):Bool
+	{
+		for (i in x...x+width)
+		{
+			if ( !this.things.exists(i) )
+				continue;
+
+			for (j in y...y+height)
+			{
+				if (this.things.get(i).exists(j))
+					return true;
+			}
+		}
+
+		return false;
 	}
 }
