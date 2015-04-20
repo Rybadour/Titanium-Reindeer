@@ -8,19 +8,20 @@ import js.html.Image;
  */
 class UniformTextureAtlas implements ITextureAtlas
 {
-	/**
-	 * An image to render tiles from.
-	 */
-	public var image:Image;
-
+	public var imagesCanvas:Canvas2D;
 	public var sourceTileWidth:Int;
 	public var sourceTileHeight:Int;
 
-	public function new(image:Image, sourceTileWidth:Int, sourceTileHeight:Int)
+	public function new(sourceTileWidth:Int, sourceTileHeight:Int, canvasWidth:Int, canvasHeight:Int)
 	{
-		this.image = image;
 		this.sourceTileWidth = sourceTileWidth;
 		this.sourceTileHeight = sourceTileHeight;
+		this.createCanvas(canvasWidth, canvasHeight);
+	}
+
+	public function createCanvas(width:Int, height:Int)
+	{
+		this.imagesCanvas = new Canvas2D("tileImages", width, height);
 	}
 
 	/**
@@ -28,12 +29,12 @@ class UniformTextureAtlas implements ITextureAtlas
 	 */
 	public function renderTexture(canvas:Canvas2D, index:Int, destinationWidth:Int, destinationHeight:Int):Void
 	{
-		var widthInTiles = Math.floor(this.image.width / this.sourceTileWidth);
+		var widthInTiles = Math.floor(this.imagesCanvas.width / this.sourceTileWidth);
 		// Render the part of the tile sheet that tile Id corresponds to
 		var sx = (index % widthInTiles) * this.sourceTileWidth;
 		var sy = Math.floor(index / widthInTiles) * this.sourceTileHeight;
 		canvas.ctx.drawImage(
-			this.image,
+			this.imagesCanvas.canvas,
 			sx, sy,
 			this.sourceTileWidth, this.sourceTileHeight,
 			0, 0, 
