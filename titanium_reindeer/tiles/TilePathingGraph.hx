@@ -1,6 +1,12 @@
 package titanium_reindeer.tiles;
 
+import titanium_reindeer.spatial.Vector2;
 import titanium_reindeer.ai.pathing.*;
+
+typedef TileCoords = {
+	x:Int,
+	y:Int
+};
 
 class TilePathingGraph implements IPathNodeGraph<PathNode>
 {
@@ -39,8 +45,9 @@ class TilePathingGraph implements IPathNodeGraph<PathNode>
 
 	public function getAdjacentNodes(pathNode:PathNode):Array<PathNode>
 	{
-		var x:Int = Math.round( (pathNode.x - this.tileWidth()/2) / this.tileWidth() );
-		var y:Int = Math.round( (pathNode.y - this.tileHeight()/2) / this.tileHeight() );
+		var c = this.getTileCoordsFromPoint(pathNode);
+		var x = c.x;
+		var y = c.y;
 		
 		var adjacent:Array<PathNode> = new Array();
 		if (this.isWalkable(x, y))
@@ -60,6 +67,13 @@ class TilePathingGraph implements IPathNodeGraph<PathNode>
 	public function tileCenterPoint(x:Int, y:Int):PathNode
 	{
 		return new PathNode(x * tileWidth() + tileWidth()/2, y * tileHeight() + tileHeight()/2);
+	}
+
+	public function getTileCoordsFromPoint(p:Vector2):TileCoords
+	{
+		var x:Int = Math.round( (p.x - this.tileWidth()/2) / this.tileWidth() );
+		var y:Int = Math.round( (p.y - this.tileHeight()/2) / this.tileHeight() );
+		return {x: x, y: y};
 	}
 
 	private inline function tileWidth():Int
