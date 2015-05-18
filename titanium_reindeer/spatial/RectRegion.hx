@@ -7,27 +7,27 @@ class RectRegion extends Rect implements IRegion
 		return new RectRegion(rr.width, rr.height, rr.position.getCopy());
 	}
 
-	public static function expandToCover(coverage:RectRegion, toFit:RectRegion):RectRegion
+	public static function expandToCover(a:RectRegion, b:RectRegion):RectRegion
 	{
-		if (coverage == null)
+		if (a == null)
 		{
-			if (toFit == null)
+			if (b == null)
 				return null;
 			else
-				return RectRegion.copy(toFit);
+				return RectRegion.copy(b);
 		}
 		else
 		{
-			if (toFit == null)
-				return RectRegion.copy(coverage);
+			if (b == null)
+				return RectRegion.copy(a);
 		}
 		
 		// Actual stretch checking
-		var left = Math.min(coverage.left, toFit.left);
-		var top = Math.min(coverage.top, toFit.top);
+		var left = Math.min(a.left, b.left);
+		var top = Math.min(a.top, b.top);
 		return new RectRegion(
-			Math.max(coverage.right, toFit.right) - left,  // Width
-			Math.max(coverage.bottom, toFit.bottom) - top, // Height
+			Math.max(a.right, b.right) - left,  // Width
+			Math.max(a.bottom, b.bottom) - top, // Height
 			new Vector2(left, top)
 		);
 	}
