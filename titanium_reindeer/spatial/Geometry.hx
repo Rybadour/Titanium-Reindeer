@@ -169,4 +169,83 @@ class Geometry
 
 		return circle.center.add(side);
 	}
+
+	/**
+	 * Takes an array of rectangles and returns an array of rectangles containing a smaller or equal
+	 * set of rectangles. It will take any overlapping or touching retangles and merge them together
+	 * and recurses until no merging happens.
+	 */
+	public static function simplifyClusterOfRectRegions(rects:Array<RectRegion>):Array<RectRegion>
+	{
+		var mergedAny = false;
+		var mergedRects:Array<RectRegion> = null;
+		var nextMergedRects = rects.copy();
+
+		do
+		{
+			mergedAny = false;
+			mergedRects = nextMergedRects;
+			nextMergedRects = new Array();
+			var mergedRectIndices:Map<Int, Bool> = new Map();
+			var i = 0;
+			for (rect in mergedRects)
+			{
+				if ( ! mergedRectIndices.exists(i))
+				{
+					var newRect = RectRegion.copy(rect);
+					for (j in (i+1)...mergedRects.length)
+					{
+						var otherRect = mergedRects[j];
+						// Above or below?
+						if (newRect.left == otherRect.left && newRect.right == otherRect.right)
+						{
+							if (newRect.top - 1 <= otherRect.bottom && newRect.bottom + 1 >= otherRect.top)
+							{
+								newRect = RectRegion.expandToCover(newRect, otherRect);
+								mergedRectIndices.set(j, true);	
+								mergedAny = true;
+							}
+						}
+						// Side by side?
+						else if (newRect.top == otherRect.top && newRect.bottom == otherRect.bottom)
+						{
+							if (newRect.left - 1 <= otherRect.right && newRect.right + 1 >= otherRect.left)
+							{
+								newRect = RectRegion.expandToCover(newRect, otherRect);
+								mergedRectIndices.set(j, true);	
+								mergedAny = true;
+							}
+						}
+						
+						// Maybe one is inside the other
+						// If newRect is bigger we just "drop" otherRect, otherwise we keep
+						// otherRect and "drop" newRect
+						if (newRect.getArea() > otherRect.getArea())
+						{
+							if (newRect.fullyCoversRectRegion(otherRect))
+							{
+								mergedRectIndices.set(j, true);	
+								mergedAny = true;
+							}
+						}
+						else
+						{
+							if (otherRect.fullyCoversRectRegion(newRect))
+							{
+								newRect = otherRect;
+								mergedRectIndices.set(i, true);	
+								mergedAny = true;
+							}
+						}
+					}
+					nextMergedRects.push(newRect);
+				}
+
+				++i;
+			}
+		}
+		while(mergedAny);
+
+		return nextMergedRects;
+	}
 }

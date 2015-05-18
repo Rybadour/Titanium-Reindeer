@@ -82,6 +82,14 @@ class RectRegion extends Rect implements IRegion
 		return region;
 	}
 
+	public function fullyCoversRectRegion(rect:RectRegion):Bool
+	{
+		return (this.left <= rect.left &&
+				this.right >= rect.right &&
+				this.top <= rect.top &&
+				this.bottom >= rect.bottom);
+	}
+
 	public function intersectsRectRegion(rect:RectRegion):Bool
 	{
 		return Geometry.isRectIntersectingRect(this, rect);
