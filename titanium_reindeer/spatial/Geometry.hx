@@ -148,4 +148,25 @@ class Geometry
 			topLeft
 		);
 	}
+
+	public static function moveCircleToEdgeOfRectangle(circle:CircleRegion, rect:RectRegion):Vector2
+	{
+		var side = new Vector2(0, 0);
+
+		if (rect.top >= circle.center.y)
+			side.y = (circle.center.y - rect.top);
+		else if (rect.bottom <= circle.center.y)
+			side.y = (circle.center.y - rect.bottom);
+
+		if (rect.left >= circle.center.x)
+			side.x = (circle.center.x - rect.left);
+		else if (rect.right <= circle.center.x)
+			side.x = (circle.center.x - rect.right);
+
+		// Circle needs to be radius - distance more away from the rect in which ever direction
+		var distance = side.getMagnitude();
+		side.setMagnitude(circle.radius - distance);
+
+		return circle.center.add(side);
+	}
 }

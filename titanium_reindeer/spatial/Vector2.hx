@@ -52,6 +52,14 @@ class Vector2
 	{
 		return Math.sqrt(this.x*this.x + this.y*this.y);
 	}
+
+	public inline function setMagnitude(newMag:Float):Void
+	{
+		var angle = this.getRadians();
+		this.x = newMag;
+		this.y = 0;
+		this.rotate(angle);
+	}
 	
 	public function getExtend(n:Float)
 	{
@@ -62,7 +70,7 @@ class Vector2
 		this.x *= n;
 		this.y *= n;
 	}
-	
+
 	public function getNormalized()
 	{
 		var mag = this.getMagnitude();
