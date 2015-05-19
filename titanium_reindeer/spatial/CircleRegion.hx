@@ -27,7 +27,7 @@ class CircleRegion extends Circle implements IRegion
 
 	public function getBoundingRectRegion():RectRegion
 	{
-		return new RectRegion(this.radius*2, this.radius*2, this.center);
+		return new RectRegion(this.radius*2, this.radius*2, this.center.subtract(new Vector2(this.radius, this.radius)));
 	}
 
 	public function intersectsRectRegion(rect:RectRegion):Bool
