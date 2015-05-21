@@ -248,4 +248,41 @@ class Geometry
 
 		return nextMergedRects;
 	}
+
+	public static function getClosestPointOnLine(a:Vector2, b:Vector2, p:Vector2)
+	{
+		// TODO: Look up this math again, it's returning negatives
+		var aToP = p.subtract(a);
+		var aToB = b.subtract(a);
+
+		var abSquared = aToB.getMagnitudeSquared();
+		var abProduct = Vector2.getDotProduct(aToP, aToB);
+		var aToClosestDist = abProduct / abSquared;
+
+		aToB.extend(aToClosestDist);
+		return a.add(aToB);
+	}
+
+	public static function getClosestPointOnLineSegment(a:Vector2, b:Vector2, p:Vector2)
+	{
+		var aToP = p.subtract(a);
+		var aToB = b.subtract(a);
+
+		var abSquared = aToB.getMagnitudeSquared();
+		var abProduct = Vector2.getDotProduct(aToP, aToB);
+		var aToClosestDist = abProduct / abSquared;
+
+		if (aToClosestDist < 0)
+		{
+			return a.getCopy();
+		}
+		else if (aToClosestDist > 1)
+		{
+			return b.getCopy();
+		}
+		else
+		{
+			return a.add(aToB).getExtend(aToClosestDist);
+		}
+	}
 }

@@ -33,6 +33,11 @@ class Vector2
 		return diff;
 	}
 
+	public static function getDotProduct(a:Vector2, b:Vector2):Float
+	{
+		return (a.x*b.x + a.y*b.y);
+	}
+
 
 	public var x:Float;
 	public var y:Float;
@@ -48,9 +53,14 @@ class Vector2
 		return new Vector2(this.x, this.y);
 	}
 	
-	public function getMagnitude()
+	public inline function getMagnitude()
 	{
-		return Math.sqrt(this.x*this.x + this.y*this.y);
+		return Math.sqrt(this.getMagnitudeSquared());
+	}
+
+	public inline function getMagnitudeSquared()
+	{
+		return this.x*this.x + this.y*this.y;
 	}
 
 	public inline function setMagnitude(newMag:Float):Void
