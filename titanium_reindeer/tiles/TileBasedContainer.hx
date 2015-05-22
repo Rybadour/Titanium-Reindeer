@@ -52,15 +52,18 @@ class TileBasedContainer<T>
 		}
 	}
 
-	public function remove(x:Int, y:Int):T
+	public function remove(x:Int, y:Int, ?width:Int = 1, ?height:Int = 1):Void
 	{
-		var thing:T = null;
-		if (this.things.exists(x))
+		for (i in x...x+width)
 		{
-			thing = this.things.get(x).get(y);
-			this.things.get(x).remove(y);
+			if (this.things.exists(i))
+			{
+				for (j in y...y+height)
+				{
+					this.things.get(i).remove(j);
+				}
+			}
 		}
-		return thing;
 	}
 
 	public function exists(x:Int, y:Int):Bool
