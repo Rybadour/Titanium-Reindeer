@@ -115,6 +115,15 @@ class Canvas2D implements IRenderer
 		this.ctx.drawImage(image, 0, 0);
 	}
 
+	public inline function renderImageCentered(image:Image, x:Int, y:Int, width:Int, height:Int, rotation:Float)
+	{
+		this.save();
+		this.ctx.translate(width/2, height/2);
+		this.ctx.rotate(rotation);
+		this.ctx.drawImage(image, x - width/2, y - height/2, width, height);
+		this.restore();
+	}
+
 	public inline function renderCanvas(canvas:Canvas2D)
 	{
 		untyped { this.ctx.drawImage(canvas.canvas, 0, 0); }
