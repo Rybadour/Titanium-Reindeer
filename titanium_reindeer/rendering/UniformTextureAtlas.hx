@@ -9,14 +9,15 @@ import js.html.Image;
 class UniformTextureAtlas implements ITextureAtlas
 {
 	public var imagesCanvas:Canvas2D;
+  public var image:Image;
+
 	public var sourceTileWidth:Int;
 	public var sourceTileHeight:Int;
 
-	public function new(sourceTileWidth:Int, sourceTileHeight:Int, canvasWidth:Int, canvasHeight:Int)
+	public function new(sourceTileWidth:Int, sourceTileHeight:Int)
 	{
 		this.sourceTileWidth = sourceTileWidth;
 		this.sourceTileHeight = sourceTileHeight;
-		this.createCanvas(canvasWidth, canvasHeight);
 	}
 
 	public function createCanvas(width:Int, height:Int)
@@ -29,16 +30,22 @@ class UniformTextureAtlas implements ITextureAtlas
 	 */
 	public function renderTexture(canvas:Canvas2D, index:Int, destinationWidth:Int, destinationHeight:Int):Void
 	{
-		var widthInTiles = Math.floor(this.imagesCanvas.width / this.sourceTileWidth);
+    if (this.image == null && this.imagesCanvas == null)
+      return;
+
+    var imageWidth = (this.image == null ? this.imagesCanvas.width : this.image.width);
+
+		var widthInTiles = Math.floor(imageWidth / this.sourceTileWidth);
 		// Render the part of the tile sheet that tile Id corresponds to
 		var sx = (index % widthInTiles) * this.sourceTileWidth;
 		var sy = Math.floor(index / widthInTiles) * this.sourceTileHeight;
-		canvas.ctx.drawImage(
-			this.imagesCanvas.canvas,
-			sx, sy,
-			this.sourceTileWidth, this.sourceTileHeight,
-			0, 0, 
-			destinationWidth, destinationHeight
-		);
+    
+    canvas.ctx.drawImage(
+      untyped __js__('(this.imagesCanvas == null ? this.image : this.imagesCanvas.canvas)'),
+      sx, sy,
+      this.sourceTileWidth, this.sourceTileHeight,
+      0, 0, 
+      destinationWidth, destinationHeight
+    );
 	}
 }

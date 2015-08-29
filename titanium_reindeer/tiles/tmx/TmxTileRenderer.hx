@@ -52,7 +52,7 @@ class TmxTileRenderer implements ITileRenderer
 			this.tmxData.sourceTileHeight - chosenTileSet.tileHeight
 		);
 
-		this.tileRenderer.tileSheet = this.imageLoader.get(chosenTileSet.imagePath);
+		this.tileRenderer.image = this.imageLoader.get(chosenTileSet.imagePath);
 		this.tileRenderer.sourceTileWidth = chosenTileSet.tileWidth;
 		this.tileRenderer.sourceTileHeight = chosenTileSet.tileHeight;
 		this.tileRenderer.render(canvas, tileIndex - chosenTileSet.firstTileId);

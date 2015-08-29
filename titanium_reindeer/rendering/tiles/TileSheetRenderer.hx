@@ -19,7 +19,8 @@ class TileSheetRenderer extends UniformTextureAtlas implements ITileRenderer
 	{
 		this.definition = definition;
 
-		super(tileSheet, sourceTileWidth, sourceTileHeight);
+		super(sourceTileWidth, sourceTileHeight);
+    this.image = tileSheet;
 	}
 
 	/**
