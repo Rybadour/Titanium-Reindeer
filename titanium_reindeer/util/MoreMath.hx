@@ -92,4 +92,14 @@ class MoreMath
 			return str.substr(0, str.length-prec) + '.'+str.substr(str.length-prec);
 		}
 	}
+
+    public static inline function isEven(n:Float)
+    {
+        return n % 2 == 0;
+    }
+
+    public static inline function isOdd(n:Float)
+    {
+        return n % 2 == 1;
+    }
 }
