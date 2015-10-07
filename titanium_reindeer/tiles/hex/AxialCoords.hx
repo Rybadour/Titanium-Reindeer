@@ -15,9 +15,33 @@ typedef AxialCoords = {
     var r:Int;
 }
 
-class AxialCoordsUtil
+class AxialCoords
 {
-    public static function getCenterFromAxialCoords(x:Int, y:Int, z:Int, edgeLength:Float, isFlatTopped:Bool = true):Vector2
+    public var q:Int;
+    public var r:Int;
+
+    public function new(q:Int, r:Int)
+    {
+    }
+
+    public function add(b:CubeCoords):CubeCoords
+    {
+        // TODO
+    }
+
+    public function addTo(b:CubeCoords):Void
+    {
+    }
+
+    public function subtract(b:CubeCoords):CubeCoords
+    {
+    }
+
+    public function subtractFrom(b:CubeCoords):Void
+    {
+    }
+
+    public static function getCenter(layout:HexLayout):Vector2
     {
     }
 

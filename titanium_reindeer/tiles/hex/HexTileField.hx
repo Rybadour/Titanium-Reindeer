@@ -7,32 +7,22 @@ import titanium_reindeer.spatial.Vector2;
  */
 class HexTileField
 {
-    public var hexTileConfig:HexTileConfig;
+    public var hexLayout:HexLayout;
 
-    public function new(hexTileConfig:HexTileConfig)
+    public function new(layout:HexLayout)
     {
-        this.hexTileConfig = hexTileConfig;
+        this.hexLayout = hexLayout;
     }
 
-    public function getTileCentersInsideRectangle(x:Int, y:Int, width:Int, height:Int):Array<Vector2>
+    public function renderRectRegionOfField(x:Int, y:Int, width:Int, height:Int):Array<Vector2>
     {
-        var tileWidth = this.hexTileConfig.getWidth();
-        var tileHeight = this.hexTileConfig.getHeight();
+        var tileWidth = this.hexLayout.getWidth();
+        var tileHeight = this.hexLayout.getHeight();
 
-        var horizSpacing = this.hexTileConfig.getHorizontalSpacing();
-        var vertSpacing = this.hexTileConfig.getVerticalSpacing();
+        var horizSpacing = this.hexLayout.getHorizontalSpacing();
+        var vertSpacing = this.hexLayout.getVerticalSpacing();
 
         // First find the center at the farthest top-left possible given x and y
 
     }
-
-
-    /*
-     * Current Plan:
-     *  - Special function to render a field inside a rect
-     *      - To prevent having to store centers as an intermediate rep. then render duplicate edges
-     *
-     *  - What representation is actually useful for game entities on the grid?
-     *      - Probably coords
-     */
 }
