@@ -10,6 +10,15 @@ import titanium_reindeer.util.MoreMath;
  */
 class CubeCoords
 {
+    // Adjacent tile offsets. Starts east/south-east and goes clock-wise.
+    public static var directions:Array<CubeCoords> = [
+        new CubeCoords( 1,  0, -1),
+        new CubeCoords( 0,  1, -1),
+        new CubeCoords(-1,  1,  0),
+        new CubeCoords(-1,  0,  1),
+        new CubeCoords( 0, -1,  1),
+        new CubeCoords( 1, -1,  0),
+    ];
     private static var sqrt3:Float = Math.sqrt(3);
 
 
@@ -53,6 +62,11 @@ class CubeCoords
         this.z -= b.z;
     }
 
+    public function equals(b:CubeCoords):Bool
+    {
+        return (this.x == b.x && this.y == b.y && this.z == b.z);
+    }
+
     public function getCenter(layout:HexLayout):Vector2
     {
         var oneAndHalfLength = layout.edgeLength * 3/2;
@@ -70,6 +84,13 @@ class CubeCoords
         }
 
         return center;
+    }
+
+    public function getAdjacent(direction:Int):CubeCoords
+    {
+        direction %= 6;
+        var neighbour = CubeCoords.directions[direction];
+        return this.add(neighbour);
     }
 
     public static function getCubeCoordsFromPoint(p:Vector2, layout:HexLayout):CubeCoords
