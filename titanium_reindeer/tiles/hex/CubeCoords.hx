@@ -38,6 +38,11 @@ class CubeCoords
         return (this.x + this.y + this.z) == 0;
     }
 
+    public function getCopy():CubeCoords
+    {
+        return new CubeCoords(this.x, this.y, this.z);
+    }
+
     public function add(b:CubeCoords):CubeCoords
     {
         return new CubeCoords(this.x + b.x, this.y + b.y, this.z + b.z);
