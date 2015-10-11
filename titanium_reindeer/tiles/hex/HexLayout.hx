@@ -77,6 +77,11 @@ class HexLayout
         return new Vector2(centerX, centerY);
     }
 
+    public function renderHexOutlineCube(canvas:Canvas2D, cube:CubeCoords):Void
+    {
+        this.renderHexOutline(canvas, cube.getCenter(this));
+    }
+
     public function renderHexOutline(canvas:Canvas2D, center:Vector2):Void
     {
         var firstCorner = this.getHexCorner(center, 0);
