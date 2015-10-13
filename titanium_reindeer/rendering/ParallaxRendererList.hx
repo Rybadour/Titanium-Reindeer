@@ -55,7 +55,6 @@ class ParallaxRendererList<S:IRenderState, R:IRenderer> extends Renderer<S>
 				ratio = this.parallaxRatios.get(i);
 			}
 
-			// TODO: Did i fuck up? Shouldn't this be wrapped in save and restore?
 			this.rule(i, layer, this.offset.getExtend(ratio), canvas);
 			layer.render(canvas);
 
