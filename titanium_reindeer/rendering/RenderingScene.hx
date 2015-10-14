@@ -22,6 +22,7 @@ class RenderingScene extends Scene
 	{
 		super.postUpdate(msTimeStep);
 
+        this.canvas.clear();
 		this._render(this.canvas);
 	}
 	
