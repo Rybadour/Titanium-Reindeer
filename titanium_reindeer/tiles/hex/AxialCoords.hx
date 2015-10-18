@@ -9,12 +9,6 @@ import titanium_reindeer.util.MoreMath;
  * There are no invalid coordinates and "up" / "down" are across egdes instead of "up" and "down" in
  * the world.
  */
-
-typedef AxialCoords = {
-    var q:Int;
-    var r:Int;
-}
-
 class AxialCoords
 {
     public var q:Int;
@@ -22,34 +16,52 @@ class AxialCoords
 
     public function new(q:Int, r:Int)
     {
+        this.q = q;
+        this.r = r;
     }
 
-    public function add(b:CubeCoords):CubeCoords
+    public function add(b:AxialCoords):AxialCoords
+    {
+        return new AxialCoords(this.q + b.q, this.r + b.r);
+    }
+
+    public function addTo(b:AxialCoords):Void
+    {
+        this.q += b.q;
+        this.r += b.r;
+    }
+
+    public function subtract(b:AxialCoords):AxialCoords
+    {
+        return new AxialCoords(this.q - b.q, this.r - b.r);
+    }
+
+    public function subtractFrom(b:AxialCoords):Void
+    {
+        this.q -= b.q;
+        this.r -= b.r;
+    }
+
+    public function getCenter(layout:HexLayout):Vector2
     {
         // TODO
+        return new Vector2(0, 0);
     }
 
-    public function addTo(b:CubeCoords):Void
+    public function getCubeCoords():CubeCoords
     {
-    }
-
-    public function subtract(b:CubeCoords):CubeCoords
-    {
-    }
-
-    public function subtractFrom(b:CubeCoords):Void
-    {
-    }
-
-    public static function getCenter(layout:HexLayout):Vector2
-    {
+        return new CubeCoords(q, -q + -r, r);
     }
 
     public static function getAxialCoordsFromCenter(center:Vector2, edgeLength:Float, isFlatTopped:Bool = true):AxialCoords
     {
+        // TODO
+        return new AxialCoords(0, 0);
     }
 
-    public static function roundAxialCoords(x:Float, y:Float, z:Float):CubeCoords
+    public static function roundAxialCoords(q:Float, r:Float):AxialCoords
     {
+        // TODO
+        return new AxialCoords(0, 0);
     }
 }

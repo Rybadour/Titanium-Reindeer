@@ -98,6 +98,11 @@ class CubeCoords
         return this.add(neighbour);
     }
 
+    public function getAxialCoords():AxialCoords
+    {
+        return new AxialCoords(x, z);
+    }
+
     public static function getCubeCoordsFromPoint(p:Vector2, layout:HexLayout):CubeCoords
     {
         var x:Float = 0;
