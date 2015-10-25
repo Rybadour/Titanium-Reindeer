@@ -9,6 +9,17 @@ class HexLayout
     public static var HEX_EDGE_RADIANS:Float = Math.PI/3;
     public static var OFF_SPACING_RATIO:Float = Math.sqrt(3) / 2;
 
+    public static function rotateLeft(starting:Int, amount:Int):Int
+    {
+        starting += amount;
+        return starting % 6;
+    }
+
+    public static function rotateRight(starting:Int, amount:Int):Int
+    {
+        return HexLayout.rotateLeft(starting, -amount);
+    }
+
 
     public var edgeLength:Float;
     public var isFlatTopped:Bool;

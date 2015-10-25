@@ -11,13 +11,14 @@ import titanium_reindeer.util.MoreMath;
 class CubeCoords
 {
     // Adjacent tile offsets. Starts east/south-east and goes clock-wise.
+    // Coords follow top-down y axis
     public static var directions:Array<CubeCoords> = [
-        new CubeCoords( 1,  0, -1),
-        new CubeCoords( 0,  1, -1),
-        new CubeCoords(-1,  1,  0),
-        new CubeCoords(-1,  0,  1),
-        new CubeCoords( 0, -1,  1),
         new CubeCoords( 1, -1,  0),
+        new CubeCoords( 0, -1,  1),
+        new CubeCoords(-1,  0,  1),
+        new CubeCoords(-1,  1,  0),
+        new CubeCoords( 0,  1, -1),
+        new CubeCoords( 1,  0, -1),
     ];
     private static var sqrt3:Float = Math.sqrt(3);
 
@@ -45,14 +46,16 @@ class CubeCoords
 
     public function add(b:CubeCoords):CubeCoords
     {
-        return new CubeCoords(this.x + b.x, this.y + b.y, this.z + b.z);
+        var result = this.getCopy();
+        result.addTo(b);
+        return result;
     }
 
     public function addTo(b:CubeCoords):Void
     {
-        this.x += b.x;
-        this.y += b.y;
-        this.z += b.z;
+            this.x += b.x;
+            this.y += b.y;
+            this.z += b.z;
     }
 
     public function subtract(b:CubeCoords):CubeCoords
@@ -98,9 +101,51 @@ class CubeCoords
         return this.add(neighbour);
     }
 
+    public function rotateLeft(amount:Int):Void
+    {
+        amount %= 6;
+        for (i in 0...amount)
+        {
+            var x = -this.y;
+            var y = -this.z;
+            var z = -this.x;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+    }
+
+    public function rotateRight(amount:Int):Void
+    {
+        amount %= 6;
+        for (i in 0...amount)
+        {
+            var x = -this.z;
+            var y = -this.x;
+            var z = -this.y;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+    }
+
     public function getAxialCoords():AxialCoords
     {
         return new AxialCoords(x, z);
+    }
+
+    public static function rotateLeftAboutTarget(coords:CubeCoords, target:CubeCoords, amount:Int):CubeCoords
+    {
+        var relative = coords.subtract(target);
+        relative.rotateLeft(amount);
+        return target.add(relative);
+    }
+
+    public static function rotateRightAboutTarget(coords:CubeCoords, target:CubeCoords, amount:Int):CubeCoords
+    {
+        var relative = coords.subtract(target);
+        relative.rotateRight(amount);
+        return target.add(relative);
     }
 
     public static function getCubeCoordsFromPoint(p:Vector2, layout:HexLayout):CubeCoords
