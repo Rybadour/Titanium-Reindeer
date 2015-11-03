@@ -72,6 +72,8 @@ class CubeCoords
 
     public function equals(b:CubeCoords):Bool
     {
+        if (b == null)
+            return false;
         return (this.x == b.x && this.y == b.y && this.z == b.z);
     }
 

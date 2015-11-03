@@ -12,7 +12,10 @@ class HexLayout
     public static function rotateLeft(starting:Int, amount:Int):Int
     {
         starting += amount;
-        return starting % 6;
+        starting %= 6;
+        if (starting < 0)
+            starting += 6;
+        return starting;
     }
 
     public static function rotateRight(starting:Int, amount:Int):Int
