@@ -106,7 +106,7 @@ class InputState
 		if (firefoxReg.match(js.Browser.window.navigator.userAgent))
 			js.Browser.document.addEventListener("DOMMouseScroll", wheelFunc, true);
 		else
-			js.Browser.document.onmousewheel = wheelFunc;
+			js.Browser.document.onwheel = wheelFunc;
 
 		js.Browser.document.onkeydown = function(event) { return me.recordEvent(InputEvent.KeyDown, event); };
 		js.Browser.document.onkeyup = function(event) { return me.recordEvent(InputEvent.KeyUp, event); };
