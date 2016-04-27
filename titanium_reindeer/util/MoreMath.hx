@@ -73,24 +73,24 @@ class MoreMath
 		return a + (b - a)/2;
 	}
 
-	public static function floatToStringPrecision(n:Float, prec:Int)
+	public static function floatToStringPrecision(n:Float, prec:Int):String
 	{
-		n = Math.round(n * Math.pow(10, prec));
-		var str = ''+n;
-		var len = str.length;
-		if (len <= prec)
+		var up = Math.pow(10, -prec);
+		var down = Math.pow(10, prec);
+		var str = "" + Math.round(n * up) * down;
+		if (str.indexOf(".") != -1)
 		{
-			while (len < prec)
+			var parts = str.split(".");
+			if (prec > 0)
+				str = parts[0];
+			else
 			{
-				str = '0'+str;
-				len++;
+				if (parts[1].length > -prec)
+					parts[1] = parts[1].substr(0, -prec);
+				str = parts.join(".");
 			}
-			return '0.'+str;
 		}
-		else
-		{
-			return str.substr(0, str.length-prec) + '.'+str.substr(str.length-prec);
-		}
+		return str;
 	}
 
     public static inline function isEven(n:Float)
