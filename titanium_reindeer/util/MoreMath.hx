@@ -44,6 +44,30 @@ class MoreMath
 		return Std.random(x*2) - x;
 	}
 
+	public static function randomBetween(a:Int, b:Int):Int
+	{
+		if (a > b)
+		{
+			var swap = b;
+			b = a;
+			a = swap;
+		}
+
+		return a + Std.random(b - a);
+	}
+
+	public static function randomBetweenf(a:Float, b:Float):Float
+	{
+		if (a > b)
+		{
+			var swap = b;
+			b = a;
+			a = swap;
+		}
+
+		return a + Math.random() * (b - a);
+	}
+
 	/**
 	 * Returns the sign of the number, either -1 for negative or 1 for positive.
 	 */
