@@ -1,5 +1,7 @@
 package titanium_reindeer.spatial;
 
+import titanium_reindeer.util.MoreMath;
+
 // A series of static methods for common geometric calculations
 class Geometry
 {
@@ -90,6 +92,17 @@ class Geometry
 			diff = -(diff - Math.PI*2);
 
 		return bounds >= diff;
+	}
+
+	public static function isAngleWithinPair(start:Float, end:Float, target:Float):Bool
+	{
+		var dist = Geometry.distanceBetweenAngles(start, end);
+		return Geometry.isAngleWithin(start + dist/2, target, dist);
+	}
+
+	public static function distanceBetweenAngles(a:Float, b:Float):Float
+	{
+		return MoreMath.unsignedModulo((b - a + Math.PI), (Math.PI*2)) - Math.PI;
 	}
 
 	public static function closestAngle(rad:Float, comparisons:Array<Float>):Float
