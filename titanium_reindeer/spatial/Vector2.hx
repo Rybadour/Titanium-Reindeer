@@ -140,30 +140,57 @@ class Vector2
 		return rads;
 	}
 	
-	public function add(b:Vector2)
+	public function add(b:Vector2):Vector2
 	{
 		if (b == null)
 			return this.getCopy();
 
-		return new Vector2(this.x + b.x, this.y + b.y);
+		return this.addf(b.x, b.y);
 	}
-	public function addTo(b:Vector2)
+	public function addTo(b:Vector2):Vector2
 	{
-		this.x += b.x;
-		this.y += b.y;
+		if (b == null)
+			return this;
 
+		return this.addTof(b.x, b.y);
+	}
+
+	public function addf(x:Float, y:Float):Vector2
+	{
+		return new Vector2(this.x + x, this.y + y);
+	}
+
+	public function addTof(x:Float, y:Float):Vector2
+	{
+		this.x += x;
+		this.y += y;
 		return this;
 	}
 	
 	public function subtract(b:Vector2)
 	{
-		return new Vector2(this.x - b.x, this.y - b.y);
+		if (b == null)
+			return this.getCopy();
+
+		return this.subtractf(b.x, b.y);
 	}
+
 	public function subtractFrom(b:Vector2)
 	{
-		this.x -= b.x;
-		this.y -= b.y;
+		if (b == null)
+			return this;
+		return this.subtractFromf(b.x, b.y);
+	}
+	
+	public function subtractf(x:Float, y:Float)
+	{
+		return new Vector2(this.x - x, this.y - y);
+	}
 
+	public function subtractFromf(x:Float, y:Float)
+	{
+		this.x -= x;
+		this.y -= y;
 		return this;
 	}
 
