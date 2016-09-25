@@ -13,16 +13,23 @@ along with Titanium-Reindeer.  If not, see <http://www.gnu.org/licenses/>.
 
 Developed by: Ryan Badour
 
+Titanium-Reindeer is a collection of utilities for making video games.
+Everything is written in Haxe and most of the rendering and asset code assumes
+the game is running in a web browser. The remaining code can be used
+independently and so can be useful in any of the languages Haxe supports.
 
-Titanium-Reindeer is a web based game engine written for Javascript using
-Haxe. The current target for rendering is the canvas tag of HTML 5.
-
-To compile the haxe code, run the compile.hxml for the particular project
-and it will attempt to compile the Haxe code and create/modify a specified
-javascript file.
-
-To run the game you've compiled open an html page with the required tag
-marked with the id specified in your game. For most examples this html file
-is already provided. You should be able to open the file in your browser
-and it will work. Ensure you are using Chrome, Firefox 4+, Internet
-Explorer 9+ or Opera 10+ for full compatibility.
+Currently supported features are:
+ - Game loop
+ - Input management
+ - Basic shape and image rendering
+ - Basic 2D non-rotated collision detection
+ - Collision R-Tree data structure for effiecent AABB lookups
+ - Dozens of helpful functions for operating on 2D geometry and rotations
+ - Tiling abstractions
+ - Hexagonal tiling
+ - Support for loading TMX files (Tiled editor files)
+ - Asset loading
+ - Basic Image Atlas
+ - Pathfinding
+ - Basic UI elements
+ - Basic sprite/animation
