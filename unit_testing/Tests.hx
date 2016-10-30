@@ -18,6 +18,7 @@ class Tests
 		tests.add(new RectRegionTests());
 		tests.add(new RTreePartitionTests());
 		tests.add(new RegionPartitionTests());
+		tests.add(new GeometryTests());
 
 		// Rendering
 

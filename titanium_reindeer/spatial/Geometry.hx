@@ -5,17 +5,26 @@ import titanium_reindeer.util.MoreMath;
 // A series of static methods for common geometric calculations
 class Geometry
 {
+	/**
+	 * Returns true if a and b intersect at all. Assumes Axis aligned (AABB) rects.
+	 */
 	public static function isRectIntersectingRect(a:RectRegion, b:RectRegion):Bool
 	{
 		return (a.right >= b.left) && (a.left <= b.right) &&
 			   (a.bottom >= b.top) && (a.top <= b.bottom);
 	}
 
+	/**
+	 * Returns true if a and b intersect at all
+	 */
 	public static function isCircleIntersectingCircle(a:CircleRegion, b:CircleRegion):Bool
 	{
 		return a.radius + b.radius > Vector2.getDistance(a.center, b.center);
 	}
 
+	/**
+	 * Returns true if a is wholly inside b.
+	 */
 	public static function isCircleInsideCircle(a:CircleRegion, b:CircleRegion):Bool
 	{
 		var dist = Vector2.getDistance(a.center, b.center);	
@@ -52,14 +61,13 @@ class Geometry
 		if ( (a.right >= b.left) && (a.left <= b.right) && (a.bottom >= b.top) && (a.top <= b.bottom) )
 		{
 			var left:Float = Math.max(a.left, b.left);
+			var right:Float = Math.min(a.right, b.right);
 			var top:Float = Math.max(a.top, b.top); 
+			var bottom = Math.min(a.bottom, b.bottom);
 			return new RectRegion(
-				left, 
-				top, 
-				new Vector2(
-					Math.min(a.right, b.right) - left, 
-					Math.min(a.bottom, b.bottom) - top
-				)
+				(right - left), 
+				(bottom - top), 
+				new Vector2(left, top)
 			);
 		}
 		else
@@ -97,12 +105,12 @@ class Geometry
 	public static function isAngleWithinPair(start:Float, end:Float, target:Float):Bool
 	{
 		var dist = Geometry.distanceBetweenAngles(start, end);
-		return Geometry.isAngleWithin(start + dist/2, target, dist);
+		return Geometry.isAngleWithin(start + dist/2, target, dist/2);
 	}
 
 	public static function distanceBetweenAngles(a:Float, b:Float):Float
 	{
-		return MoreMath.unsignedModulo((b - a + Math.PI), (Math.PI*2)) - Math.PI;
+		return Math.abs(MoreMath.unsignedModulo((b - a + Math.PI), (Math.PI*2)) - Math.PI);
 	}
 
 	public static function closestAngle(rad:Float, comparisons:Array<Float>):Float
@@ -132,6 +140,17 @@ class Geometry
 		}
 
 		return closestComparison;
+	}
+
+	/**
+	 * Returns true if b is within 180 of a going counter-clockwise.
+	 */
+	public static function isAngleToTheRight(a:Float, b:Float):Bool
+	{
+		a = MoreMath.unsignedModulo(a, Math.PI*2);
+		b = MoreMath.unsignedModulo(b, Math.PI*2);
+		var bRelative = MoreMath.unsignedModulo(b - a, Math.PI*2);
+		return (bRelative < Math.PI);
 	}
 
 	/**
