@@ -46,17 +46,27 @@ class CubeCoords
 
     public function add(b:CubeCoords):CubeCoords
     {
-        var result = this.getCopy();
-        result.addTo(b);
-        return result;
+		return this.addf(b.x, b.y, b.z);
     }
+
+	public function addf(x:Int, y:Int, z:Int):CubeCoords
+	{
+        var result = this.getCopy();
+        result.addTof(x, y, z);
+        return result;
+	}
 
     public function addTo(b:CubeCoords):Void
     {
-            this.x += b.x;
-            this.y += b.y;
-            this.z += b.z;
+		this.addTof(b.x, b.y, b.z);
     }
+
+	public function addTof(x:Int, y:Int, z:Int):Void
+	{
+		this.x += x;
+		this.y += y;
+		this.z += z;
+	}
 
     public function subtract(b:CubeCoords):CubeCoords
     {
