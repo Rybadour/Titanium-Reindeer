@@ -11,6 +11,16 @@ import titanium_reindeer.util.MoreMath;
  */
 class AxialCoords
 {
+	// List of directions going counter clockwise to match degrees around a circle.
+    public static var directions:Array<AxialCoords> = [
+        new AxialCoords( 1, -1),
+		new AxialCoords( 0, -1),
+		new AxialCoords(-1,  0),
+		new AxialCoords(-1,  1),
+		new AxialCoords( 0,  1),
+		new AxialCoords( 1,  0),
+    ];
+
     public var q:Int;
     public var r:Int;
 
@@ -46,6 +56,13 @@ class AxialCoords
     {
         // TODO
         return new Vector2(0, 0);
+    }
+
+    public function getAdjacent(direction:Int):AxialCoords
+    {
+        direction %= 6;
+        var neighbour = AxialCoords.directions[direction];
+        return this.add(neighbour);
     }
 
     public function getCubeCoords():CubeCoords

@@ -35,6 +35,11 @@ class HexLayout
         this.isOddInset = isOddInset;
     }
 
+	public function getDirectionRadians(i:Int):Float
+	{
+		return (HEX_EDGE_RADIANS * i) + (this.isFlatTopped ? HEX_EDGE_RADIANS / 2 : 0);
+	}
+
     public function getHexCorner(center:Vector2, i:Int):Vector2
     {
         var angle:Float = HEX_EDGE_RADIANS * i;

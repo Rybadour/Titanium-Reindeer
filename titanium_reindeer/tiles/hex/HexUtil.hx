@@ -21,4 +21,13 @@ class HexUtil
 
 		return results;
 	}
+	
+	/**
+	 * Returns the opposite direction index. A valid direction is between 0 and 5 inclusive.
+	 */
+	public static function getOppositeDirection(direction:Int):Int
+	{
+		direction += 3;
+		return direction % 6;
+	}
 }
