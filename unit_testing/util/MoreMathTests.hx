@@ -73,4 +73,53 @@ class MoreMathTests extends haxe.unit.TestCase
 		assertEquals(-0.75, MoreMath.between(-1, -0.5));
 		assertEquals(0.0,   MoreMath.between(-100, 100));
 	}
+
+	public function testFloatToStringPrecision()
+	{
+		assertEquals("5.24", MoreMath.floatToStringPrecision(5.2393, -2));
+		assertEquals("5.5", MoreMath.floatToStringPrecision(5.5, -1));
+		assertEquals("5", MoreMath.floatToStringPrecision(5, -1));
+		assertEquals("10", MoreMath.floatToStringPrecision(5.5, 1));
+		assertEquals("0", MoreMath.floatToStringPrecision(5.5, 2));
+		assertEquals("141000", MoreMath.floatToStringPrecision(141392.2, 3));
+		assertEquals("141000", MoreMath.floatToStringPrecision(141392.2, 3));
+	}
+	
+	public function testIsEven()
+	{
+		assertTrue(MoreMath.isEven(2));
+		assertTrue(MoreMath.isEven(-22));
+		assertTrue(MoreMath.isEven(0));
+		assertTrue(MoreMath.isEven(12));
+		assertTrue(MoreMath.isEven(1357902));
+		assertFalse(MoreMath.isEven(1));
+		assertFalse(MoreMath.isEven(3));
+		assertFalse(MoreMath.isEven(-11));
+		assertFalse(MoreMath.isEven(23));
+	}
+
+	public function testIsOdd()
+	{
+		assertTrue(MoreMath.isOdd(1));
+		assertTrue(MoreMath.isOdd(3));
+		assertTrue(MoreMath.isOdd(-11));
+		assertTrue(MoreMath.isOdd(23));
+		assertFalse(MoreMath.isOdd(2));
+		assertFalse(MoreMath.isOdd(-22));
+		assertFalse(MoreMath.isOdd(0));
+		assertFalse(MoreMath.isOdd(12));
+		assertFalse(MoreMath.isOdd(1357902));
+	}
+
+	public function testUnsignedModulo()
+	{
+		assertEquals(0.0, MoreMath.unsignedModulo(10, -10));
+		assertEquals(5.0, MoreMath.unsignedModulo(-4, 9));
+		assertTrue(TestUtilities.floatApproxEquals(4.2, MoreMath.unsignedModulo(14.2, 5)));
+		assertTrue(TestUtilities.floatApproxEquals(4.2, MoreMath.unsignedModulo(-5.8, 10)));
+
+		// TODO: I'm not sure if negative is expected or not, we can't enforce
+		// unsgined with Haxe
+		assertEquals(-5.8, MoreMath.unsignedModulo(-5.8, -10));
+	}
 }

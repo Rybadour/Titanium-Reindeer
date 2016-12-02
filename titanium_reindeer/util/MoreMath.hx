@@ -99,8 +99,8 @@ class MoreMath
 
 	public static function floatToStringPrecision(n:Float, prec:Int):String
 	{
-		var down = Math.pow(10, -prec);
-		var up = Math.pow(10, prec);
+		var up = Math.pow(10, -prec);
+		var down = Math.pow(10, prec);
 		var str = "" + Math.round(n * up) * down;
 		if (str.indexOf(".") != -1)
 		{
@@ -124,7 +124,7 @@ class MoreMath
 
     public static inline function isOdd(n:Float)
     {
-        return n % 2 == 1;
+        return Math.abs(n % 2) == 1;
     }
 
 	public static inline function unsignedModulo(a:Float, b:Float):Float
