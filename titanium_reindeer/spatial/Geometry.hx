@@ -317,4 +317,16 @@ class Geometry
 			return a.add(aToB).getExtend(aToClosestDist);
 		}
 	}
+
+	public static function isCircleIntersectingRotatedRectangle(cPos:Vector2, cRad:Float, rTopLeft:Vector2, rWidth:Float, rHeight:Float, rRad:Float):Bool
+	{
+		var circle:CircleRegion = new CircleRegion(cRad, cPos);
+		var rect:RectRegion = new RectRegion(rWidth, rHeight, new Vector2(0, 0));
+	
+		// Normalize the circle to the orientation of the rotated rect.
+		circle.center.subtractFrom(rTopLeft);
+		circle.center.rotate(-rRad);
+
+		return Geometry.isCircleIntersectingRect(circle, rect);
+	}
 }
