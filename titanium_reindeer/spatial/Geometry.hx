@@ -314,7 +314,8 @@ class Geometry
 		}
 		else
 		{
-			return a.add(aToB).getExtend(aToClosestDist);
+			aToB.extend(aToClosestDist);
+			return a.add(aToB);
 		}
 	}
 
