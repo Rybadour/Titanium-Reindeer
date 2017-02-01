@@ -136,4 +136,29 @@ class Utility
 		}
 		return label;
 	}
+
+	/**
+	 * Returns an array of arrays for each matcher function passed. Matchers are ran in order and the
+	 * first true result assigns that item to that bucket. All non-matching items are discarded.
+	 */
+	public static function splitArray<T>(arr:Array<T>, matchers:Array<T -> Bool>):Array<Array<T>>
+	{
+		var results:Array<Array<T>> = [];
+		for (i in 0...matchers.length)
+			results.push([]);
+
+		for (item in arr)
+		{
+			for (i in 0...matchers.length)
+			{
+				if (matchers[i](item))
+				{
+					results[i].push(item);
+					break;
+				}
+			}
+		}
+
+		return results;
+	}
 }
