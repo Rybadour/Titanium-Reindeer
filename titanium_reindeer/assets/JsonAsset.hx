@@ -14,7 +14,7 @@ class JsonAsset extends HttpAsset
 		super(url, HttpAssetType.Json);
 	}
 
-	private override function _onLoad(event)
+	private override function _onLoad(event:Dynamic):Void
 	{
 		super._onLoad(event);
 
