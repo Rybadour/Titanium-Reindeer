@@ -42,9 +42,8 @@ class TileTerrainAtlas extends UniformTextureAtlas
 
 	public function new(tileWidth:Int, tileHeight:Int, baseRendering:Canvas2D -> Void, edgeRenderings:Array<Canvas2D -> Void>)
 	{
-		// 8 is derived from the 8 possible adjacent tiles
 		super(tileWidth, tileHeight);
-    this.createCanvas(tileWidth * this.getNumPermutations(), tileHeight);
+		this.createCanvas(tileWidth * this.getNumPermutations(), tileHeight);
 
 		this.allGenerated = false;
 		this.generated = new Map();
@@ -55,6 +54,7 @@ class TileTerrainAtlas extends UniformTextureAtlas
 
 	public function getNumPermutations():Int
 	{
+		// 8 is derived from the 8 possible adjacent tiles
 		return Math.floor(Math.pow(2, 8));
 	}
 
