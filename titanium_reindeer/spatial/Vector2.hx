@@ -19,9 +19,9 @@ class Vector2
 		return outgoing;
 	}
 
-	public static function fromAngle(rad:Float):Vector2
+	public static function fromAngle(rad:Float, ?length:Float = 1):Vector2
 	{
-		var v:Vector2 = new Vector2(1, 0);
+		var v:Vector2 = new Vector2(length, 0);
 		v.rotate(rad);
 		return v;
 	}
