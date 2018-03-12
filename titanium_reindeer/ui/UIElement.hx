@@ -13,12 +13,12 @@ class UIElement implements IRenderer
 	public var width(default, null):Int;
 	public var height(default, null):Int;
 
-	public function new()
+	public function new(position:Vector2, width:Int = 0, height:Int = 0, alignment)
 	{
-		this.position = new Vector2(0, 0);
-		this.width = 0;
-		this.height = 0;
-		this.alignment = new UIAlignment(UIAlignX.Left, UIAlignY.Top);
+		this.position = (position == null ? new Vector2(0, 0) : position);
+		this.width = width;
+		this.height = height;
+		this.alignment = (alignment == null ? new UIAlignment(UIAlignX.Left, UIAlignY.Top) : alignment);
 	}
 
 	public function render(canvas:Canvas2D):Void
