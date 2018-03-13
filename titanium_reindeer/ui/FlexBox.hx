@@ -1,19 +1,21 @@
 package titanium_reindeer.ui;
 
+typedef FlexChild = {
+	var element:UIElement;
+	var margin:UIMargin;
+}
+
 class FlexBox extends UIElement
 {
-	public function new(position:Vector2, children:Array<>)
+	public function new(width:Int, height:Int, children:Array<FlexChild>, direction:FlexDirection, wrap:FlexWrap)
 	{
-		super(position, this.getWidth(), this.getHeight()
+		super(width, height);
+
+		this.children = children;
 	}
 
-	public function getWidth():Int
+	private override function _render(canvas:Canvas2D):Void
 	{
-		return (this.numColumns * this.cellWidth) + (cellMargin * (this.numColumns-1));
 	}
 
-	public function getHeight():Int
-	{
-		return (this.numRows * this.cellHeight) + (cellMargin * (this.numRows-1));
-	}
 }
