@@ -57,12 +57,12 @@ class FlexBox extends UIElement
 				x += this.getChildWidth(child);
 				if (x > this.width)
 				{
-					x = 0;
+					x = this.getChildWidth(child);
 					y += biggestHeight;
 					biggestHeight = 0;
 					canvas.restore();
 					canvas.save();
-					canvas.translatef(x, y);
+					canvas.translatef(0, y);
 				}
 				var height = this.getChildHeight(child);
 				if (biggestHeight < height)
@@ -93,10 +93,10 @@ class FlexBox extends UIElement
 				{
 					y += biggestHeight;
 					biggestHeight = 0;
-					x = this.width;
+					x = this.width - this.getChildWidth(child);
 					canvas.restore();
 					canvas.save();
-					canvas.translatef(x, y);
+					canvas.translatef(0, y);
 				}
 				var height = this.getChildHeight(child);
 				if (biggestHeight < height)
@@ -117,7 +117,6 @@ class FlexBox extends UIElement
 		var biggestWidth = 0;
 		var x = 0;
 		var y = 0;
-		canvas.translatef(x, y);
 		for (child in this.children)
 		{
 			if (this.wrap == Wrap)
@@ -126,11 +125,11 @@ class FlexBox extends UIElement
 				if (y > this.height)
 				{
 					x += biggestWidth;
+					y = this.getChildHeight(child);
 					biggestWidth = 0;
-					y = 0;
 					canvas.restore();
 					canvas.save();
-					canvas.translatef(x, y);
+					canvas.translatef(x, 0);
 				}
 				var width = this.getChildWidth(child);
 				if (biggestWidth < width)
@@ -157,11 +156,11 @@ class FlexBox extends UIElement
 				if (y < 0)
 				{
 					x += biggestWidth;
-					y = this.height;
+					y = this.height - this.getChildHeight(child);
 					biggestWidth = 0;
 					canvas.restore();
 					canvas.save();
-					canvas.translatef(x, y);
+					canvas.translatef(x, 0);
 				}
 				var width = this.getChildWidth(child);
 				if (biggestWidth < width)
