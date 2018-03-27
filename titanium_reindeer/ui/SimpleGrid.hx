@@ -47,8 +47,8 @@ class SimpleGrid extends UIElement
 		if (c >= 0 && c < this.numColumns && r >= 0 && r < this.numRows)
 		{
 			var sideMargin = this.cellMargin/2;
-			if (offsetC >= sideMargin && offsetC <= this.cellWidth - sideMargin &&
-					offsetR >= sideMargin && offsetR <= this.cellHeight - sideMargin)
+			if (offsetC >= sideMargin && offsetC <= this.cellWidth + sideMargin &&
+				offsetR >= sideMargin && offsetR <= this.cellHeight + sideMargin)
 			{
 				return c + (r * this.numColumns);
 			}
