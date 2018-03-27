@@ -161,4 +161,10 @@ class Utility
 
 		return results;
 	}
+
+	public static function randomEnum<T>(e:Enum<T>):T
+	{
+		var enums = Type.allEnums(e);
+		return enums[Std.random(enums.length)];
+	}
 }

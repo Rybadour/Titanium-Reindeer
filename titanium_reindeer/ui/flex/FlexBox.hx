@@ -7,172 +7,130 @@ typedef FlexChild = {
 	var margin:UIMargin;
 }
 
-class FlexBox extends UIElement
+class FlexBox
 {
-	public var children:Array<FlexChild>;
-	public var direction:FlexDirection;
-	public var wrap:FlexWrap;
-
-	public function new(width:Int, height:Int, children:Array<FlexChild>, direction:FlexDirection, wrap:FlexWrap)
+	public static function positionElements(width:Int, height:Int, children:Array<FlexChild>, direction:FlexDirection, wrap:FlexWrap)
 	{
-		super(width, height);
-
-		this.children = children;
-		this.direction = direction;
-		this.wrap = wrap;
-	}
-
-	private override function _render(canvas:Canvas2D):Void
-	{
-		canvas.save();
-		switch (this.direction)
+		switch (direction)
 		{
-			case Row:           this._renderRow(canvas);
-			case RowReverse:    this._renderRowReverse(canvas);
-			case Column:        this._renderColumn(canvas);
-			case ColumnReverse: this._renderColumnReverse(canvas);
+			case Row:           _row(width, height, children, wrap);
+			case RowReverse:    _rowReverse(width, height, children, wrap);
+			case Column:        _column(width, height, children, wrap);
+			case ColumnReverse: _columnReverse(width, height, children, wrap);
 		}
-		canvas.restore();
 	}
 
-	private function getChildWidth(child:FlexChild):Int
+	private static function _getChildWidth(child:FlexChild):Int
 	{
 		return child.margin.left + child.element.width + child.margin.right;
 	}
 
-	private function getChildHeight(child:FlexChild):Int
+	private static function _getChildHeight(child:FlexChild):Int
 	{
 		return child.margin.top + child.element.height + child.margin.bottom;
 	}
 
-	private function _renderRow(canvas:Canvas2D):Void
+	private static function _row(width:Int, height:Int, children:Array<FlexChild>, wrap:FlexWrap):Void
 	{
 		var biggestHeight = 0;
 		var x = 0;
 		var y = 0;
-		for (child in this.children)
+		for (child in children)
 		{
-			if (this.wrap == Wrap)
+			x += FlexBox._getChildWidth(child);
+			if (wrap == Wrap)
 			{
-				x += this.getChildWidth(child);
-				if (x > this.width)
+				if (x > width)
 				{
-					x = this.getChildWidth(child);
+					x = FlexBox._getChildWidth(child);
 					y += biggestHeight;
 					biggestHeight = 0;
-					canvas.restore();
-					canvas.save();
-					canvas.translatef(0, y);
 				}
-				var height = this.getChildHeight(child);
+				var height = FlexBox._getChildHeight(child);
 				if (biggestHeight < height)
 					biggestHeight = height;
 			}
 
-			canvas.translatef(child.margin.left, child.margin.top);
-			child.element.render(canvas);
-			canvas.translatef(
-				(child.element.width + child.margin.right),
-				-child.margin.top
-			);
+			child.element.position.x = x - child.margin.right - child.element.width;
+			child.element.position.y = y + child.margin.top;
 		}
 	}
 
-	private function _renderRowReverse(canvas:Canvas2D):Void
+	private static function _rowReverse(width:Int, height:Int, children:Array<FlexChild>, wrap:FlexWrap):Void
 	{
 		var biggestHeight = 0;
-		var x = this.width;
+		var x = width;
 		var y = 0;
-		canvas.translatef(x, y);
-		for (child in this.children)
+		for (child in children)
 		{
-			if (this.wrap == Wrap)
+			x -= FlexBox._getChildWidth(child);
+			if (wrap == Wrap)
 			{
-				x -= this.getChildWidth(child);
 				if (x < 0)
 				{
 					y += biggestHeight;
 					biggestHeight = 0;
-					x = this.width - this.getChildWidth(child);
-					canvas.restore();
-					canvas.save();
-					canvas.translatef(0, y);
+					x = width - FlexBox._getChildWidth(child);
 				}
-				var height = this.getChildHeight(child);
+				var height = FlexBox._getChildHeight(child);
 				if (biggestHeight < height)
 					biggestHeight = height;
 			}
 
-			canvas.translatef(
-				-(child.margin.right + child.element.width),
-				child.margin.top
-			);
-			child.element.render(canvas);
-			canvas.translatef(-child.margin.left, -child.margin.top);
+			child.element.position.x = x + child.margin.left;
+			child.element.position.y = y + child.margin.top;
 		}
 	}
 
-	private function _renderColumn(canvas:Canvas2D):Void
+	private static function _column(width:Int, height:Int, children:Array<FlexChild>, wrap:FlexWrap):Void
 	{
 		var biggestWidth = 0;
 		var x = 0;
 		var y = 0;
-		for (child in this.children)
+		for (child in children)
 		{
-			if (this.wrap == Wrap)
+			y += FlexBox._getChildHeight(child);
+			if (wrap == Wrap)
 			{
-				y += this.getChildHeight(child);
-				if (y > this.height)
+				if (y > height)
 				{
 					x += biggestWidth;
-					y = this.getChildHeight(child);
+					y = FlexBox._getChildHeight(child);
 					biggestWidth = 0;
-					canvas.restore();
-					canvas.save();
-					canvas.translatef(x, 0);
 				}
-				var width = this.getChildWidth(child);
+				var width = FlexBox._getChildWidth(child);
 				if (biggestWidth < width)
 					biggestWidth = width;
 			}
 
-			canvas.translatef(child.margin.right, child.margin.top);
-			child.element.render(canvas);
-			canvas.translatef(-child.margin.right, child.element.height + child.margin.bottom);
+			child.element.position.x = x + child.margin.left;
+			child.element.position.y = y - child.margin.bottom - child.element.height;
 		}
 	}
 
-	private function _renderColumnReverse(canvas:Canvas2D):Void
+	private static function _columnReverse(width:Int, height:Int, children:Array<FlexChild>, wrap:FlexWrap):Void
 	{
 		var biggestWidth = 0;
 		var x = 0;
-		var y = this.height;
-		canvas.translatef(x, y);
-		for (child in this.children)
+		var y = height;
+		for (child in children)
 		{
-			if (this.wrap == Wrap)
+			y -= FlexBox._getChildHeight(child);
+			if (wrap == Wrap)
 			{
-				y -= this.getChildHeight(child);
 				if (y < 0)
 				{
 					x += biggestWidth;
-					y = this.height - this.getChildHeight(child);
+					y = height - FlexBox._getChildHeight(child);
 					biggestWidth = 0;
-					canvas.restore();
-					canvas.save();
-					canvas.translatef(x, 0);
 				}
-				var width = this.getChildWidth(child);
+				var width = FlexBox._getChildWidth(child);
 				if (biggestWidth < width)
 					biggestWidth = width;
 			}
 
-			canvas.translatef(
-				child.margin.right,
-				-(child.margin.top + child.element.height)
-			);
-			child.element.render(canvas);
-			canvas.translatef(-child.margin.right, -child.margin.bottom);
+			child.element.position.x = x + child.margin.left;
+			child.element.position.y = y + child.margin.top;
 		}
 	}
 
