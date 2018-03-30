@@ -48,7 +48,7 @@ class Canvas2D implements IRenderer
 		this.width = width;
 		this.height = height;
 
-		this.ctx = this.canvas.getContext2d();
+		this.ctx = this.canvas.getContext2d({alpha: false});
 	}
 
 	public function appendToDom(element:Element)
@@ -138,6 +138,12 @@ class Canvas2D implements IRenderer
 	public inline function renderRect(rect:Rect)
 	{
 		this.renderRectf(rect.width, rect.height);
+	}
+
+	public inline function renderRectRegion(rect:RectRegion)
+	{
+		this.translate(rect.position);
+		this.renderRect(rect);
 	}
 
 	public function renderCirclef(radius:Float)

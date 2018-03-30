@@ -77,6 +77,11 @@ class InputState
 	public var mouseMoved(default, null):Bool;
 
 	/**
+	 * True if the left mouse button was double clicked at all since the last update.
+	 */
+	public var mouseDoubleClicked(default, null):Bool;
+
+	/**
 	 * The number of ticks of the mouse wheel since the last update.
 	 */
 	public var mouseWheelTicks(default, null):Int;
@@ -98,6 +103,7 @@ class InputState
 		this.targetElement.onmousedown = function(event) { return me.recordEvent(InputEvent.MouseDown, event); };
 		this.targetElement.onmouseup = function(event) { return me.recordEvent(InputEvent.MouseUp, event); };
 		this.targetElement.onmousemove = function(event) { return me.recordEvent(InputEvent.MouseMove, event); };
+		this.targetElement.ondblclick = function(event) { return me.recordEvent(InputEvent.DoubleClick, event); };
 
 		this.targetElement.oncontextmenu = this.contextMenu;
 
@@ -134,29 +140,16 @@ class InputState
 	 */
 	private function recordEvent(type:InputEvent, event:Dynamic):Bool
 	{
-		var func:Dynamic -> Void;
-		switch (type)
+		var func:Dynamic -> Void = switch (type)
 		{
-			case MouseDown:
-				func = this.mouseDown;
-
-			case MouseUp:
-				func = this.mouseUp;
-
-			case MouseMove:
-				func = this.mouseMove;
-
-			case MouseWheel:
-				func = this.mouseWheel;
-
-			case KeyDown:
-				func = this.keyDown;
-
-			case KeyUp:
-				func = this.keyUp;
-
-			default:
-				func = null;
+			case MouseDown: this.mouseDown;
+			case MouseUp: this.mouseUp;
+			case MouseMove: this.mouseMove;
+			case DoubleClick: this.doubleClick;
+			case MouseWheel: this.mouseWheel;
+			case KeyDown: this.keyDown;
+			case KeyUp: this.keyUp;
+			default: null;
 		}
 		func(event);
 
@@ -195,6 +188,15 @@ class InputState
 	{
 		this.mousePos = this.getMousePositionFromEvent(event);
 		this.mouseMoved = true;
+	}
+
+	/**
+	 * Called whenever the left mouse button is clicked twice in short succession.
+	 */
+	private function doubleClick(event:Dynamic):Void
+	{
+		var mousePos:Vector2 = this.getMousePositionFromEvent(event);
+		this.mouseDoubleClicked = true;
 	}
 
 	// TODO: Need a way to use this function...
@@ -256,6 +258,7 @@ class InputState
 		this.keysPressed = new Map();
 		this.mouseMoved = false;
 		this.mouseWheelTicks = 0;
+		this.mouseDoubleClicked = false;
 	}
 
 	/**
@@ -280,6 +283,14 @@ class InputState
 	public function wasMouseButtonPressed(mouseButton:MouseButton):Bool
 	{
 		return this.mouseButtonsPressed.exists(mouseButton);
+	}
+
+	/**
+	 * Returns true if the left mouse button was double clicked since the last refresh.
+	 */
+	public function wasMouseDoubleClicked():Bool
+	{
+		return this.mouseDoubleClicked;
 	}
 
 	/**

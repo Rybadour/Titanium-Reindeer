@@ -54,7 +54,7 @@ class UniformTextureAtlas implements ITextureAtlas
 		if (widthInTiles == null)
 		{
 			var widthLeft = imageWidth;
-			var tiles = 0;
+			var tiles = 1;
 			while (widthLeft > 0) {
 				widthLeft -= this.sourceTileWidth;
 				if (widthLeft <= 0)
@@ -62,6 +62,7 @@ class UniformTextureAtlas implements ITextureAtlas
 				tiles++;
 				widthLeft -= this.tileMarginX;
 			}
+			widthInTiles = tiles;
 		}
 		// Render the part of the tile sheet that tile Id corresponds to
 		var sx = (index % widthInTiles) * (this.sourceTileWidth + this.tileMarginX) + offsetX;

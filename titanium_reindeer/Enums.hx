@@ -47,6 +47,7 @@ enum InputEvent
 	MouseDown;
 	MouseUp;
 	MouseMove;
+	DoubleClick;
 	MouseWheel;
 	KeyUp;
 	KeyDown;
