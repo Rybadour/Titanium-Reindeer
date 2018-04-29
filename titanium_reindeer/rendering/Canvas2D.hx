@@ -68,12 +68,12 @@ class Canvas2D implements IRenderer
 
 	public function translatef(x:Float, y:Float)
 	{
-		this.ctx.translate(x, y);
+		this.ctx.translate(Math.round(x), Math.round(y));
 	}
 
 	public inline function translate(vector:Vector2)
 	{
-		this.ctx.translate(vector.x, vector.y);
+		this.translatef(vector.x, vector.y);
 	}
 
 	public inline function scale(sx:Float, ?sy:Float = null):Void
@@ -86,21 +86,31 @@ class Canvas2D implements IRenderer
 		this.ctx.rotate(r);
 	}
 
+	public inline function moveTof(x:Float, y:Float)
+	{
+		this.ctx.moveTo(Math.round(x), Math.round(y));
+	}
+
 	public inline function moveTo(vector:Vector2)
 	{
-		this.ctx.moveTo(vector.x, vector.y);
+		this.moveTof(vector.x, vector.y);
+	}
+
+	public inline function lineTof(x:Float, y:Float)
+	{
+		this.ctx.lineTo(Math.round(x), Math.round(y));
 	}
 
 	public inline function lineTo(vector:Vector2)
 	{
-		this.ctx.lineTo(vector.x, vector.y);
+		this.lineTof(vector.x, vector.y);
 	}
 
 	public inline function renderLinef(ax:Float, ay:Float, bx:Float, by:Float)
 	{
 		this.ctx.beginPath();
-		this.ctx.moveTo(ax, ay);
-		this.ctx.lineTo(bx, by);
+		this.moveTof(ax, ay);
+		this.lineTof(bx, by);
 		this.ctx.stroke();
 		this.ctx.closePath();
 	}
@@ -118,9 +128,9 @@ class Canvas2D implements IRenderer
 	public inline function renderImageCentered(image:Image, x:Int, y:Int, width:Int, height:Int, rotation:Float)
 	{
 		this.save();
-		this.ctx.translate(width/2, height/2);
+		this.translatef(width/2, height/2);
 		this.ctx.rotate(rotation);
-		this.ctx.drawImage(image, x - width/2, y - height/2, width, height);
+		this.ctx.drawImage(image, Math.round(x - width/2), Math.round(y - height/2), width, height);
 		this.restore();
 	}
 
@@ -131,6 +141,8 @@ class Canvas2D implements IRenderer
 
 	public inline function renderRectf(width:Float, height:Float)
 	{
+		width = Math.round(width);
+		height = Math.round(height);
 		this.ctx.fillRect(0, 0, width, height);
 		this.ctx.strokeRect(0, 0, width, height);
 	}
@@ -185,9 +197,9 @@ class Canvas2D implements IRenderer
 	public function clear(rect:RectRegion = null):Void
 	{
 		if (rect == null)
-			this.ctx.clearRect(0, 0, this.width, this.height);
+			this.ctx.clearRect(0, 0, Math.round(this.width), Math.round(this.height));
 		else
-			this.ctx.clearRect(rect.left, rect.top, rect.width, rect.height);
+			this.ctx.clearRect(Math.round(rect.left), Math.round(rect.top), Math.round(rect.width), Math.round(rect.height));
 	}
 
 	public function render(canvas:Canvas2D)
